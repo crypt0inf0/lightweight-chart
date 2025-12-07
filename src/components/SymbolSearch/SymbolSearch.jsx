@@ -7,10 +7,16 @@ const SymbolSearch = ({ isOpen, onClose, onSelect, addedSymbols = [], isCompareM
     const [symbols, setSymbols] = useState([]);
 
     useEffect(() => {
+        let mounted = true;
+        const abortController = new AbortController();
+
         if (isOpen && symbols.length === 0) {
-            fetch('https://api.binance.com/api/v3/exchangeInfo')
+            fetch('https://api.binance.com/api/v3/exchangeInfo', {
+                signal: abortController.signal
+            })
                 .then(res => res.json())
                 .then(data => {
+                    if (!mounted) return;
                     const pairs = data.symbols
                         .filter(s => s.status === 'TRADING')
                         .map(s => ({
@@ -20,8 +26,17 @@ const SymbolSearch = ({ isOpen, onClose, onSelect, addedSymbols = [], isCompareM
                         }));
                     setSymbols(pairs);
                 })
-                .catch(err => console.error(err));
+                .catch(err => {
+                    if (err.name !== 'AbortError') {
+                        console.error('Error fetching symbols:', err);
+                    }
+                });
         }
+
+        return () => {
+            mounted = false;
+            abortController.abort();
+        };
     }, [isOpen, symbols.length]);
 
     const filteredSymbols = useMemo(() => {

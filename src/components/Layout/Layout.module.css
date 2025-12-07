@@ -1,88 +1,83 @@
 .container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vw;
-    background-color: var(--tv-color-border);
-    /* Grid gap color - thin gray lines between components */
-    gap: 1px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
 .topbarArea {
-    height: 38px;
-    /* Standard TV topbar height */
-    flex-shrink: 0;
-    z-index: 20;
-    background-color: var(--tv-color-toolbar-background);
+  flex: 0 0 auto;
+  height: 48px;
+  border-bottom: 1px solid var(--tv-color-border, #2A2E39);
+  background-color: var(--tv-color-toolbar-background, #1e1e1e);
 }
 
 .mainArea {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    gap: 1px;
-    /* Grid gap between components */
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
 }
 
 .leftToolbarArea {
-    width: 52px;
-    flex-shrink: 0;
-    /* Standard TV left toolbar width */
-    z-index: 15;
-    transition: width 0.2s ease, opacity 0.2s ease;
-    overflow: hidden;
-    background-color: var(--tv-color-pane-background);
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 48px;
+  background-color: var(--tv-color-toolbar-background, #1e1e1e);
+  border-right: 1px solid var(--tv-color-border, #2A2E39);
+  z-index: 20;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
 }
 
 .leftToolbarHidden {
-    width: 0;
-    opacity: 0;
-    pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .centerArea {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-    gap: 1px;
-    /* Grid gap between chart and bottom bar */
-    background-color: var(--tv-color-border);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  /* Chart extends under the toolbar */
+  margin-left: 0;
 }
 
 .chartArea {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    background-color: var(--tv-color-pane-background);
+  flex: 1;
+  position: relative;
+  overflow: hidden;
 }
 
 .bottomBarArea {
-    flex-shrink: 0;
-    z-index: 5;
-    background-color: var(--tv-color-toolbar-background);
+  flex: 0 0 auto;
+  height: 32px;
+  border-top: 1px solid var(--tv-color-border, #2A2E39);
+  background-color: var(--tv-color-toolbar-background, #1e1e1e);
 }
 
 .watchlistArea {
-    width: 280px;
-    /* Standard TV watchlist width */
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--tv-color-pane-background);
+  flex: 0 0 auto;
+  width: 320px;
+  background-color: var(--tv-color-pane-background, #131722);
+  border-left: 1px solid var(--tv-color-border, #2A2E39);
+  overflow: hidden;
 }
 
 .optionsPanelArea {
-    width: 280px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--tv-color-pane-background);
-    overflow-y: auto;
+  flex: 0 0 auto;
+  width: 320px;
+  background-color: var(--tv-color-pane-background, #131722);
+  border-left: 1px solid var(--tv-color-border, #2A2E39);
 }
+
 .rightToolbarArea {
-    width: 52px;
-    flex-shrink: 0;
-    z-index: 15;
-    background-color: var(--tv-color-pane-background);
+  flex: 0 0 auto;
+  width: 48px;
+  background-color: var(--tv-color-toolbar-background, #1e1e1e);
+  border-left: 1px solid var(--tv-color-border, #2A2E39);
 }

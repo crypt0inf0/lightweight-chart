@@ -16,16 +16,68 @@ import AlertDialog from './components/Alert/AlertDialog';
 import RightToolbar from './components/Toolbar/RightToolbar';
 import AlertsPanel from './components/Alerts/AlertsPanel';
 
+const VALID_INTERVAL_UNITS = new Set(['s', 'm', 'h', 'd', 'w', 'M']);
+const DEFAULT_FAVORITE_INTERVALS = ['1m', '5m', '15m', '1h', '4h', '1d'];
+
+const isValidIntervalValue = (value) => {
+  if (!value || typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  if (/^\d+$/.test(trimmed)) {
+    return parseInt(trimmed, 10) > 0;
+  }
+  const match = /^([1-9]\d*)([smhdwM])$/.exec(trimmed);
+  if (!match) return false;
+  const unit = match[2];
+  return VALID_INTERVAL_UNITS.has(unit);
+};
+
+const sanitizeFavoriteIntervals = (raw) => {
+  if (!Array.isArray(raw)) return DEFAULT_FAVORITE_INTERVALS;
+  const filtered = raw.filter(isValidIntervalValue);
+  const unique = Array.from(new Set(filtered));
+  return unique.length ? unique : DEFAULT_FAVORITE_INTERVALS;
+};
+
+const sanitizeCustomIntervals = (raw) => {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((item) => item && typeof item === 'object' && isValidIntervalValue(item.value))
+    .map((item) => ({
+      value: item.value,
+      label: item.label || item.value,
+      isCustom: true,
+    }));
+};
+
+const safeParseJSON = (value, fallback) => {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    console.error('Failed to parse JSON from localStorage:', error);
+    return fallback;
+  }
+};
+
+const ALERT_RETENTION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+const formatPrice = (value) => {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return value;
+  return num.toFixed(2);
+};
+
 function App() {
   // Multi-Chart State
   const [layout, setLayout] = useState(() => {
-    const saved = localStorage.getItem('tv_saved_layout');
-    return saved ? JSON.parse(saved).layout : '1';
+    const saved = safeParseJSON(localStorage.getItem('tv_saved_layout'), null);
+    return saved && saved.layout ? saved.layout : '1';
   });
   const [activeChartId, setActiveChartId] = useState(1);
   const [charts, setCharts] = useState(() => {
-    const saved = localStorage.getItem('tv_saved_layout');
-    return saved ? JSON.parse(saved).charts : [
+    const saved = safeParseJSON(localStorage.getItem('tv_saved_layout'), null);
+    return saved && Array.isArray(saved.charts) ? saved.charts : [
       { id: 1, symbol: 'BTCUSDT', interval: localStorage.getItem('tv_interval') || '1d', indicators: { sma: false, ema: false }, comparisonSymbols: [] }
     ];
   });
@@ -51,9 +103,25 @@ function App() {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertPrice, setAlertPrice] = useState(null);
 
-  // Alert State
-  const [alerts, setAlerts] = useState([]);
-  const [alertLogs, setAlertLogs] = useState([]);
+  // Alert State (persisted with 24h retention)
+  const [alerts, setAlerts] = useState(() => {
+    const saved = safeParseJSON(localStorage.getItem('tv_alerts'), []);
+    if (!Array.isArray(saved)) return [];
+    const cutoff = Date.now() - ALERT_RETENTION_MS;
+    return saved.filter(a => {
+      const ts = a && a.created_at ? new Date(a.created_at).getTime() : NaN;
+      return Number.isFinite(ts) && ts >= cutoff;
+    });
+  });
+  const [alertLogs, setAlertLogs] = useState(() => {
+    const saved = safeParseJSON(localStorage.getItem('tv_alert_logs'), []);
+    if (!Array.isArray(saved)) return [];
+    const cutoff = Date.now() - ALERT_RETENTION_MS;
+    return saved.filter(l => {
+      const ts = l && l.time ? new Date(l.time).getTime() : NaN;
+      return Number.isFinite(ts) && ts >= cutoff;
+    });
+  });
   const [unreadAlertCount, setUnreadAlertCount] = useState(0);
 
   // Bottom Bar State
@@ -92,31 +160,49 @@ function App() {
 
   // Timeframe Management
   const [favoriteIntervals, setFavoriteIntervals] = useState(() => {
-    const saved = localStorage.getItem('tv_fav_intervals_v2');
-    return saved ? JSON.parse(saved) : ['1m', '5m', '15m', '1h', '4h', '1d'];
+    const saved = safeParseJSON(localStorage.getItem('tv_fav_intervals_v2'), null);
+    return sanitizeFavoriteIntervals(saved);
   });
 
   const [customIntervals, setCustomIntervals] = useState(() => {
-    const saved = localStorage.getItem('tv_custom_intervals');
-    return saved ? JSON.parse(saved) : [];
+    const saved = safeParseJSON(localStorage.getItem('tv_custom_intervals'), []);
+    return sanitizeCustomIntervals(saved);
   });
 
   // Track last selected non-favorite interval (persisted)
   const [lastNonFavoriteInterval, setLastNonFavoriteInterval] = useState(() => {
-    return localStorage.getItem('tv_last_nonfav_interval') || null;
+    const saved = localStorage.getItem('tv_last_nonfav_interval');
+    return isValidIntervalValue(saved) ? saved : null;
   });
 
   useEffect(() => {
-    localStorage.setItem('tv_fav_intervals_v2', JSON.stringify(favoriteIntervals));
+    try {
+      localStorage.setItem('tv_fav_intervals_v2', JSON.stringify(favoriteIntervals));
+    } catch (error) {
+      console.error('Failed to persist favorite intervals:', error);
+    }
   }, [favoriteIntervals]);
 
   useEffect(() => {
-    localStorage.setItem('tv_custom_intervals', JSON.stringify(customIntervals));
+    try {
+      localStorage.setItem('tv_custom_intervals', JSON.stringify(customIntervals));
+    } catch (error) {
+      console.error('Failed to persist custom intervals:', error);
+    }
   }, [customIntervals]);
 
   useEffect(() => {
+    if (lastNonFavoriteInterval && !isValidIntervalValue(lastNonFavoriteInterval)) {
+      return;
+    }
     if (lastNonFavoriteInterval) {
-      localStorage.setItem('tv_last_nonfav_interval', lastNonFavoriteInterval);
+      try {
+        localStorage.setItem('tv_last_nonfav_interval', lastNonFavoriteInterval);
+      } catch (error) {
+        console.error('Failed to persist last non-favorite interval:', error);
+      }
+    } else {
+      localStorage.removeItem('tv_last_nonfav_interval');
     }
   }, [lastNonFavoriteInterval]);
 
@@ -134,17 +220,35 @@ function App() {
   };
 
   const handleToggleFavorite = (interval) => {
+    if (!isValidIntervalValue(interval)) {
+      showToast('Invalid interval provided', 'error');
+      return;
+    }
     setFavoriteIntervals(prev =>
       prev.includes(interval) ? prev.filter(i => i !== interval) : [...prev, interval]
     );
   };
 
   const handleAddCustomInterval = (value, unit) => {
-    const newValue = value + unit;
-    const defaultTimeframes = ['1m', '5m', '15m', '30m', '1h', '4h', '1d', '1w', '1M'];
+    const numericValue = parseInt(value, 10);
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+      showToast('Enter a valid number greater than 0', 'error');
+      return;
+    }
+    const unitNormalized = VALID_INTERVAL_UNITS.has(unit) ? unit : null;
+    if (!unitNormalized) {
+      showToast('Invalid interval unit', 'error');
+      return;
+    }
+    const newValue = `${numericValue}${unitNormalized}`;
+
+    if (!isValidIntervalValue(newValue)) {
+      showToast('Invalid interval format', 'error');
+      return;
+    }
 
     // Check if already exists in default or custom
-    if (defaultTimeframes.includes(newValue) || customIntervals.some(i => i.value === newValue)) {
+    if (DEFAULT_FAVORITE_INTERVALS.includes(newValue) || customIntervals.some(i => i.value === newValue)) {
       showToast('Interval already available!', 'info');
       return;
     }
@@ -166,8 +270,8 @@ function App() {
 
   // Load watchlist from localStorage or default
   const [watchlistSymbols, setWatchlistSymbols] = useState(() => {
-    const saved = localStorage.getItem('tv_watchlist');
-    return saved ? JSON.parse(saved) : ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'DOGEUSDT', 'ADAUSDT', 'DOTUSDT'];
+    const saved = safeParseJSON(localStorage.getItem('tv_watchlist'), null);
+    return Array.isArray(saved) && saved.length ? saved : ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'DOGEUSDT', 'ADAUSDT', 'DOTUSDT'];
   });
 
   const [watchlistData, setWatchlistData] = useState([]);
@@ -179,11 +283,16 @@ function App() {
 
   // Fetch watchlist data
   useEffect(() => {
-    const fetchData = async () => {
+    let ws = null;
+    let mounted = true;
+    let initialDataLoaded = false;
+    const abortController = new AbortController();
+
+    const hydrateWatchlist = async () => {
       try {
         const promises = watchlistSymbols.map(async (sym) => {
           const data = await getTickerPrice(sym);
-          if (data) {
+          if (data && mounted) {
             return {
               symbol: sym,
               last: parseFloat(data.lastPrice).toFixed(2),
@@ -196,74 +305,138 @@ function App() {
         });
 
         const results = await Promise.all(promises);
-        setWatchlistData(results.filter(r => r !== null));
+        if (mounted) {
+          setWatchlistData(results.filter(r => r !== null));
+          initialDataLoaded = true;
+        }
       } catch (error) {
         console.error('Error fetching watchlist data:', error);
-        showToast('Failed to load watchlist data', 'error');
+        if (mounted) {
+          showToast('Failed to load watchlist data', 'error');
+          initialDataLoaded = true;
+        }
       }
+
+      if (!mounted || watchlistSymbols.length === 0) {
+        if (mounted && watchlistSymbols.length === 0) {
+          setWatchlistData([]);
+          initialDataLoaded = true;
+        }
+        return;
+      }
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+
+      ws = subscribeToMultiTicker(watchlistSymbols, (ticker) => {
+        if (!mounted || !initialDataLoaded) return;
+        setWatchlistData(prev => {
+          const index = prev.findIndex(item => item.symbol === ticker.symbol);
+          if (index !== -1) {
+            const newData = [...prev];
+            newData[index] = {
+              ...newData[index],
+              last: ticker.last.toFixed(2),
+              chg: ticker.chg.toFixed(2),
+              chgP: ticker.chgP.toFixed(2) + '%',
+              up: ticker.chg >= 0
+            };
+            return newData;
+          }
+          return prev;
+        });
+      });
     };
 
-    // Initial fetch
-    fetchData();
-
-    // Subscribe to WebSocket for real-time updates
-    const ws = subscribeToMultiTicker(watchlistSymbols, (ticker) => {
-      setWatchlistData(prev => {
-        const index = prev.findIndex(item => item.symbol === ticker.symbol);
-        if (index !== -1) {
-          const newData = [...prev];
-          newData[index] = {
-            ...newData[index],
-            last: ticker.last.toFixed(2),
-            chg: ticker.chg.toFixed(2),
-            chgP: ticker.chgP.toFixed(2) + '%',
-            up: ticker.chg >= 0
-          };
-          return newData;
-        }
-        return prev;
-      });
-    });
+    hydrateWatchlist();
 
     return () => {
-      if (ws) ws.close();
+      mounted = false;
+      abortController.abort();
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
     };
   }, [watchlistSymbols]);
 
-  // Check Alerts Logic
+  // Persist alerts/logs to localStorage with 24h retention
   useEffect(() => {
-    if (alerts.length === 0) return;
+    const cutoff = Date.now() - ALERT_RETENTION_MS;
+    const filtered = alerts.filter(a => {
+      const ts = a && a.created_at ? new Date(a.created_at).getTime() : NaN;
+      return Number.isFinite(ts) && ts >= cutoff;
+    });
 
-    // Subscribe to all alert symbols
-    const alertSymbols = [...new Set(alerts.filter(a => a.status === 'Active').map(a => a.symbol))];
+    if (filtered.length !== alerts.length) {
+      setAlerts(filtered);
+      return; // avoid persisting stale data in this pass
+    }
+
+    try {
+      localStorage.setItem('tv_alerts', JSON.stringify(filtered));
+    } catch (error) {
+      console.error('Failed to persist alerts:', error);
+    }
+  }, [alerts]);
+
+  useEffect(() => {
+    const cutoff = Date.now() - ALERT_RETENTION_MS;
+    const filtered = alertLogs.filter(l => {
+      const ts = l && l.time ? new Date(l.time).getTime() : NaN;
+      return Number.isFinite(ts) && ts >= cutoff;
+    });
+
+    if (filtered.length !== alertLogs.length) {
+      setAlertLogs(filtered);
+      return;
+    }
+
+    try {
+      localStorage.setItem('tv_alert_logs', JSON.stringify(filtered));
+    } catch (error) {
+      console.error('Failed to persist alert logs:', error);
+    }
+  }, [alertLogs]);
+
+  // Check Alerts Logic (only for non line-tools alerts to avoid conflicting with plugin)
+  useEffect(() => {
+    const activeNonLineToolAlerts = alerts.filter(a => a.status === 'Active' && a._source !== 'lineTools');
+    if (activeNonLineToolAlerts.length === 0) return;
+
+    const alertSymbols = [...new Set(activeNonLineToolAlerts.map(a => a.symbol))];
     if (alertSymbols.length === 0) return;
 
     const ws = subscribeToMultiTicker(alertSymbols, (ticker) => {
       setAlerts(prevAlerts => {
         let hasChanges = false;
         const newAlerts = prevAlerts.map(alert => {
+          if (alert._source === 'lineTools') return alert; // never auto-trigger plugin alerts
           if (alert.status !== 'Active' || alert.symbol !== ticker.symbol) return alert;
 
           const currentPrice = parseFloat(ticker.last);
           const targetPrice = parseFloat(alert.price);
+          if (!Number.isFinite(currentPrice) || !Number.isFinite(targetPrice) || targetPrice === 0) return alert;
 
-          // Simple crossing logic (triggered if price is within 0.1% range or crossed)
+          // Simple crossing logic (triggered if price is within 0.1% range)
           const threshold = targetPrice * 0.001; // 0.1% tolerance
 
           if (Math.abs(currentPrice - targetPrice) <= threshold) {
             hasChanges = true;
+
+            const displayPrice = formatPrice(targetPrice);
 
             // Log the alert
             const logEntry = {
               id: Date.now(),
               alertId: alert.id,
               symbol: alert.symbol,
-              message: `Alert triggered: ${alert.symbol} crossed ${targetPrice}`,
+              message: `Alert triggered: ${alert.symbol} crossed ${displayPrice}`,
               time: new Date().toISOString()
             };
             setAlertLogs(prev => [logEntry, ...prev]);
             setUnreadAlertCount(prev => prev + 1);
-            showToast(`Alert Triggered: ${alert.symbol} at ${targetPrice}`, 'info');
+            showToast(`Alert Triggered: ${alert.symbol} at ${displayPrice}`, 'info');
 
             return { ...alert, status: 'Triggered' };
           }
@@ -430,8 +603,13 @@ function App() {
       layout,
       charts
     };
-    localStorage.setItem('tv_saved_layout', JSON.stringify(layoutData));
-    showSnapshotToast('Layout saved successfully');
+    try {
+      localStorage.setItem('tv_saved_layout', JSON.stringify(layoutData));
+      showSnapshotToast('Layout saved successfully');
+    } catch (error) {
+      console.error('Failed to save layout:', error);
+      showToast('Failed to save layout', 'error');
+    }
   };
 
   // handleUndo and handleRedo are now integrated into handleToolChange, but we need wrappers for Topbar
@@ -541,24 +719,139 @@ function App() {
   };
 
   const handleSaveAlert = (alertData) => {
+    const priceDisplay = formatPrice(alertData.value);
+
     const newAlert = {
       id: Date.now(),
       symbol: currentSymbol,
-      price: alertData.value,
-      condition: `Crossing ${alertData.value}`,
+      price: priceDisplay,
+      condition: `Crossing ${priceDisplay}`,
       status: 'Active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
-    setAlerts(prev => [newAlert, ...prev]);
-    showToast(`Alert created for ${currentSymbol} at ${alertData.value}`, 'success');
+
+    // Show toast with formatted price
+    showToast(`Alert created for ${currentSymbol} at ${priceDisplay}`, 'success');
+
+    // Also create a visual alert on the active chart via the line-tools alerts primitive
+    const activeRef = chartRefs.current[activeChartId];
+    if (activeRef && typeof activeRef.addPriceAlert === 'function') {
+      activeRef.addPriceAlert(newAlert);
+    }
   };
 
   const handleRemoveAlert = (id) => {
-    setAlerts(prev => prev.filter(a => a.id !== id));
+    setAlerts(prev => {
+      const target = prev.find(a => a.id === id);
+
+      // If this alert came from the chart-side line-tools primitive, also
+      // remove it from the chart so the marker disappears.
+      if (target && target._source === 'lineTools' && target.chartId != null && target.externalId) {
+        const chartRef = chartRefs.current[target.chartId];
+        if (chartRef && typeof chartRef.removePriceAlert === 'function') {
+          chartRef.removePriceAlert(target.externalId);
+        }
+      }
+
+      return prev.filter(a => a.id !== id);
+    });
   };
 
   const handleRestartAlert = (id) => {
-    setAlerts(prev => prev.map(a => a.id === id ? { ...a, status: 'Active' } : a));
+    setAlerts(prev => {
+      const next = prev.map(a => a.id === id ? { ...a, status: 'Active' } : a);
+
+      const target = next.find(a => a.id === id);
+      if (target && target._source === 'lineTools' && target.chartId != null) {
+        const chartRef = chartRefs.current[target.chartId];
+        if (chartRef && typeof chartRef.restartPriceAlert === 'function') {
+          chartRef.restartPriceAlert(target.price, 'crossing');
+        }
+      }
+
+      return next;
+    });
+  };
+
+  const handleChartAlertsSync = (chartId, symbol, chartAlerts) => {
+    setAlerts(prev => {
+      // Remove any previous synced alerts for this chart to avoid duplicates
+      const existingForChart = prev.filter(a => a._source === 'lineTools' && a.chartId === chartId);
+      // Keep previously Triggered alerts as history; only replace active ones
+      const remaining = prev.filter(a => a._source !== 'lineTools' || a.chartId !== chartId || a.status === 'Triggered');
+
+      const mapped = (chartAlerts || []).map(a => {
+        const priceDisplay = formatPrice(a.price);
+        return {
+          id: `lt-${chartId}-${a.id}`,
+          externalId: a.id,
+          symbol,
+          price: priceDisplay,
+          condition: a.condition === 'crossing' ? `Crossing ${priceDisplay}` : a.condition,
+          status: 'Active',
+          created_at: new Date().toISOString(),
+          _source: 'lineTools',
+          chartId,
+        };
+      });
+
+      // Detect newly created alerts (by externalId) to show a toast similar
+      // to the topbar-based alert creation flow.
+      const prevIds = new Set(existingForChart.map(a => a.externalId));
+      const newlyCreated = mapped.filter(a => !prevIds.has(a.externalId));
+      if (newlyCreated.length > 0) {
+        const latest = newlyCreated[newlyCreated.length - 1];
+        const displayPrice = formatPrice(latest.price);
+        showToast(`Alert created for ${symbol} at ${displayPrice}`, 'success');
+      }
+
+      return [...remaining, ...mapped];
+    });
+  };
+
+  const handleChartAlertTriggered = (chartId, symbol, evt) => {
+    const displayPrice = formatPrice(evt.price ?? evt.alertPrice);
+    const timestamp = evt.timestamp ? new Date(evt.timestamp).toISOString() : new Date().toISOString();
+
+    // Log entry for the Logs tab
+    const logEntry = {
+      id: Date.now(),
+      alertId: evt.externalId || evt.alertId,
+      symbol,
+      message: `Alert triggered: ${symbol} crossed ${displayPrice}`,
+      time: timestamp,
+    };
+    setAlertLogs(prev => [logEntry, ...prev]);
+    setUnreadAlertCount(prev => prev + 1);
+    showToast(`Alert Triggered: ${symbol} at ${displayPrice}`, 'info');
+
+    // Mark corresponding alert as Triggered in the Alerts tab, or add a new history row
+    setAlerts(prev => {
+      let updated = false;
+      const next = prev.map(a => {
+        if (a._source === 'lineTools' && a.chartId === chartId && a.externalId === (evt.externalId || evt.alertId)) {
+          updated = true;
+          return { ...a, status: 'Triggered' };
+        }
+        return a;
+      });
+
+      if (!updated) {
+        next.unshift({
+          id: `lt-${chartId}-${evt.externalId || evt.alertId}-triggered-${Date.now()}`,
+          externalId: evt.externalId || evt.alertId,
+          symbol,
+          price: displayPrice,
+          condition: evt.condition || `Crossing ${displayPrice}`,
+          status: 'Triggered',
+          created_at: timestamp,
+          _source: 'lineTools',
+          chartId,
+        });
+      }
+
+      return next;
+    });
   };
 
   const handleRightPanelToggle = (panel) => {
@@ -667,6 +960,8 @@ function App() {
             activeChartId={activeChartId}
             onActiveChartChange={setActiveChartId}
             chartRefs={chartRefs}
+            onAlertsSync={handleChartAlertsSync}
+            onAlertTriggered={handleChartAlertTriggered}
             // Common props
             chartType={chartType}
             // indicators={indicators} // Handled per chart now

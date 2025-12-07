@@ -27,7 +27,11 @@ const BottomBar = ({
     ];
 
     return (
-        <div className={styles.bottomBar}>
+        <div
+            className={classNames(styles.bottomBar, {
+                [styles.withLeftToolbar]: isToolbarVisible,
+            })}
+        >
             <div className={styles.leftSection}>
                 {timeRanges.map((range) => (
                     <div

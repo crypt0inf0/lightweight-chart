@@ -229,6 +229,21 @@ export const DateRangeIcon = ({ size = 28, ...props }) => (
 );
 DateRangeIcon.propTypes = IconPropTypes;
 
+export const DatePriceRangeIcon = ({ size = 28, ...props }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width={size} height={size} {...props}>
+        <g fill="currentColor">
+            <path fill-rule="nonzero" d="M6.5 23v1h17.5v-17.5h-1v16.5z"></path>
+            <path fill-rule="nonzero" d="M21.5 5v-1h-17.5v17.5h1v-16.5z"></path>
+            <path fill-rule="nonzero" d="M4.5 25c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zM23.5 6c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"></path>
+            <path fill-rule="nonzero" d="M13 9v13h1v-13z" id="Line"></path>
+            <path d="M13.5 6l2.5 3h-5z"></path>
+            <path fill-rule="nonzero" d="M19 14h-13v1h13z"></path>
+            <path d="M19 17v-5l3 2.5z"></path>
+        </g>
+    </svg>
+);
+DatePriceRangeIcon.propTypes = IconPropTypes;
+
 export const BrushIcon = ({ size = 28, ...props }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width={size} height={size} {...props}>
         <g fill="currentColor" fillRule="nonzero">
@@ -333,61 +348,3 @@ export const MeasureIcon = ({ size = 28, ...props }) => (
     </svg>
 );
 MeasureIcon.propTypes = IconPropTypes;
-
-export const HeadAndShouldersIcon = ({ size = 28, ...props }) => (
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' width={size} height={size} {...props}>
-        <g fill='currentColor' fillRule='nonzero'>
-            <path d='M4 20l4-4 4 4 4-8 4 4 4-4'
-                stroke='currentColor' strokeWidth='1' fill='none' strokeLinejoin='round' strokeLinecap='round'></path>
-            <circle cx='4' cy='20' r='1.5'></circle>
-            <circle cx='8' cy='16' r='1.5'></circle>
-            <circle cx='12' cy='20' r='1.5'></circle>
-            <circle cx='16' cy='12' r='1.5'></circle>
-            <circle cx='20' cy='16' r='1.5'></circle>
-            <circle cx='24' cy='12' r='1.5'></circle>
-        </g>
-    </svg>
-);
-HeadAndShouldersIcon.propTypes = IconPropTypes;
-
-export const DatePriceRangeIcon = ({ size = 28, ...props }) => (
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' width={size} height={size} {...props}>
-        <g fill='currentColor'>
-            <path fillRule='nonzero' d='M4 5h16.5v-1h-16.5zM25 24h-16.5v1h16.5z'></path>
-            <path fillRule='nonzero' d='M6.5 26c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zM22.5 6c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z'></path>
-            <path fillRule='nonzero' d='M14 9v10h1v-10z'></path>
-            <path d='M14.5 6l2.5 3h-5z'></path>
-            <path d='M14.5 22l-2.5-3h5z'></path>
-            <path fillRule='nonzero' d='M9 14h10v1h-10z'></path>
-            <path d='M6 14.5l3 2.5v-5z'></path>
-            <path d='M22 14.5l-3-2.5v5z'></path>
-        </g>
-    </svg>
-);
-DatePriceRangeIcon.propTypes = IconPropTypes;
-
-export const UndoIcon = ({ size = 28, ...props }) => (
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' width={size} height={size} {...props}>
-        <path fill='currentColor' d='M5.293 13.707L1.586 10l3.707-3.707.707.707L3.414 9.5H17a6.5 6.5 0 0 1 0 13h-5v-1h5a5.5 5.5 0 0 0 0-11H3.414L6 14l-.707.707z'></path>
-    </svg>
-);
-UndoIcon.propTypes = IconPropTypes;
-
-export const RedoIcon = ({ size = 28, ...props }) => (
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' width={size} height={size} {...props}>
-        <path fill='currentColor' d='M22.707 13.707l3.707-3.707-3.707-3.707-.707.707 2.586 2.5H11a6.5 6.5 0 0 0 0 13h5v-1h-5a5.5 5.5 0 0 1 0-11h13.586L22 14l.707.707z'></path>
-    </svg>
-);
-RedoIcon.propTypes = IconPropTypes;
-
-export const InfoLineIcon = ({ size = 28, ...props }) => (
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' width={size} height={size} {...props}>
-        <g fill='currentColor' fillRule='nonzero'>
-            <path d='M7.354 21.354l14-14-.707-.707-14 14z'></path>
-            <path d='M22.5 7c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zM5.5 24c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z'></path>
-            <rect x='12' y='12' width='6' height='5' rx='1'></rect>
-        </g>
-    </svg>
-);
-InfoLineIcon.propTypes = IconPropTypes;
-

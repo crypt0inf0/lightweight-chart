@@ -8,6 +8,8 @@ const ChartGrid = ({
     activeChartId,
     onActiveChartChange,
     chartRefs,
+    onAlertsSync,
+    onAlertTriggered,
     ...chartProps
 }) => {
     const getGridClass = () => {
@@ -35,6 +37,8 @@ const ChartGrid = ({
                         }}
                         symbol={chart.symbol}
                         interval={chart.interval}
+                        onAlertsSync={onAlertsSync ? (alerts) => onAlertsSync(chart.id, chart.symbol, alerts) : undefined}
+                        onAlertTriggered={onAlertTriggered ? (evt) => onAlertTriggered(chart.id, chart.symbol, evt) : undefined}
                         {...chartProps}
                         indicators={chart.indicators}
                         comparisonSymbols={chart.comparisonSymbols}

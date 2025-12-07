@@ -37,38 +37,44 @@ const AlertsPanel = ({ alerts, logs, onRemoveAlert, onRestartAlert }) => {
                         {alerts.length === 0 ? (
                             <div className={styles.emptyState}>No active alerts</div>
                         ) : (
-                            alerts.map(alert => (
-                                <div key={alert.id} className={classNames(styles.item, styles[alert.status.toLowerCase()])}>
-                                    <div className={styles.itemHeader}>
-                                        <span className={styles.symbol}>{alert.symbol}</span>
-                                        <span className={classNames(styles.status, styles[alert.status.toLowerCase()])}>
-                                            {alert.status}
-                                        </span>
-                                    </div>
-                                    <div className={styles.condition}>
-                                        {alert.condition}
-                                    </div>
-                                    <div className={styles.itemFooter}>
-                                        <span className={styles.time}>{new Date(alert.created_at).toLocaleDateString()}</span>
-                                        <div className={styles.itemActions}>
-                                            {alert.status === 'Triggered' && (
-                                                <PlayCircle
+                            alerts.map(alert => {
+                                // Normalize status so we always show a readable label
+                                const status = alert.status || 'Active';
+                                const statusKey = status.toLowerCase();
+
+                                return (
+                                    <div key={alert.id} className={classNames(styles.item, styles[statusKey])}>
+                                        <div className={styles.itemHeader}>
+                                            <span className={styles.symbol}>{alert.symbol}</span>
+                                            <span className={classNames(styles.status, styles[statusKey])}>
+                                                {status}
+                                            </span>
+                                        </div>
+                                        <div className={styles.condition}>
+                                            {alert.condition}
+                                        </div>
+                                        <div className={styles.itemFooter}>
+                                            <span className={styles.time}>{new Date(alert.created_at).toLocaleDateString()}</span>
+                                            <div className={styles.itemActions}>
+                                                {status === 'Triggered' && (
+                                                    <PlayCircle
+                                                        size={16}
+                                                        className={styles.actionIcon}
+                                                        onClick={() => onRestartAlert(alert.id)}
+                                                        title="Restart Alert"
+                                                    />
+                                                )}
+                                                <Trash2
                                                     size={16}
                                                     className={styles.actionIcon}
-                                                    onClick={() => onRestartAlert(alert.id)}
-                                                    title="Restart Alert"
+                                                    onClick={() => onRemoveAlert(alert.id)}
+                                                    title="Remove Alert"
                                                 />
-                                            )}
-                                            <Trash2
-                                                size={16}
-                                                className={styles.actionIcon}
-                                                onClick={() => onRemoveAlert(alert.id)}
-                                                title="Remove Alert"
-                                            />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
                 ) : (

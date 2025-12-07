@@ -4255,18 +4255,22 @@ export declare class LineToolManager extends PluginBase {
 	private _isDrawing;
 	private _lastPixelPoint;
 	private _isRightClick;
-	private _lastMouseEvent;
 	private _selectedTool;
 	private _dragState;
 	private _isDragging;
 	private _lastClickTime;
 	private _lastClickPoint;
+	private _contextMenuHandler;
 	private _userPriceAlerts;
 	private _alertNotifications;
 	private _toolbar;
 	private _chartControls;
+	private _textInputDialog;
 	private _historyManager;
 	private _dragPrevState;
+	private _alertSubscription;
+	private _lastClickedTool;
+	private _lastToolClickTime;
 	private _setNoneButtonActive;
 	private _cancelActiveDrawing;
 	private _updateCursor;
@@ -4298,6 +4302,10 @@ export declare class LineToolManager extends PluginBase {
 	 * Deselect the currently selected tool
 	 */
 	private _deselectCurrentTool;
+	/**
+	 * Show inline text editor for editing text/callout tools
+	 */
+	private _showTextInputDialog;
 	/**
 	 * Delete a tool from the chart
 	 */

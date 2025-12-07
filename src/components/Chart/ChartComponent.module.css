@@ -16,6 +16,11 @@
     height: 100%;
 }
 
+.chartContainer.forceVisible {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
 .loadingOverlay {
     position: absolute;
     top: 0;

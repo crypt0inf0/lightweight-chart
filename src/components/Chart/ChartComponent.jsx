@@ -15,6 +15,7 @@ import { intervalToSeconds } from '../../utils/timeframes';
 import { LineToolManager } from '../../plugins/line-tools/line-tools.js';
 import '../../plugins/line-tools/line-tools.css';
 import ReplayControls from '../Replay/ReplayControls';
+import ReplaySlider from '../Replay/ReplaySlider';
 
 const ChartComponent = forwardRef(({
     symbol,
@@ -30,9 +31,12 @@ const ChartComponent = forwardRef(({
     isToolbarVisible = true,
     theme = 'dark',
     comparisonSymbols = [],
+    onAlertsSync,
+    onAlertTriggered,
 }, ref) => {
     const chartContainerRef = useRef();
     const [isLoading, setIsLoading] = useState(true);
+    const isActuallyLoadingRef = useRef(true); // Track if we're actually loading data (not just updating indicators) - start as true on mount
     const chartRef = useRef(null);
     const mainSeriesRef = useRef(null);
     const smaSeriesRef = useRef(null);
@@ -54,6 +58,14 @@ const ChartComponent = forwardRef(({
     const [isSelectingReplayPoint, setIsSelectingReplayPoint] = useState(false);
     const fullDataRef = useRef([]); // Store full data for replay
     const replayIntervalRef = useRef(null);
+    const fadedSeriesRef = useRef(null); // Store faded series for future candles
+    
+    // Refs for stable callbacks to prevent race conditions
+    const replayIndexRef = useRef(null);
+    const isPlayingRef = useRef(false);
+    const updateReplayDataRef = useRef(null); // Ref to store updateReplayData function
+    useEffect(() => { replayIndexRef.current = replayIndex; }, [replayIndex]);
+    useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
 
     const DEFAULT_CANDLE_WINDOW = 230;
     const DEFAULT_RIGHT_OFFSET = 10;
@@ -90,6 +102,7 @@ const ChartComponent = forwardRef(({
     // Axis Label State
     const [axisLabel, setAxisLabel] = useState(null);
     const [timeRemaining, setTimeRemaining] = useState('');
+    const isChartVisibleRef = useRef(true);
 
     useEffect(() => {
         chartTypeRef.current = chartType;
@@ -107,6 +120,66 @@ const ChartComponent = forwardRef(({
         clearTools: () => {
             if (lineToolManagerRef.current) lineToolManagerRef.current.clearTools();
         },
+        addPriceAlert: (alert) => {
+            // Bridge App-level alerts to the line-tools UserPriceAlerts primitive
+            // WITHOUT opening an extra dialog – just create the alert directly.
+            try {
+                const manager = lineToolManagerRef.current;
+                const userAlerts = manager && manager._userPriceAlerts;
+                if (!userAlerts || !alert || alert.price == null) return;
+
+                if (typeof userAlerts.setSymbolName === 'function') {
+                    userAlerts.setSymbolName(symbol);
+                }
+
+                const priceNum = Number(alert.price);
+                if (!Number.isFinite(priceNum)) return;
+
+                // Directly add the alert with a simple crossing condition so it
+                // is rendered on the chart without another confirmation dialog.
+                if (typeof userAlerts.addAlertWithCondition === 'function') {
+                    userAlerts.addAlertWithCondition(priceNum, 'crossing');
+                } else if (typeof userAlerts.openEditDialog === 'function') {
+                    // Fallback for older builds: still ensure it works, even if
+                    // it means showing the internal dialog.
+                    userAlerts.openEditDialog(alert.id, {
+                        price: priceNum,
+                        condition: 'crossing',
+                    });
+                }
+            } catch (err) {
+                console.warn('Failed to add price alert to chart', err);
+            }
+        },
+        removePriceAlert: (externalId) => {
+            try {
+                const manager = lineToolManagerRef.current;
+                const userAlerts = manager && manager._userPriceAlerts;
+                if (!userAlerts || !externalId) return;
+
+                if (typeof userAlerts.removeAlert === 'function') {
+                    userAlerts.removeAlert(externalId);
+                }
+            } catch (err) {
+                console.warn('Failed to remove price alert from chart', err);
+            }
+        },
+        restartPriceAlert: (price, condition = 'crossing') => {
+            try {
+                const manager = lineToolManagerRef.current;
+                const userAlerts = manager && manager._userPriceAlerts;
+                if (!userAlerts || price == null) return;
+
+                const priceNum = Number(price);
+                if (!Number.isFinite(priceNum)) return;
+
+                if (typeof userAlerts.addAlertWithCondition === 'function') {
+                    userAlerts.addAlertWithCondition(priceNum, condition === 'crossing' ? 'crossing' : condition);
+                }
+            } catch (err) {
+                console.warn('Failed to restart price alert on chart', err);
+            }
+        },
         resetZoom: () => {
             applyDefaultCandlePosition(dataRef.current.length);
         },
@@ -119,26 +192,52 @@ const ChartComponent = forwardRef(({
             return null;
         },
         toggleReplay: () => {
-            setIsReplayMode(prev => !prev);
-            if (!isReplayMode) {
-                // Entering replay mode
-                fullDataRef.current = [...dataRef.current];
-                setIsPlaying(false);
-                setReplayIndex(dataRef.current.length - 1);
-            } else {
-                // Exiting replay mode
-                stopReplay();
-                setIsPlaying(false);
-                setReplayIndex(null);
-                setIsSelectingReplayPoint(false);
-                // Restore full data
-                if (mainSeriesRef.current && fullDataRef.current.length > 0) {
-                    dataRef.current = fullDataRef.current;
-                    const transformedData = transformData(fullDataRef.current, chartTypeRef.current);
-                    mainSeriesRef.current.setData(transformedData);
-                    updateIndicators(fullDataRef.current);
+            setIsReplayMode(prev => {
+                const newMode = !prev;
+                if (!prev) {
+                    // Entering replay mode
+                    fullDataRef.current = [...dataRef.current];
+                    setIsPlaying(false);
+                    isPlayingRef.current = false;
+                    const startIndex = Math.max(0, dataRef.current.length - 1);
+                    setReplayIndex(startIndex);
+                    replayIndexRef.current = startIndex;
+                    // Initialize replay data display - show all candles initially
+                    setTimeout(() => {
+                        if (updateReplayDataRef.current) {
+                            updateReplayDataRef.current(startIndex, false);
+                        }
+                    }, 0);
+                } else {
+                    // Exiting replay mode
+                    stopReplay();
+                    setIsPlaying(false);
+                    isPlayingRef.current = false;
+                    setReplayIndex(null);
+                    replayIndexRef.current = null;
+                    setIsSelectingReplayPoint(false);
+                    
+                    // Clean up faded series (if we were using it)
+                    if (fadedSeriesRef.current && chartRef.current) {
+                        try {
+                            chartRef.current.removeSeries(fadedSeriesRef.current);
+                        } catch (e) {
+                            console.warn('Error removing faded series:', e);
+                        }
+                        fadedSeriesRef.current = null;
+                    }
+
+                    
+                    // Restore full data
+                    if (mainSeriesRef.current && fullDataRef.current.length > 0) {
+                        dataRef.current = fullDataRef.current;
+                        const transformedData = transformData(fullDataRef.current, chartTypeRef.current);
+                        mainSeriesRef.current.setData(transformedData);
+                        updateIndicators(fullDataRef.current);
+                    }
                 }
-            }
+                return newMode;
+            });
         }
     }));
 
@@ -173,15 +272,13 @@ const ChartComponent = forwardRef(({
                 'xabcd': 'XABCD',
                 'elliott_impulse': 'ElliottImpulseWave',
                 'elliott_correction': 'ElliottCorrectionWave',
+                'head_and_shoulders': 'HeadAndShoulders',
                 'prediction': 'LongPosition',
                 'prediction_short': 'ShortPosition',
                 'date_range': 'DateRange',
                 'price_range': 'PriceRange',
                 'date_price_range': 'DatePriceRange',
                 'measure': 'Measure',
-                'head_and_shoulders': 'HeadAndShoulders',
-                'eraser': 'Eraser',
-                'info_line': 'TrendLine',
                 'remove': 'None'
             };
 
@@ -230,6 +327,33 @@ const ChartComponent = forwardRef(({
         return () => clearInterval(timerId);
         return () => clearInterval(timerId);
     }, [interval, isReplayMode]);
+
+    // Track chart visibility to avoid unnecessary RAF work
+    useEffect(() => {
+        if (!chartContainerRef.current) return undefined;
+
+        const handleVisibility = (entries) => {
+            if (entries && entries[0]) {
+                isChartVisibleRef.current = entries[0].isIntersecting;
+            }
+        };
+
+        const observer = new IntersectionObserver(handleVisibility, { threshold: 0 });
+        observer.observe(chartContainerRef.current);
+
+        const handleDocumentVisibility = () => {
+            if (document.visibilityState === 'hidden') {
+                isChartVisibleRef.current = false;
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleDocumentVisibility);
+
+        return () => {
+            observer.disconnect();
+            document.removeEventListener('visibilitychange', handleDocumentVisibility);
+        };
+    }, []);
 
     // Update Axis Label Position and Content
     const updateAxisLabel = useCallback(() => {
@@ -307,11 +431,13 @@ const ChartComponent = forwardRef(({
         let animationFrameId;
 
         const animate = () => {
-            updateAxisLabel();
+            if (isChartVisibleRef.current && document.visibilityState !== 'hidden') {
+                updateAxisLabel();
+            }
             animationFrameId = requestAnimationFrame(animate);
         };
 
-        animate();
+        animationFrameId = requestAnimationFrame(animate);
 
         return () => cancelAnimationFrame(animationFrameId);
     }, [updateAxisLabel]);
@@ -438,6 +564,53 @@ const ChartComponent = forwardRef(({
             lineToolManagerRef.current = manager;
             console.log('✅ LineToolManager initialized');
 
+            // Ensure alerts primitive (if present) knows the current symbol
+            try {
+                const userAlerts = manager._userPriceAlerts;
+                if (userAlerts && typeof userAlerts.setSymbolName === 'function') {
+                    userAlerts.setSymbolName(symbol);
+                }
+
+                // Bridge internal alert list out to React so the Alerts tab
+                // can show alerts created from the chart-side UI.
+                if (userAlerts && typeof userAlerts.alertsChanged === 'function' && typeof userAlerts.alerts === 'function' && typeof onAlertsSync === 'function') {
+                    userAlerts.alertsChanged().subscribe(() => {
+                        try {
+                            const rawAlerts = userAlerts.alerts() || [];
+                            const mapped = rawAlerts.map(a => ({
+                                id: a.id,
+                                price: a.price,
+                                condition: a.condition || 'crossing',
+                                type: a.type || 'price',
+                            }));
+                            onAlertsSync(mapped);
+                        } catch (err) {
+                            console.warn('Failed to sync chart alerts to app', err);
+                        }
+                    }, manager);
+                }
+
+                // Also bridge trigger events so the app can mark alerts as Triggered
+                // and write log entries when the internal primitive fires.
+                if (userAlerts && typeof userAlerts.alertTriggered === 'function' && typeof onAlertTriggered === 'function') {
+                    userAlerts.alertTriggered().subscribe((evt) => {
+                        try {
+                            onAlertTriggered({
+                                externalId: evt.alertId,
+                                price: evt.alertPrice,
+                                timestamp: evt.timestamp,
+                                direction: evt.direction,
+                                condition: evt.condition,
+                            });
+                        } catch (err) {
+                            console.warn('Failed to propagate alertTriggered event to app', err);
+                        }
+                    }, manager);
+                }
+            } catch (err) {
+                console.warn('Failed to initialize alert symbol name', err);
+            }
+
             window.lineToolManager = manager;
             window.chartInstance = chartRef.current;
             window.seriesInstance = series;
@@ -520,13 +693,30 @@ const ChartComponent = forwardRef(({
         container.addEventListener('contextmenu', handleContextMenu, true);
 
         return () => {
-            container.removeEventListener('contextmenu', handleContextMenu, true);
-            resizeObserver.disconnect();
-            if (wsRef.current) wsRef.current.close();
-            chart.remove();
-            chartRef.current = null;
-            mainSeriesRef.current = null;
-            lineToolManagerRef.current = null;
+            try {
+                container.removeEventListener('contextmenu', handleContextMenu, true);
+            } catch (error) {
+                console.warn('Failed to remove contextmenu listener', error);
+            }
+            try {
+                resizeObserver.disconnect();
+            } catch (error) {
+                console.warn('Failed to disconnect resize observer', error);
+            }
+            try {
+                if (wsRef.current) wsRef.current.close();
+            } catch (error) {
+                console.warn('Failed to close chart WebSocket', error);
+            }
+            try {
+                chart.remove();
+            } catch (error) {
+                console.warn('Failed to remove chart instance', error);
+            } finally {
+                chartRef.current = null;
+                mainSeriesRef.current = null;
+                lineToolManagerRef.current = null;
+            }
         };
     }, []); // Only create chart once
 
@@ -565,6 +755,21 @@ const ChartComponent = forwardRef(({
             applyDefaultCandlePosition(existingData.length);
             updateAxisLabel();
         }
+        
+        // Recreate faded series if in replay mode
+        if (isReplayMode && fadedSeriesRef.current) {
+            try {
+                chart.removeSeries(fadedSeriesRef.current);
+            } catch (e) {
+                console.warn('Error removing faded series on chart type change:', e);
+            }
+            fadedSeriesRef.current = null;
+            
+            // Trigger replay data update to recreate faded series with new type
+            if (replayIndex !== null) {
+                updateReplayData(replayIndex);
+            }
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chartType, updateAxisLabel]);
 
@@ -572,7 +777,8 @@ const ChartComponent = forwardRef(({
     useEffect(() => {
         if (!chartRef.current) return;
 
-        let disposed = false;
+        let cancelled = false;
+        let indicatorFrame = null;
         const abortController = new AbortController();
 
         if (wsRef.current) {
@@ -581,10 +787,15 @@ const ChartComponent = forwardRef(({
         }
 
         const loadData = async () => {
+            isActuallyLoadingRef.current = true;
             setIsLoading(true);
+            // Remove forceVisible class when actually loading data
+            if (chartContainerRef.current) {
+                chartContainerRef.current.classList.remove(styles.forceVisible);
+            }
             try {
                 const data = await getKlines(symbol, interval, 1000, abortController.signal);
-                if (disposed) return;
+                if (cancelled) return;
 
                 if (Array.isArray(data) && data.length > 0 && mainSeriesRef.current) {
                     dataRef.current = data;
@@ -592,46 +803,65 @@ const ChartComponent = forwardRef(({
                     const transformedData = transformData(data, activeType);
                     mainSeriesRef.current.setData(transformedData);
 
-                    updateIndicators(data);
+                    if (indicatorFrame) cancelAnimationFrame(indicatorFrame);
+                    indicatorFrame = requestAnimationFrame(() => {
+                        if (!cancelled) {
+                            // Ensure chart is visible before updating indicators
+                            if (chartContainerRef.current) {
+                                chartContainerRef.current.classList.add(styles.forceVisible);
+                                chartContainerRef.current.style.visibility = 'visible';
+                                chartContainerRef.current.style.opacity = '1';
+                            }
+                            updateIndicators(data);
+                        }
+                    });
 
                     applyDefaultCandlePosition(transformedData.length);
 
                     setTimeout(() => {
-                        if (!disposed) {
+                        if (!cancelled) {
+                            isActuallyLoadingRef.current = false;
                             setIsLoading(false);
+                            // Ensure chart is visible after data loads
+                            if (chartContainerRef.current) {
+                                chartContainerRef.current.classList.add(styles.forceVisible);
+                                chartContainerRef.current.style.visibility = 'visible';
+                                chartContainerRef.current.style.opacity = '1';
+                            }
                             updateAxisLabel();
                         }
                     }, 50);
 
                     wsRef.current = subscribeToTicker(symbol.toLowerCase(), interval, (ticker) => {
-                        if (disposed || !ticker || typeof ticker.close !== 'number' || isNaN(ticker.close)) return;
+                        if (cancelled || !ticker) return;
 
-                        const newCandle = {
-                            time: ticker.time,
-                            open: ticker.open,
-                            high: ticker.high,
-                            low: ticker.low,
-                            close: ticker.close,
+                        const parsedCandle = {
+                            time: Number(ticker.time),
+                            open: Number(ticker.open),
+                            high: Number(ticker.high),
+                            low: Number(ticker.low),
+                            close: Number(ticker.close),
                         };
 
-                        if (isNaN(newCandle.open) || isNaN(newCandle.high) || isNaN(newCandle.low) || isNaN(newCandle.close)) {
-                            console.warn('Received invalid candle data:', newCandle);
-                            return;
-                        }
-
-                        const currentData = dataRef.current.slice();
-                        const lastCandle = currentData[currentData.length - 1];
                         const intervalSeconds = intervalToSeconds(interval);
                         if (!Number.isFinite(intervalSeconds) || intervalSeconds <= 0) {
                             return;
                         }
-                        const candleTime = Math.floor(newCandle.time / intervalSeconds) * intervalSeconds;
-                        newCandle.time = candleTime;
 
-                        if (lastCandle && lastCandle.time === candleTime) {
-                            currentData[currentData.length - 1] = newCandle;
+                        if (!['open', 'high', 'low', 'close'].every(key => Number.isFinite(parsedCandle[key]))) {
+                            console.warn('Received invalid candle data:', parsedCandle);
+                            return;
+                        }
+
+                        const candleTime = Math.floor(parsedCandle.time / intervalSeconds) * intervalSeconds;
+                        const normalizedCandle = { ...parsedCandle, time: candleTime };
+
+                        const currentData = dataRef.current.length ? [...dataRef.current] : [];
+                        const lastIndex = currentData.length - 1;
+                        if (lastIndex >= 0 && currentData[lastIndex].time === candleTime) {
+                            currentData[lastIndex] = normalizedCandle;
                         } else {
-                            currentData.push(newCandle);
+                            currentData.push(normalizedCandle);
                         }
 
                         dataRef.current = currentData;
@@ -643,41 +873,56 @@ const ChartComponent = forwardRef(({
                         let isValidUpdate = false;
                         if (latestUpdate) {
                             if (latestUpdate.value !== undefined) {
-                                isValidUpdate = !isNaN(latestUpdate.value);
+                                isValidUpdate = Number.isFinite(latestUpdate.value);
                             } else if (latestUpdate.open !== undefined) {
-                                isValidUpdate = !isNaN(latestUpdate.open) && !isNaN(latestUpdate.high) && !isNaN(latestUpdate.low) && !isNaN(latestUpdate.close);
+                                isValidUpdate = ['open', 'high', 'low', 'close'].every(key => Number.isFinite(latestUpdate[key]));
                             }
                         }
 
-                        if (isValidUpdate && mainSeriesRef.current) {
-                            // In replay mode, do NOT update the chart with live data
-                            if (!isReplayModeRef.current) {
-                                mainSeriesRef.current.setData(transformedRealtimeData);
-                                updateRealtimeIndicators(currentData);
-                                updateAxisLabel();
-                            }
+                        if (isValidUpdate && mainSeriesRef.current && !isReplayModeRef.current) {
+                            mainSeriesRef.current.setData(transformedRealtimeData);
+                            updateRealtimeIndicators(currentData);
+                            updateAxisLabel();
                         }
                     });
                 } else {
                     dataRef.current = [];
                     mainSeriesRef.current?.setData([]);
+                    isActuallyLoadingRef.current = false;
                     setIsLoading(false);
+                    // Ensure chart is visible after loading completes (even if no data)
+                    if (chartContainerRef.current) {
+                        chartContainerRef.current.classList.add(styles.forceVisible);
+                        chartContainerRef.current.style.visibility = 'visible';
+                        chartContainerRef.current.style.opacity = '1';
+                    }
                 }
             } catch (error) {
                 if (error.name === 'AbortError') {
                     return;
                 }
                 console.error('Error loading chart data:', error);
-                if (!disposed) {
+                if (!cancelled) {
+                    isActuallyLoadingRef.current = false;
                     setIsLoading(false);
+                    // Ensure chart is visible even after error
+                    if (chartContainerRef.current) {
+                        chartContainerRef.current.classList.add(styles.forceVisible);
+                        chartContainerRef.current.style.visibility = 'visible';
+                        chartContainerRef.current.style.opacity = '1';
+                    }
                 }
             }
         };
 
+        emaLastValueRef.current = null;
         loadData();
 
         return () => {
-            disposed = true;
+            cancelled = true;
+            if (indicatorFrame) {
+                cancelAnimationFrame(indicatorFrame);
+            }
             abortController.abort();
             if (wsRef.current) {
                 wsRef.current.close();
@@ -687,22 +932,42 @@ const ChartComponent = forwardRef(({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [symbol, interval]);
 
+    const emaLastValueRef = useRef(null);
+
     const updateRealtimeIndicators = useCallback((data) => {
         if (!chartRef.current) return;
 
+        const lastIndex = data.length - 1;
+        const lastDataPoint = data[lastIndex];
+
         // SMA Indicator
         if (indicators.sma && smaSeriesRef.current) {
-            const smaData = calculateSMA(data, 20);
-            if (smaData && smaData.length > 0) {
-                smaSeriesRef.current.update(smaData[smaData.length - 1]);
+            if (data.length < 20) {
+                const smaData = calculateSMA(data, 20);
+                if (smaData && smaData.length > 0) {
+                    smaSeriesRef.current.setData(smaData);
+                }
+            } else {
+                const subset = data.slice(-20);
+                const sum = subset.reduce((acc, d) => acc + d.close, 0);
+                const average = sum / subset.length;
+                smaSeriesRef.current.update({ time: lastDataPoint.time, value: average });
             }
         }
 
         // EMA Indicator
         if (indicators.ema && emaSeriesRef.current) {
-            const emaData = calculateEMA(data, 20);
-            if (emaData && emaData.length > 0) {
-                emaSeriesRef.current.update(emaData[emaData.length - 1]);
+            if (data.length < 20 || emaLastValueRef.current === null) {
+                const emaData = calculateEMA(data, 20);
+                if (emaData && emaData.length > 0) {
+                    emaLastValueRef.current = emaData[emaData.length - 1].value;
+                    emaSeriesRef.current.setData(emaData);
+                }
+            } else {
+                const smoothing = 2 / (20 + 1);
+                const emaValue = (lastDataPoint.close - emaLastValueRef.current) * smoothing + emaLastValueRef.current;
+                emaLastValueRef.current = emaValue;
+                emaSeriesRef.current.update({ time: lastDataPoint.time, value: emaValue });
             }
         }
     }, [indicators]);
@@ -710,8 +975,44 @@ const ChartComponent = forwardRef(({
     const updateIndicators = useCallback((data) => {
         if (!chartRef.current) return;
 
+        // CRITICAL: Ensure chart container remains visible during indicator updates
+        // This must be done FIRST, before any chart operations
+        // Always ensure visibility when updating indicators, even during initial load
+        if (chartContainerRef.current) {
+            // Add CSS class for guaranteed visibility (using !important) - do this FIRST
+            chartContainerRef.current.classList.add(styles.forceVisible);
+            // Set immediately and synchronously - always visible when updating indicators
+            chartContainerRef.current.style.visibility = 'visible';
+            chartContainerRef.current.style.opacity = '1';
+            // Remove any inline styles that might hide it
+            chartContainerRef.current.style.display = '';
+        }
+
         // Batch all operations to prevent multiple redraws
         chartRef.current.applyOptions({});
+        
+        // Double-check visibility after chart operations
+        if (chartContainerRef.current) {
+            chartContainerRef.current.classList.add(styles.forceVisible);
+            chartContainerRef.current.style.visibility = 'visible';
+            chartContainerRef.current.style.opacity = '1';
+        }
+        
+        // Also use requestAnimationFrame as backup
+        requestAnimationFrame(() => {
+            if (chartContainerRef.current) {
+                chartContainerRef.current.classList.add(styles.forceVisible);
+                chartContainerRef.current.style.visibility = 'visible';
+                chartContainerRef.current.style.opacity = '1';
+            }
+        });
+
+        // Ensure visibility before each indicator calculation
+        if (chartContainerRef.current) {
+            chartContainerRef.current.classList.add(styles.forceVisible);
+            chartContainerRef.current.style.visibility = 'visible';
+            chartContainerRef.current.style.opacity = '1';
+        }
 
         // SMA Indicator
         if (indicators.sma) {
@@ -724,15 +1025,30 @@ const ChartComponent = forwardRef(({
                     lastValueVisible: false
                 });
             }
-            const smaData = calculateSMA(data, 20);
-            if (smaData && smaData.length > 0) {
-                smaSeriesRef.current.setData(smaData);
+            // Ensure visibility before calculation
+            if (chartContainerRef.current) {
+                chartContainerRef.current.classList.add(styles.forceVisible);
+                chartContainerRef.current.style.visibility = 'visible';
+                chartContainerRef.current.style.opacity = '1';
+            }
+            if (typeof calculateSMA === 'function') {
+                const smaData = calculateSMA(data, 20);
+                if (smaData && smaData.length > 0) {
+                    smaSeriesRef.current.setData(smaData);
+                }
             }
         } else {
             if (smaSeriesRef.current) {
                 chartRef.current.removeSeries(smaSeriesRef.current);
                 smaSeriesRef.current = null;
             }
+        }
+
+        // Ensure visibility before EMA calculation
+        if (chartContainerRef.current) {
+            chartContainerRef.current.classList.add(styles.forceVisible);
+            chartContainerRef.current.style.visibility = 'visible';
+            chartContainerRef.current.style.opacity = '1';
         }
 
         // EMA Indicator
@@ -746,9 +1062,17 @@ const ChartComponent = forwardRef(({
                     lastValueVisible: false
                 });
             }
-            const emaData = calculateEMA(data, 20);
-            if (emaData && emaData.length > 0) {
-                emaSeriesRef.current.setData(emaData);
+            // Ensure visibility before calculation
+            if (chartContainerRef.current) {
+                chartContainerRef.current.classList.add(styles.forceVisible);
+                chartContainerRef.current.style.visibility = 'visible';
+                chartContainerRef.current.style.opacity = '1';
+            }
+            if (typeof calculateEMA === 'function') {
+                const emaData = calculateEMA(data, 20);
+                if (emaData && emaData.length > 0) {
+                    emaSeriesRef.current.setData(emaData);
+                }
             }
         } else {
             if (emaSeriesRef.current) {
@@ -756,13 +1080,83 @@ const ChartComponent = forwardRef(({
                 emaSeriesRef.current = null;
             }
         }
+        
+        // Final visibility check after all indicator operations
+        if (chartContainerRef.current) {
+            chartContainerRef.current.classList.add(styles.forceVisible);
+            chartContainerRef.current.style.visibility = 'visible';
+            chartContainerRef.current.style.opacity = '1';
+        }
     }, [indicators]);
 
     // Separate effect for indicators to prevent data reload
     useEffect(() => {
-        if (dataRef.current.length > 0) {
-            updateIndicators(dataRef.current);
+        // CRITICAL: Ensure chart remains visible IMMEDIATELY when indicators change
+        // This must happen synchronously before any other operations to prevent flicker
+        // Always ensure visibility, regardless of loading state (indicators should never hide chart)
+        if (chartContainerRef.current) {
+            // Add CSS class for guaranteed visibility (using !important)
+            chartContainerRef.current.classList.add(styles.forceVisible);
+            // Also set inline styles immediately (synchronously) as primary method
+            chartContainerRef.current.style.visibility = 'visible';
+            chartContainerRef.current.style.opacity = '1';
+            
+            // Use requestAnimationFrame to ensure this runs before any paint
+            requestAnimationFrame(() => {
+                if (chartContainerRef.current) {
+                    chartContainerRef.current.classList.add(styles.forceVisible);
+                    chartContainerRef.current.style.visibility = 'visible';
+                    chartContainerRef.current.style.opacity = '1';
+                }
+            });
         }
+        
+        // CRITICAL: Ensure chart is visible BEFORE any indicator calculations
+        // This must happen synchronously, before any async operations
+        if (chartContainerRef.current) {
+            chartContainerRef.current.classList.add(styles.forceVisible);
+            chartContainerRef.current.style.visibility = 'visible';
+            chartContainerRef.current.style.opacity = '1';
+        }
+        
+        emaLastValueRef.current = null;
+        if (dataRef.current.length > 0) {
+            // Ensure visibility again right before calling updateIndicators
+            if (chartContainerRef.current) {
+                chartContainerRef.current.classList.add(styles.forceVisible);
+                chartContainerRef.current.style.visibility = 'visible';
+                chartContainerRef.current.style.opacity = '1';
+            }
+            
+            // Wrap in try-catch to handle any potential errors from indicator calculations
+            try {
+                updateIndicators(dataRef.current);
+                if (emaSeriesRef.current && dataRef.current.length >= 20) {
+                    const emaData = calculateEMA(dataRef.current, 20);
+                    if (emaData && emaData.length > 0) {
+                        emaLastValueRef.current = emaData[emaData.length - 1].value;
+                        emaSeriesRef.current.setData(emaData);
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating indicators:', error);
+                // Ensure chart stays visible even if there's an error
+                if (chartContainerRef.current) {
+                    chartContainerRef.current.classList.add(styles.forceVisible);
+                    chartContainerRef.current.style.visibility = 'visible';
+                    chartContainerRef.current.style.opacity = '1';
+                }
+            }
+        }
+        
+        // Double-check visibility after a microtask to ensure it wasn't reset
+        Promise.resolve().then(() => {
+            if (chartContainerRef.current) {
+                chartContainerRef.current.classList.add(styles.forceVisible);
+                chartContainerRef.current.style.visibility = 'visible';
+                chartContainerRef.current.style.opacity = '1';
+            }
+        });
     }, [updateIndicators]);
 
     // Handle Magnet Mode
@@ -907,13 +1301,71 @@ const ChartComponent = forwardRef(({
         }
     };
 
+    // Define updateReplayData first since other functions depend on it
+    const updateReplayData = useCallback((index, hideFeature = true, preserveView = false) => {
+        if (!mainSeriesRef.current || !fullDataRef.current || !chartRef.current) return;
+        
+        // Clamp index to valid range
+        const clampedIndex = Math.max(0, Math.min(index, fullDataRef.current.length - 1));
+        
+        // Store current visible range if we need to preserve it
+        let currentVisibleRange = null;
+        if (preserveView && chartRef.current) {
+            try {
+                const timeScale = chartRef.current.timeScale();
+                currentVisibleRange = timeScale.getVisibleLogicalRange();
+            } catch (e) {
+                // Ignore errors
+            }
+        }
+        
+        const pastData = fullDataRef.current.slice(0, clampedIndex + 1);
+        
+        if (hideFeature) {
+            // Hide future candles - show only past data
+            dataRef.current = pastData;
+            const transformedData = transformData(pastData, chartTypeRef.current);
+            mainSeriesRef.current.setData(transformedData);
+        } else {
+            // Show all candles (for preview mode)
+            dataRef.current = fullDataRef.current;
+            const transformedData = transformData(fullDataRef.current, chartTypeRef.current);
+            mainSeriesRef.current.setData(transformedData);
+        }
+        
+        // Update indicators only with past data
+        updateIndicators(pastData);
+        updateAxisLabel();
+        
+        // Update ref to keep in sync
+        replayIndexRef.current = clampedIndex;
+        
+        // Restore visible range if we're preserving the view
+        if (preserveView && currentVisibleRange && chartRef.current) {
+            try {
+                setTimeout(() => {
+                    const timeScale = chartRef.current.timeScale();
+                    timeScale.setVisibleLogicalRange(currentVisibleRange);
+                }, 0);
+            } catch (e) {
+                // Ignore errors
+            }
+        }
+    }, []);
+    
+    // Store updateReplayData in ref so it can be accessed from useImperativeHandle
+    useEffect(() => {
+        updateReplayDataRef.current = updateReplayData;
+    }, [updateReplayData]);
+
     const handleReplayPlayPause = () => {
         setIsPlaying(prev => !prev);
     };
 
     const handleReplayForward = () => {
-        if (replayIndex !== null && replayIndex < fullDataRef.current.length - 1) {
-            const nextIndex = replayIndex + 1;
+        const currentIndex = replayIndexRef.current;
+        if (currentIndex !== null && currentIndex < fullDataRef.current.length - 1) {
+            const nextIndex = currentIndex + 1;
             setReplayIndex(nextIndex);
             updateReplayData(nextIndex);
         }
@@ -922,75 +1374,294 @@ const ChartComponent = forwardRef(({
     const handleReplayJumpTo = () => {
         setIsSelectingReplayPoint(true);
         setIsPlaying(false);
+        
+        // Show ALL candles so user can see the full timeline and select a new point
+        // But preserve the current zoom level and position
+        if (mainSeriesRef.current && fullDataRef.current && fullDataRef.current.length > 0) {
+            // Store current visible range to preserve zoom level
+            let currentVisibleRange = null;
+            if (chartRef.current) {
+                try {
+                    const timeScale = chartRef.current.timeScale();
+                    currentVisibleRange = timeScale.getVisibleRange();
+                } catch (e) {
+                    // Ignore errors
+                }
+            }
+            
+            // Store current replay index before showing all candles
+            const currentReplayIndex = replayIndexRef.current;
+            
+            // Show all candles so user can see the full timeline
+            dataRef.current = fullDataRef.current;
+            const transformedData = transformData(fullDataRef.current, chartTypeRef.current);
+            mainSeriesRef.current.setData(transformedData);
+            updateIndicators(fullDataRef.current);
+            
+            // Restore the visible range to maintain zoom level
+            // Use setTimeout to ensure data update has completed
+            setTimeout(() => {
+                if (chartRef.current && fullDataRef.current && fullDataRef.current.length > 0) {
+                    try {
+                        const timeScale = chartRef.current.timeScale();
+                        
+                        // If we have a current visible range, restore it to maintain zoom
+                        if (currentVisibleRange && currentVisibleRange.from && currentVisibleRange.to) {
+                            // Restore the exact same range to maintain zoom level
+                            timeScale.setVisibleRange(currentVisibleRange);
+                        } else if (currentReplayIndex !== null && currentReplayIndex >= 0) {
+                            // No current range, but we have a replay index - show around it
+                            const currentIndex = currentReplayIndex;
+                            const currentTime = fullDataRef.current[currentIndex]?.time;
+                            
+                            if (currentTime) {
+                                // Use a reasonable default window that matches typical zoom
+                                const DEFAULT_VIEW_WINDOW = 200; // Larger window to avoid zooming in
+                                const startIndex = Math.max(0, currentIndex - DEFAULT_VIEW_WINDOW / 2);
+                                const endIndex = Math.min(fullDataRef.current.length - 1, currentIndex + DEFAULT_VIEW_WINDOW / 2);
+                                
+                                const startTime = fullDataRef.current[startIndex]?.time;
+                                const endTime = fullDataRef.current[endIndex]?.time;
+                                
+                                if (startTime && endTime) {
+                                    timeScale.setVisibleRange({ from: startTime, to: endTime });
+                                }
+                            }
+                        } else {
+                            // No current range or replay index - use fitContent to show all
+                            try {
+                                timeScale.fitContent();
+                            } catch (e) {
+                                // Ignore
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Failed to restore visible range in Jump to Bar:', e);
+                    }
+                }
+            }, 50);
+        }
+        
         // Change cursor to indicate selection
         if (chartContainerRef.current) {
             chartContainerRef.current.style.cursor = 'crosshair';
         }
     };
 
-    const updateReplayData = (index) => {
-        if (!mainSeriesRef.current || !fullDataRef.current) return;
+    const handleSliderChange = useCallback((index, hideFuture = true) => {
+        if (index >= 0 && index < fullDataRef.current.length) {
+            // Stop playback when user manually changes position
+            if (isPlayingRef.current) {
+                setIsPlaying(false);
+                isPlayingRef.current = false;
+                stopReplay();
+            }
+            
+            setReplayIndex(index);
+            updateReplayData(index, hideFuture);
+        }
+    }, [updateReplayData]);
 
-        const slicedData = fullDataRef.current.slice(0, index + 1);
-        dataRef.current = slicedData;
-
-        const transformedData = transformData(slicedData, chartTypeRef.current);
-        mainSeriesRef.current.setData(transformedData);
-        updateIndicators(slicedData);
-        updateAxisLabel();
-    };
-
-    // Playback Effect
+    // Playback Effect - Fixed race condition and synchronization
     useEffect(() => {
         if (isPlaying && isReplayMode) {
             stopReplay();
+            
+            // When playback starts, ensure we're showing only candles up to current index
+            // Hide future candles immediately
+            const currentIndex = replayIndexRef.current;
+            if (currentIndex !== null) {
+                updateReplayData(currentIndex, true); // true = hide future candles
+            }
+            
             const intervalMs = 1000 / replaySpeed; // 1x = 1 sec, 10x = 0.1 sec
 
             replayIntervalRef.current = setInterval(() => {
-                setReplayIndex(prev => {
-                    if (prev === null || prev >= fullDataRef.current.length - 1) {
-                        setIsPlaying(false);
-                        return prev;
-                    }
-                    const next = prev + 1;
-                    updateReplayData(next);
-                    return next;
-                });
+                // Use ref to get current value and avoid stale closures
+                const currentIndex = replayIndexRef.current;
+                
+                if (currentIndex === null || currentIndex >= fullDataRef.current.length - 1) {
+                    setIsPlaying(false);
+                    isPlayingRef.current = false;
+                    return;
+                }
+                
+                const nextIndex = currentIndex + 1;
+                
+                // Update state and data synchronously - always hide future candles during playback
+                setReplayIndex(nextIndex);
+                updateReplayData(nextIndex, true); // true = hide future candles
             }, intervalMs);
         } else {
             stopReplay();
         }
         return () => stopReplay();
-    }, [isPlaying, isReplayMode, replaySpeed]);
+    }, [isPlaying, isReplayMode, replaySpeed, updateReplayData]);
 
-    // Click Handler for "Jump to Bar"
+    // Click Handler for "Jump to Bar" - TradingView style
     useEffect(() => {
         if (!chartRef.current || !isSelectingReplayPoint) return;
+        if (!mainSeriesRef.current) return;
 
+        // Chart click handler - param.time gives us the exact time at the clicked position
         const handleChartClick = (param) => {
-            if (!param.time || !isSelectingReplayPoint) return;
+            if (!param || !isSelectingReplayPoint) return;
+            if (!fullDataRef.current || fullDataRef.current.length === 0) return;
 
-            // Find index of clicked time
-            const clickedTime = param.time;
-            const index = fullDataRef.current.findIndex(d => d.time === clickedTime);
-
-            if (index !== -1) {
-                setReplayIndex(index);
-                updateReplayData(index);
-                setIsSelectingReplayPoint(false);
-                if (chartContainerRef.current) {
-                    chartContainerRef.current.style.cursor = 'default';
+            try {
+                let clickedTime = null;
+                
+                // First try to use param.time (most accurate - exact time at click position)
+                if (param.time) {
+                    clickedTime = param.time;
+                } else if (param.point) {
+                    // Fallback: use coordinate to get time
+                    const timeScale = chartRef.current.timeScale();
+                    const x = param.point.x;
+                    clickedTime = timeScale.coordinateToTime(x);
                 }
+                
+                if (!clickedTime) return;
+
+                // Find exact time match first (most accurate)
+                let clickedIndex = fullDataRef.current.findIndex(d => d.time === clickedTime);
+                
+                // If no exact match, find the closest candle by time
+                if (clickedIndex === -1) {
+                    let minDiff = Infinity;
+                    fullDataRef.current.forEach((d, i) => {
+                        const diff = Math.abs(d.time - clickedTime);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            clickedIndex = i;
+                        }
+                    });
+                }
+
+                // Clamp to valid range
+                clickedIndex = Math.max(0, Math.min(clickedIndex, fullDataRef.current.length - 1));
+
+                if (clickedIndex >= 0 && clickedIndex < fullDataRef.current.length) {
+                    // Store the selected index before updating
+                    const selectedIndex = clickedIndex;
+                    
+                    // Get current visible range BEFORE updating data to preserve zoom level
+                    let currentVisibleRange = null;
+                    let currentVisibleLogicalRange = null;
+                    try {
+                        const timeScale = chartRef.current.timeScale();
+                        currentVisibleRange = timeScale.getVisibleRange();
+                        currentVisibleLogicalRange = timeScale.getVisibleLogicalRange();
+                    } catch (e) {
+                        // Ignore
+                    }
+                    
+                    // Calculate the range width in time units to maintain zoom
+                    let rangeWidth = null;
+                    if (currentVisibleRange && currentVisibleRange.from && currentVisibleRange.to) {
+                        rangeWidth = currentVisibleRange.to - currentVisibleRange.from;
+                    }
+                    
+                    setReplayIndex(selectedIndex);
+                    replayIndexRef.current = selectedIndex;
+                    
+                    // Calculate target visible range BEFORE updating data
+                    const selectedTime = fullDataRef.current[selectedIndex]?.time;
+                    let targetRange = null;
+                    
+                    if (selectedTime && rangeWidth && rangeWidth > 0) {
+                        // Calculate target range to maintain zoom
+                        const newFrom = selectedTime - rangeWidth / 2;
+                        const newTo = selectedTime + rangeWidth / 2;
+                        
+                        const firstTime = fullDataRef.current[0]?.time;
+                        const lastAvailableTime = fullDataRef.current[selectedIndex]?.time;
+                        
+                        if (firstTime && lastAvailableTime) {
+                            let adjustedFrom = Math.max(firstTime, newFrom);
+                            let adjustedTo = Math.min(lastAvailableTime, newTo);
+                            
+                            // Adjust boundaries while maintaining width
+                            if (adjustedFrom === firstTime && adjustedTo < newTo) {
+                                adjustedTo = Math.min(lastAvailableTime, adjustedFrom + rangeWidth);
+                            } else if (adjustedTo === lastAvailableTime && adjustedFrom > newFrom) {
+                                adjustedFrom = Math.max(firstTime, adjustedTo - rangeWidth);
+                            }
+                            
+                            if (adjustedTo > adjustedFrom && (adjustedTo - adjustedFrom) >= rangeWidth * 0.3) {
+                                targetRange = { from: adjustedFrom, to: adjustedTo };
+                            }
+                        }
+                    }
+                    
+                    // If no target range calculated, use a default that doesn't zoom in
+                    if (!targetRange && selectedTime) {
+                        const VIEW_WINDOW = 300;
+                        const startIndex = Math.max(0, selectedIndex - VIEW_WINDOW / 2);
+                        const endIndex = selectedIndex;
+                        const startTime = fullDataRef.current[startIndex]?.time;
+                        const endTime = fullDataRef.current[endIndex]?.time;
+                        if (startTime && endTime) {
+                            targetRange = { from: startTime, to: endTime };
+                        }
+                    }
+                    
+                    // Update replay data
+                    updateReplayData(selectedIndex, true, false);
+                    
+                    setIsSelectingReplayPoint(false);
+                    if (chartContainerRef.current) {
+                        chartContainerRef.current.style.cursor = 'default';
+                    }
+                    
+                    // Immediately set visible range to prevent auto-zoom
+                    // Set multiple times to ensure it sticks
+                    if (targetRange && chartRef.current) {
+                        try {
+                            const timeScale = chartRef.current.timeScale();
+                            // Set immediately
+                            timeScale.setVisibleRange(targetRange);
+                            
+                            // Set again after a short delay to override any auto-zoom
+                            setTimeout(() => {
+                                if (chartRef.current) {
+                                    try {
+                                        chartRef.current.timeScale().setVisibleRange(targetRange);
+                                    } catch (e) {
+                                        // Ignore
+                                    }
+                                }
+                            }, 10);
+                            
+                            // Set one more time after data update completes
+                            setTimeout(() => {
+                                if (chartRef.current) {
+                                    try {
+                                        chartRef.current.timeScale().setVisibleRange(targetRange);
+                                    } catch (e) {
+                                        // Ignore
+                                    }
+                                }
+                            }, 100);
+                        } catch (e) {
+                            console.warn('Failed to set visible range after selection:', e);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Error handling chart click in Jump to Bar:', e);
             }
         };
 
+        // Subscribe to chart clicks only (series don't have subscribeClick method)
         chartRef.current.subscribeClick(handleChartClick);
+        
         return () => {
             if (chartRef.current) {
                 chartRef.current.unsubscribeClick(handleChartClick);
             }
         };
-    }, [isSelectingReplayPoint]);
+    }, [isSelectingReplayPoint, updateReplayData]);
 
     return (
         <div className={`${styles.chartWrapper} ${isToolbarVisible ? styles.toolbarVisible : ''}`}>
@@ -1001,7 +1672,10 @@ const ChartComponent = forwardRef(({
                 style={{
                     position: 'relative',
                     touchAction: 'none',
-                    visibility: isLoading ? 'hidden' : 'visible'
+                    // Only hide if actually loading data, not during indicator updates
+                    visibility: (isLoading && isActuallyLoadingRef.current) ? 'hidden' : 'visible',
+                    opacity: (isLoading && isActuallyLoadingRef.current) ? 0 : 1,
+                    transition: 'opacity 0.1s ease-in-out'
                 }}
             />
             {isLoading && <div className={styles.loadingOverlay}><div className={styles.spinner}></div><div>Loading...</div></div>}
@@ -1053,6 +1727,20 @@ const ChartComponent = forwardRef(({
                             updateIndicators(fullDataRef.current);
                         }
                     }}
+                />
+            )}
+
+            {/* Replay Slider */}
+            {isReplayMode && (
+                <ReplaySlider
+                    chartRef={chartRef}
+                    isReplayMode={isReplayMode}
+                    replayIndex={replayIndex}
+                    fullData={fullDataRef.current}
+                    onSliderChange={handleSliderChange}
+                    containerRef={chartContainerRef}
+                    isSelectingReplayPoint={isSelectingReplayPoint}
+                    isPlaying={isPlaying}
                 />
             )}
 

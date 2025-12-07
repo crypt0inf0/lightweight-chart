@@ -1,0 +1,85 @@
+.fadeOverlay {
+  position: absolute;
+  top: 0;
+  height: calc(100% - 30px); /* Leave space for time axis at bottom */
+  background-color: rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+  z-index: 35;
+  transition: left 0.05s ease-out, width 0.05s ease-out;
+}
+
+/* Dark theme support - adjust based on your theme */
+[data-theme="dark"] .fadeOverlay,
+.dark .fadeOverlay {
+  background-color: rgba(0, 0, 0, 0.65);
+}
+
+.sliderContainer {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 40;
+  transform: translateX(-1px);
+}
+
+.sliderLine {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background-color: #F23645;
+  transform: translateX(-50%);
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(242, 54, 69, 0.5);
+  opacity: 0.85;
+}
+
+.sliderHandle {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background-color: #F23645;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  transform: translate(-50%, 50%);
+  cursor: ew-resize;
+  pointer-events: all;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 12px rgba(242, 54, 69, 0.6);
+  z-index: 50;
+}
+
+.sliderHandle:hover {
+  transform: translate(-50%, 50%) scale(1.2);
+  box-shadow: 0 3px 16px rgba(242, 54, 69, 0.8);
+}
+
+.sliderHandle:active {
+  transform: translate(-50%, 50%) scale(1.1);
+  box-shadow: 0 2px 14px rgba(242, 54, 69, 0.9);
+  cursor: grabbing;
+}
+
+.timeTooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(19, 23, 34, 0.95);
+  color: #D1D4DC;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  margin-bottom: 30px;
+  border: 1px solid rgba(242, 54, 69, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+}

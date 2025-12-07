@@ -18,7 +18,6 @@ const DrawingToolbar = ({ activeTool, onToolChange }) => {
                 { id: 'trendline', icon: Icons.TrendLineIcon, label: 'Trend Line' },
                 { id: 'arrow', icon: Icons.ArrowIcon, label: 'Arrow' },
                 { id: 'ray', icon: Icons.RayIcon, label: 'Ray' },
-                { id: 'info_line', icon: Icons.TrendLineIcon, label: 'Info Line' },
                 { id: 'extended_line', icon: Icons.ExtendedLineIcon, label: 'Extended Line' },
                 { id: 'horizontal_ray', icon: Icons.HorizontalRayIcon, label: 'Horizontal Ray' },
                 { id: 'horizontal', icon: Icons.HorizontalLineIcon, label: 'Horizontal Line' },
@@ -67,7 +66,7 @@ const DrawingToolbar = ({ activeTool, onToolChange }) => {
                 { id: 'prediction_short', icon: Icons.ShortPositionIcon, label: 'Short Position' },
                 { id: 'date_range', icon: Icons.DateRangeIcon, label: 'Date Range' },
                 { id: 'price_range', icon: Icons.PriceRangeIcon, label: 'Price Range' },
-                { id: 'date_price_range', icon: Icons.DateRangeIcon, label: 'Date & Price Range' }
+                { id: 'date_price_range', icon: Icons.DatePriceRangeIcon, label: 'Date & Price Range' }
             ]
         },
         {

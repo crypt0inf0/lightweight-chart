@@ -1,4 +1,22 @@
 // Template Manager for saving and loading drawing configurations
+const safeParseJSON = (value, fallback) => {
+    if (!value) return fallback;
+    try {
+        return JSON.parse(value);
+    } catch (error) {
+        console.error('TemplateManager: Failed to parse JSON from localStorage', error);
+        return fallback;
+    }
+};
+
+const safeSetItem = (key, data) => {
+    try {
+        localStorage.setItem(key, data);
+    } catch (error) {
+        console.error(`TemplateManager: Failed to persist ${key}`, error);
+    }
+};
+
 export class TemplateManager {
     constructor() {
         this.templates = this.loadTemplates();
@@ -6,14 +24,9 @@ export class TemplateManager {
 
     // Load templates from localStorage
     loadTemplates() {
-        const saved = localStorage.getItem('tv_drawing_templates');
-        if (saved) {
-            try {
-                return JSON.parse(saved);
-            } catch (error) {
-                console.error('Error loading templates:', error);
-                return this.getDefaultTemplates();
-            }
+        const saved = safeParseJSON(localStorage.getItem('tv_drawing_templates'), null);
+        if (saved && typeof saved === 'object') {
+            return saved;
         }
         return this.getDefaultTemplates();
     }
@@ -170,11 +183,7 @@ export class TemplateManager {
 
     // Persist templates to localStorage
     persist() {
-        try {
-            localStorage.setItem('tv_drawing_templates', JSON.stringify(this.templates));
-        } catch (error) {
-            console.error('Error saving templates:', error);
-        }
+        safeSetItem('tv_drawing_templates', JSON.stringify(this.templates));
     }
 
     // Export templates as JSON file
@@ -221,8 +230,8 @@ export class TemplateManager {
 
     // Get favorite templates (stored separately)
     getFavorites() {
-        const saved = localStorage.getItem('tv_template_favorites');
-        return saved ? JSON.parse(saved) : [];
+        const saved = safeParseJSON(localStorage.getItem('tv_template_favorites'), []);
+        return Array.isArray(saved) ? saved : [];
     }
 
     // Toggle favorite status
@@ -236,7 +245,7 @@ export class TemplateManager {
             favorites.splice(index, 1);
         }
 
-        localStorage.setItem('tv_template_favorites', JSON.stringify(favorites));
+        safeSetItem('tv_template_favorites', JSON.stringify(favorites));
         return favorites;
     }
 }

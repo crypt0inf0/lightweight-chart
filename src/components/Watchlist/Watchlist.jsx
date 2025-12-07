@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Plus, X } from 'lucide-react';
 import styles from './Watchlist.module.css';
 import classNames from 'classnames';
@@ -7,7 +7,7 @@ const Watchlist = ({ currentSymbol, items, onSymbolSelect, onAddClick, onRemoveC
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
     const [draggedIndex, setDraggedIndex] = useState(null);
 
-    const handleSort = (key) => {
+    const handleSort = useCallback((key) => {
         let direction = 'asc';
         if (sortConfig.key === key) {
             if (sortConfig.direction === 'asc') {
@@ -19,20 +19,20 @@ const Watchlist = ({ currentSymbol, items, onSymbolSelect, onAddClick, onRemoveC
             }
         }
         setSortConfig({ key, direction });
-    };
+    }, [sortConfig]);
 
-    const handleDragStart = (e, index) => {
+    const handleDragStart = useCallback((e, index) => {
         setDraggedIndex(index);
         e.dataTransfer.effectAllowed = "move";
         // Optional: set drag image or style
-    };
+    }, []);
 
-    const handleDragOver = (e, index) => {
+    const handleDragOver = useCallback((e, index) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";
-    };
+    }, []);
 
-    const handleDrop = (e, dropIndex) => {
+    const handleDrop = useCallback((e, dropIndex) => {
         e.preventDefault();
         if (draggedIndex === null || draggedIndex === dropIndex) return;
 
@@ -43,24 +43,25 @@ const Watchlist = ({ currentSymbol, items, onSymbolSelect, onAddClick, onRemoveC
         const newSymbols = newItems.map(item => item.symbol);
         if (onReorder) onReorder(newSymbols);
         setDraggedIndex(null);
-    };
+    }, [draggedIndex, items, onReorder]);
 
-    const sortedItems = [...items].sort((a, b) => {
-        if (!sortConfig.key) return 0;
+    const sortedItems = useMemo(() => {
+        if (!sortConfig.key) return items;
 
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
+        return [...items].sort((a, b) => {
+            let aValue = a[sortConfig.key];
+            let bValue = b[sortConfig.key];
 
-        // Parse numbers for price fields
-        if (['last', 'chg', 'chgP'].includes(sortConfig.key)) {
-            aValue = parseFloat(aValue) || 0;
-            bValue = parseFloat(bValue) || 0;
-        }
+            if (['last', 'chg', 'chgP'].includes(sortConfig.key)) {
+                aValue = parseFloat(aValue) || 0;
+                bValue = parseFloat(bValue) || 0;
+            }
 
-        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-    });
+            if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [items, sortConfig]);
 
     return (
         <div className={styles.watchlist}>
@@ -121,4 +122,4 @@ const Watchlist = ({ currentSymbol, items, onSymbolSelect, onAddClick, onRemoveC
     );
 };
 
-export default Watchlist;
+export default React.memo(Watchlist);

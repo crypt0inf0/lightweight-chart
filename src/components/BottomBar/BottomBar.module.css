@@ -10,6 +10,12 @@
     user-select: none;
 }
 
+/* When the left drawing toolbar is visible, visually align the bottom bar
+   content with the chart by offsetting it to the right by the toolbar width. */
+.withLeftToolbar {
+    padding-left: 62px; /* 52px toolbar + 10px base padding */
+}
+
 .leftSection {
     display: flex;
     align-items: center;

@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "classnames": "^2.5.1",
     "html2canvas": "^1.4.1",
     "lightweight-charts": "^5.0.9",
     "lucide-react": "^0.555.0",

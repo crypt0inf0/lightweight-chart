@@ -1,3 +1,53 @@
+const createManagedWebSocket = (urlBuilder, attachHandlers) => {
+    let socket = null;
+    let manualClose = false;
+    let reconnectAttempts = 0;
+    const maxAttempts = 5;
+
+    const connect = () => {
+        const url = typeof urlBuilder === 'function' ? urlBuilder() : urlBuilder;
+        try {
+            socket = new WebSocket(url);
+        } catch (error) {
+            console.error('Failed to create WebSocket:', error);
+            return;
+        }
+
+        attachHandlers(socket);
+
+        socket.onopen = () => {
+            reconnectAttempts = 0;
+        };
+
+        socket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        socket.onclose = (event) => {
+            if (manualClose) return;
+            if (!event.wasClean && reconnectAttempts < maxAttempts) {
+                const delay = Math.min(1000 * 2 ** reconnectAttempts, 10000);
+                reconnectAttempts += 1;
+                setTimeout(connect, delay);
+            }
+        };
+    };
+
+    connect();
+
+    return {
+        close: () => {
+            manualClose = true;
+            if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+                socket.close();
+            }
+        },
+        get readyState() {
+            return socket ? socket.readyState : WebSocket.CLOSED;
+        }
+    };
+};
+
 export const getKlines = async (symbol, interval = '1d', limit = 1000, signal) => {
     const safeLimit = Number.isFinite(limit) ? limit : 1000;
     const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${safeLimit}`;
@@ -42,61 +92,50 @@ export const getTickerPrice = async (symbol) => {
 };
 
 export const subscribeToTicker = (symbol, interval, callback) => {
-    const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`);
+    return createManagedWebSocket(() => `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`, (socket) => {
+        socket.onmessage = (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                if (!message || !message.k) return;
 
-    ws.onmessage = (event) => {
-        try {
-            const message = JSON.parse(event.data);
-            if (!message || !message.k) return;
-
-            const kline = message.k;
-            const candle = {
-                time: kline.t / 1000,
-                open: parseFloat(kline.o),
-                high: parseFloat(kline.h),
-                low: parseFloat(kline.l),
-                close: parseFloat(kline.c),
-            };
-            callback(candle);
-        } catch (error) {
-            console.error('Error parsing WebSocket message:', error);
-        }
-    };
-
-    return ws;
+                const kline = message.k;
+                const candle = {
+                    time: kline.t / 1000,
+                    open: parseFloat(kline.o),
+                    high: parseFloat(kline.h),
+                    low: parseFloat(kline.l),
+                    close: parseFloat(kline.c),
+                };
+                callback(candle);
+            } catch (error) {
+                console.error('Error parsing WebSocket message:', error);
+            }
+        };
+    });
 };
 
 export const subscribeToMultiTicker = (symbols, callback) => {
     if (!symbols || symbols.length === 0) return null;
 
-    const streams = symbols.map(s => `${s.toLowerCase()}@miniTicker`).join('/');
-    const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+    const streamPath = symbols.map(s => `${s.toLowerCase()}@miniTicker`).join('/');
+    return createManagedWebSocket(() => `wss://stream.binance.com:9443/stream?streams=${streamPath}`, (socket) => {
+        socket.onmessage = (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                if (!message || !message.data) return;
 
-    ws.onmessage = (event) => {
-        try {
-            const message = JSON.parse(event.data);
-            if (!message || !message.data) return;
-
-            const ticker = message.data;
-            // miniTicker format:
-            // e: event type, E: event time, s: symbol, c: close, o: open, h: high, l: low, v: volume, q: quote volume
-            const data = {
-                symbol: ticker.s,
-                last: parseFloat(ticker.c),
-                open: parseFloat(ticker.o),
-                // Calculate change and change% based on open (approximate for miniTicker) or use 24hr ticker if needed.
-                // Note: miniTicker 'o' is 24hr open price? No, it's usually candle open.
-                // Actually @miniTicker gives 24hr rolling window stats?
-                // Binance docs: @miniTicker "24hr Rolling Window Mini-Ticker Statistics"
-                // So 'o' is Open Price (24hr).
-                chg: parseFloat(ticker.c) - parseFloat(ticker.o),
-                chgP: ((parseFloat(ticker.c) - parseFloat(ticker.o)) / parseFloat(ticker.o)) * 100
-            };
-            callback(data);
-        } catch (error) {
-            console.error('Error parsing WebSocket message:', error);
-        }
-    };
-
-    return ws;
+                const ticker = message.data;
+                const data = {
+                    symbol: ticker.s,
+                    last: parseFloat(ticker.c),
+                    open: parseFloat(ticker.o),
+                    chg: parseFloat(ticker.c) - parseFloat(ticker.o),
+                    chgP: ((parseFloat(ticker.c) - parseFloat(ticker.o)) / parseFloat(ticker.o)) * 100
+                };
+                callback(data);
+            } catch (error) {
+                console.error('Error parsing WebSocket message:', error);
+            }
+        };
+    });
 };

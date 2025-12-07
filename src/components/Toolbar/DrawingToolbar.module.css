@@ -11,6 +11,8 @@
     /* Firefox */
     z-index: 20;
     /* Ensure it stays above chart content if needed */
+    /* Allow chart to be visible behind toolbar */
+    pointer-events: auto;
 }
 
 .toolbar::-webkit-scrollbar {

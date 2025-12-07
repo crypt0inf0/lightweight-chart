@@ -1,9 +1,9 @@
-function Ht(h) {
+function Bt(h) {
   if (h === void 0)
     throw new Error("Value is undefined");
   return h;
 }
-class Zt {
+class Gt {
   _chart = void 0;
   _series = void 0;
   requestUpdate() {
@@ -17,10 +17,10 @@ class Zt {
     this._series?.unsubscribeDataChanged(this._fireDataUpdated), this._chart = void 0, this._series = void 0, this._requestUpdate = void 0;
   }
   get chart() {
-    return Ht(this._chart);
+    return Bt(this._chart);
   }
   get series() {
-    return Ht(this._series);
+    return Bt(this._series);
   }
   // This method is a class property to maintain the
   // lexical 'this' scope (due to the use of the arrow function)
@@ -29,7 +29,7 @@ class Zt {
     this.dataUpdated && this.dataUpdated(t);
   };
 }
-function ft(h, t, e) {
+function gt(h, t, e) {
   const i = t.timeScale();
   return h.map((s) => ({
     x: i.logicalToCoordinate(s.logical),
@@ -42,26 +42,26 @@ function T(h, t, e) {
     y: e.priceToCoordinate(h.price)
   };
 }
-function A(h, t, e) {
+function L(h, t, e) {
   const i = (t.x - e.x) ** 2 + (t.y - e.y) ** 2;
   if (i === 0) return Math.hypot(h.x - t.x, h.y - t.y);
   let s = ((h.x - t.x) * (e.x - t.x) + (h.y - t.y) * (e.y - t.y)) / i;
   return s = Math.max(0, Math.min(1, s)), Math.hypot(h.x - (t.x + s * (e.x - t.x)), h.y - (t.y + s * (e.y - t.y)));
 }
-function gt(h, t) {
+function mt(h, t) {
   const e = Math.min(t.x1, t.x2), i = Math.max(t.x1, t.x2), s = Math.min(t.y1, t.y2), o = Math.max(t.y1, t.y2);
   return h.x >= e && h.x <= i && h.y >= s && h.y <= o;
 }
-function ee(h, t, e) {
+function se(h, t, e) {
   return Math.hypot(h.x - t.x, h.y - t.y) <= e;
 }
 function xt(h, t) {
   h.strokeStyle = t.lineColor, h.lineWidth = t.width, t.lineJoin && (h.lineJoin = t.lineJoin), t.lineCap && (h.lineCap = t.lineCap), t.globalAlpha !== void 0 && (h.globalAlpha = t.globalAlpha);
 }
-function mt(h) {
+function yt(h) {
   h.lineJoin = "miter", h.lineCap = "butt", h.globalAlpha = 1, h.setLineDash([]);
 }
-function F(h, t) {
+function z(h, t) {
   const e = [
     [],
     // 0: Solid
@@ -80,7 +80,7 @@ function y(h, t, e, i = "#FFFFFF", s = "#2962FF") {
   const o = h.context;
   o.fillStyle = i, o.strokeStyle = s, o.lineWidth = 2, o.beginPath(), o.arc(t, e, 6 * h.horizontalPixelRatio, 0, 2 * Math.PI), o.fill(), o.stroke();
 }
-function x(h, t) {
+function m(h, t) {
   return Math.round(h * t);
 }
 class w {
@@ -121,46 +121,46 @@ class w {
     return new w(this.x, this.y);
   }
 }
-class ie {
+class oe {
   min;
   max;
   constructor(t, e) {
     this.min = new w(Math.min(t.x, e.x), Math.min(t.y, e.y)), this.max = new w(Math.max(t.x, e.x), Math.max(t.y, e.y));
   }
 }
-function st(h, t) {
+function nt(h, t) {
   return Math.abs(h.x - t.x) < 1e-6 && Math.abs(h.y - t.y) < 1e-6;
 }
-function se(h, t, e) {
+function ne(h, t, e) {
   return { a: h, b: t, c: e };
 }
-function oe(h, t) {
-  return se(h.y - t.y, t.x - h.x, h.x * t.y - t.x * h.y);
+function le(h, t) {
+  return ne(h.y - t.y, t.x - h.x, h.x * t.y - t.x * h.y);
 }
-function J(h, t) {
+function G(h, t) {
   return [h, t];
 }
-function Bt(h, t) {
+function Wt(h, t) {
   for (let e = 0; e < h.length; e++)
-    if (st(h[e], t))
+    if (nt(h[e], t))
       return !1;
   return h.push(t), !0;
 }
-function ne(h, t) {
+function re(h, t) {
   if (Math.abs(h.a) < 1e-6) {
     const o = -h.c / h.b;
-    return t.min.y <= o && o <= t.max.y ? J(new w(t.min.x, o), new w(t.max.x, o)) : null;
+    return t.min.y <= o && o <= t.max.y ? G(new w(t.min.x, o), new w(t.max.x, o)) : null;
   }
   if (Math.abs(h.b) < 1e-6) {
     const o = -h.c / h.a;
-    return t.min.x <= o && o <= t.max.x ? J(new w(o, t.min.y), new w(o, t.max.y)) : null;
+    return t.min.x <= o && o <= t.max.x ? G(new w(o, t.min.y), new w(o, t.max.y)) : null;
   }
   const e = [], i = function(o) {
-    const l = -(h.c + h.a * o) / h.b;
-    t.min.y <= l && l <= t.max.y && Bt(e, new w(o, l));
+    const n = -(h.c + h.a * o) / h.b;
+    t.min.y <= n && n <= t.max.y && Wt(e, new w(o, n));
   }, s = function(o) {
-    const l = -(h.c + h.b * o) / h.a;
-    t.min.x <= l && l <= t.max.x && Bt(e, new w(l, o));
+    const n = -(h.c + h.b * o) / h.a;
+    t.min.x <= n && n <= t.max.x && Wt(e, new w(n, o));
   };
   switch (i(t.min.x), s(t.min.y), i(t.max.x), s(t.max.y), e.length) {
     case 0:
@@ -168,59 +168,59 @@ function ne(h, t) {
     case 1:
       return e[0];
     case 2:
-      return st(e[0], e[1]) ? e[0] : J(e[0], e[1]);
+      return nt(e[0], e[1]) ? e[0] : G(e[0], e[1]);
   }
   return null;
 }
-function It(h, t, e) {
+function Nt(h, t, e) {
   const i = t.subtract(h), s = [];
   if (i.x !== 0) {
-    const o = (e.min.x - h.x) / i.x, l = h.y + o * i.y;
-    o >= 0 && l >= e.min.y && l <= e.max.y && s.push({ t: o, p: new w(e.min.x, l) });
+    const o = (e.min.x - h.x) / i.x, n = h.y + o * i.y;
+    o >= 0 && n >= e.min.y && n <= e.max.y && s.push({ t: o, p: new w(e.min.x, n) });
   }
   if (i.x !== 0) {
-    const o = (e.max.x - h.x) / i.x, l = h.y + o * i.y;
-    o >= 0 && l >= e.min.y && l <= e.max.y && s.push({ t: o, p: new w(e.max.x, l) });
+    const o = (e.max.x - h.x) / i.x, n = h.y + o * i.y;
+    o >= 0 && n >= e.min.y && n <= e.max.y && s.push({ t: o, p: new w(e.max.x, n) });
   }
   if (i.y !== 0) {
-    const o = (e.min.y - h.y) / i.y, l = h.x + o * i.x;
-    o >= 0 && l >= e.min.x && l <= e.max.x && s.push({ t: o, p: new w(l, e.min.y) });
+    const o = (e.min.y - h.y) / i.y, n = h.x + o * i.x;
+    o >= 0 && n >= e.min.x && n <= e.max.x && s.push({ t: o, p: new w(n, e.min.y) });
   }
   if (i.y !== 0) {
-    const o = (e.max.y - h.y) / i.y, l = h.x + o * i.x;
-    o >= 0 && l >= e.min.x && l <= e.max.x && s.push({ t: o, p: new w(l, e.max.y) });
+    const o = (e.max.y - h.y) / i.y, n = h.x + o * i.x;
+    o >= 0 && n >= e.min.x && n <= e.max.x && s.push({ t: o, p: new w(n, e.max.y) });
   }
-  return s.length === 0 ? null : (s.sort((o, l) => o.t - l.t), s[0].p);
+  return s.length === 0 ? null : (s.sort((o, n) => o.t - n.t), s[0].p);
 }
-function Jt(h, t, e, i, s, o) {
-  if (st(h, t))
+function Kt(h, t, e, i, s, o) {
+  if (nt(h, t))
     return null;
-  const l = new w(0, 0), r = new w(e, i), n = new ie(l, r);
+  const n = new w(0, 0), r = new w(e, i), l = new oe(n, r);
   if (s)
     if (o) {
-      const a = ne(oe(h, t), n);
+      const a = re(le(h, t), l);
       return Array.isArray(a) ? a : null;
     } else {
-      const a = It(t, h, n);
-      return a === null || st(t, a) ? null : J(t, a);
+      const a = Nt(t, h, l);
+      return a === null || nt(t, a) ? null : G(t, a);
     }
   if (o) {
-    const a = It(h, t, n);
-    return a === null || st(h, a) ? null : J(h, a);
+    const a = Nt(h, t, l);
+    return a === null || nt(h, a) ? null : G(h, a);
   } else
-    return J(h, t);
+    return G(h, t);
 }
-function le(h, t, e) {
-  const i = 0.5 * e, s = Math.sqrt(2), l = t.subtract(h).normalized();
+function ae(h, t, e) {
+  const i = 0.5 * e, s = Math.sqrt(2), n = t.subtract(h).normalized();
   let r = 1;
   e === 1 ? r = 3.5 : e === 2 ? r = 2 : e === 3 ? r = 1.5 : e === 4 && (r = 1.25);
-  const n = 5 * e * r, a = 1 * i;
-  if (n * s * 0.2 <= a)
+  const l = 5 * e * r, a = 1 * i;
+  if (l * s * 0.2 <= a)
     return [];
-  const c = l.scaled(n), p = t.subtract(c), _ = l.transposed(), f = 1 * n, d = _.scaled(f), u = p.add(d), g = p.subtract(d), m = u.subtract(t).normalized().scaled(a), v = g.subtract(t).normalized().scaled(a), P = t.add(m), L = t.add(v), C = i * (s - 1), M = _.scaled(C), D = Math.min(n - 1 * i / s, i * s * 1), b = l.scaled(D), X = t.subtract(M), nt = t.add(M), G = t.subtract(b);
-  return [[u, P], [g, L], [X, G.subtract(M)], [nt, G.add(M)]];
+  const c = n.scaled(l), p = t.subtract(c), _ = n.transposed(), u = 1 * l, d = _.scaled(u), f = p.add(d), g = p.subtract(d), x = f.subtract(t).normalized().scaled(a), v = g.subtract(t).normalized().scaled(a), C = t.add(x), V = t.add(v), b = i * (s - 1), M = _.scaled(b), H = Math.min(l - 1 * i / s, i * s * 1), P = n.scaled(H), X = t.subtract(M), rt = t.add(M), K = t.subtract(P);
+  return [[f, C], [g, V], [X, K.subtract(M)], [rt, K.add(M)]];
 }
-class re {
+class ce {
   _p1;
   _p2;
   _options;
@@ -232,28 +232,28 @@ class re {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = new w(s, o), a = new w(l, r), c = e.mediaSize.width * e.horizontalPixelRatio, p = e.mediaSize.height * e.verticalPixelRatio, _ = Jt(
-        n,
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = new w(s, o), a = new w(n, r), c = e.mediaSize.width * e.horizontalPixelRatio, p = e.mediaSize.height * e.verticalPixelRatio, _ = Kt(
+        l,
         a,
         c,
         p,
         !!this._options.extendLeft,
         !!this._options.extendRight
       );
-      _ && (i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.lineCap = "butt", F(i, this._options.lineStyle || 0), i.beginPath(), i.moveTo(_[0].x, _[0].y), i.lineTo(_[1].x, _[1].y), i.stroke(), i.setLineDash([])), this._options.leftEnd === 1 && this._drawArrow(i, a, n, this._options.width), this._options.rightEnd === 1 && this._drawArrow(i, n, a, this._options.width), this._selected && (y(e, s, o), y(e, l, r));
+      _ && (i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.lineCap = "butt", z(i, this._options.lineStyle || 0), i.beginPath(), i.moveTo(_[0].x, _[0].y), i.lineTo(_[1].x, _[1].y), i.stroke(), i.setLineDash([])), this._options.leftEnd === 1 && this._drawArrow(i, a, l, this._options.width), this._options.rightEnd === 1 && this._drawArrow(i, l, a, this._options.width), this._selected && (y(e, s, o), y(e, n, r));
     });
   }
   _drawArrow(t, e, i, s) {
-    const o = le(e, i, s);
+    const o = ae(e, i, s);
     if (o.length !== 0) {
       t.beginPath();
-      for (const [l, r] of o)
-        t.moveTo(l.x, l.y), t.lineTo(r.x, r.y);
+      for (const [n, r] of o)
+        t.moveTo(n.x, n.y), t.lineTo(r.x, r.y);
       t.stroke();
     }
   }
 }
-class ae {
+class he {
   _source;
   _p1 = { x: null, y: null };
   _p2 = { x: null, y: null };
@@ -272,7 +272,7 @@ class ae {
     );
   }
   renderer() {
-    return new re(
+    return new ce(
       this._p1,
       this._p2,
       this._source._options,
@@ -280,7 +280,7 @@ class ae {
     );
   }
 }
-const ce = {
+const pe = {
   lineColor: "rgb(0, 0, 0)",
   width: 2,
   lineStyle: 0,
@@ -302,9 +302,9 @@ class W {
   _alertId;
   constructor(t, e, i, s, o) {
     this._chart = t, this._series = e, this._p1 = i, this._p2 = s, this._options = {
-      ...ce,
+      ...pe,
       ...o
-    }, this._paneViews = [new ae(this)];
+    }, this._paneViews = [new he(this)];
   }
   /**
    * Update both points of the trend line
@@ -341,25 +341,25 @@ class W {
    * @returns Hit test result indicating what was clicked
    */
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price);
-    if (o === null || l === null || r === null || n === null) return null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price);
+    if (o === null || n === null || r === null || l === null) return null;
     const a = 8;
-    if (Math.hypot(t - o, e - l) < a)
+    if (Math.hypot(t - o, e - n) < a)
       return { hit: !0, type: "point", index: 0 };
-    if (Math.hypot(t - r, e - n) < a)
+    if (Math.hypot(t - r, e - l) < a)
       return { hit: !0, type: "point", index: 1 };
-    const c = this._chart.chartElement?.(), p = c?.clientWidth || window.innerWidth, _ = c?.clientHeight || window.innerHeight, f = new w(o, l), d = new w(r, n), u = Jt(
-      f,
+    const c = this._chart.chartElement?.(), p = c?.clientWidth || window.innerWidth, _ = c?.clientHeight || window.innerHeight, u = new w(o, n), d = new w(r, l), f = Kt(
+      u,
       d,
       p,
       _,
       !!this._options.extendLeft,
       !!this._options.extendRight
     );
-    if (u) {
-      if (A({ x: t, y: e }, u[0], u[1]) < 5)
+    if (f) {
+      if (L({ x: t, y: e }, f[0], f[1]) < 5)
         return { hit: !0, type: "line" };
-    } else if (A({ x: t, y: e }, { x: o, y: l }, { x: r, y: n }) < 5)
+    } else if (L({ x: t, y: e }, { x: o, y: n }, { x: r, y: l }) < 5)
       return { hit: !0, type: "line" };
     return null;
   }
@@ -373,7 +373,7 @@ class W {
     return this._paneViews;
   }
 }
-function he(h, t) {
+function _e(h, t) {
   const e = [
     [],
     // 0: Solid
@@ -388,14 +388,14 @@ function he(h, t) {
   ], i = e[t] || e[0];
   h.setLineDash(i);
 }
-function pe(h, t, e, i = "#FFFFFF", s = "#2962FF") {
+function de(h, t, e, i = "#FFFFFF", s = "#2962FF") {
   const o = h.context;
   o.fillStyle = i, o.strokeStyle = s, o.lineWidth = 2, o.beginPath(), o.arc(t, e, 6 * h.horizontalPixelRatio, 0, 2 * Math.PI), o.fill(), o.stroke();
 }
-function _e(h, t) {
+function ue(h, t) {
   return Math.round(h * t);
 }
-class de {
+class fe {
   _y;
   _options;
   _selected;
@@ -405,12 +405,12 @@ class de {
   draw(t) {
     t.useBitmapCoordinateSpace((e) => {
       if (this._y === null) return;
-      const i = e.context, s = _e(this._y, e.verticalPixelRatio), o = e.mediaSize.width * e.horizontalPixelRatio;
-      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, he(i, this._options.lineStyle), i.beginPath(), i.moveTo(0, s), i.lineTo(o, s), i.stroke(), i.setLineDash([]), this._selected && pe(e, o - 30 * e.horizontalPixelRatio, s);
+      const i = e.context, s = ue(this._y, e.verticalPixelRatio), o = e.mediaSize.width * e.horizontalPixelRatio;
+      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, _e(i, this._options.lineStyle), i.beginPath(), i.moveTo(0, s), i.lineTo(o, s), i.stroke(), i.setLineDash([]), this._selected && de(e, o - 30 * e.horizontalPixelRatio, s);
     });
   }
 }
-class ue {
+class ge {
   _source;
   _y = null;
   constructor(t) {
@@ -420,20 +420,20 @@ class ue {
     this._y = this._source._series.priceToCoordinate(this._source._price);
   }
   renderer() {
-    return new de(
+    return new fe(
       this._y,
       this._source._options,
       this._source._selected
     );
   }
 }
-const fe = {
+const me = {
   lineColor: "#2962FF",
   width: 2,
   lineStyle: 0,
   locked: !1
 };
-class j {
+class q {
   _chart;
   _series;
   _price;
@@ -443,9 +443,9 @@ class j {
   _locked = !1;
   constructor(t, e, i, s) {
     this._chart = t, this._series = e, this._price = i, this._options = {
-      ...fe,
+      ...me,
       ...s
-    }, this._paneViews = [new ue(this)];
+    }, this._paneViews = [new ge(this)];
   }
   /**
    * Update the price level of the horizontal line
@@ -471,8 +471,8 @@ class j {
   toolHitTest(t, e) {
     const i = this._series.priceToCoordinate(this._price);
     if (i === null) return null;
-    const l = (this._chart.chartElement?.()?.clientWidth || window.innerWidth) - 30;
-    return Math.hypot(t - l, e - i) < 8 ? { hit: !0, type: "point", index: 0 } : Math.abs(e - i) < 5 ? { hit: !0, type: "line" } : null;
+    const n = (this._chart.chartElement?.()?.clientWidth || window.innerWidth) - 30;
+    return Math.hypot(t - n, e - i) < 8 ? { hit: !0, type: "point", index: 0 } : Math.abs(e - i) < 5 ? { hit: !0, type: "line" } : null;
   }
   autoscaleInfo(t, e) {
     return null;
@@ -484,7 +484,7 @@ class j {
     return this._paneViews;
   }
 }
-class ge {
+class xe {
   _x;
   _y;
   _options;
@@ -495,12 +495,12 @@ class ge {
   draw(t) {
     t.useBitmapCoordinateSpace((e) => {
       if (this._x === null || this._y === null) return;
-      const i = e.context, s = x(this._x, e.horizontalPixelRatio), o = x(this._y, e.verticalPixelRatio), l = e.mediaSize.width * e.horizontalPixelRatio;
-      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, F(i, this._options.lineStyle), i.beginPath(), i.moveTo(s, o), i.lineTo(l, o), i.stroke(), i.setLineDash([]), this._selected && y(e, s, o);
+      const i = e.context, s = m(this._x, e.horizontalPixelRatio), o = m(this._y, e.verticalPixelRatio), n = e.mediaSize.width * e.horizontalPixelRatio;
+      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, z(i, this._options.lineStyle), i.beginPath(), i.moveTo(s, o), i.lineTo(n, o), i.stroke(), i.setLineDash([]), this._selected && y(e, s, o);
     });
   }
 }
-class xe {
+class ye {
   _source;
   _x = null;
   _y = null;
@@ -512,7 +512,7 @@ class xe {
     this._x = t.logicalToCoordinate(this._source._point.logical), this._y = this._source._series.priceToCoordinate(this._source._point.price);
   }
   renderer() {
-    return new ge(
+    return new xe(
       this._x,
       this._y,
       this._source._options,
@@ -520,12 +520,12 @@ class xe {
     );
   }
 }
-const me = {
+const ve = {
   lineColor: "#2962FF",
   width: 2,
   lineStyle: 0
 };
-class q {
+class j {
   _chart;
   _series;
   _point;
@@ -534,9 +534,9 @@ class q {
   _selected = !1;
   constructor(t, e, i, s) {
     this._chart = t, this._series = e, this._point = i, this._options = {
-      ...me,
+      ...ve,
       ...s
-    }, this._paneViews = [new xe(this)];
+    }, this._paneViews = [new ye(this)];
   }
   /**
    * Update the point of the horizontal ray
@@ -573,7 +573,7 @@ class q {
     return this._paneViews;
   }
 }
-class ye {
+class Te {
   _x;
   _text;
   _options;
@@ -584,18 +584,18 @@ class ye {
   draw(t) {
     t.useBitmapCoordinateSpace((e) => {
       if (this._x === null) return;
-      const i = e.context, s = x(this._x, e.horizontalPixelRatio), o = e.mediaSize.height * e.verticalPixelRatio;
-      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, F(i, this._options.lineStyle), i.beginPath(), i.moveTo(s, 0), i.lineTo(s, o), i.stroke(), i.setLineDash([]), this._options.showLabel && this._text && this._drawTextLabel(e, this._text, s, o - 20 * e.verticalPixelRatio), this._selected && y(e, s, o - 30 * e.verticalPixelRatio);
+      const i = e.context, s = m(this._x, e.horizontalPixelRatio), o = e.mediaSize.height * e.verticalPixelRatio;
+      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, z(i, this._options.lineStyle), i.beginPath(), i.moveTo(s, 0), i.lineTo(s, o), i.stroke(), i.setLineDash([]), this._options.showLabel && this._text && this._drawTextLabel(e, this._text, s, o - 20 * e.verticalPixelRatio), this._selected && y(e, s, o - 30 * e.verticalPixelRatio);
     });
   }
   _drawTextLabel(t, e, i, s) {
     const o = t.context;
     o.font = "12px Arial", o.beginPath();
-    const l = 4 * t.horizontalPixelRatio, r = o.measureText(e).width, n = 16 * t.verticalPixelRatio;
-    o.fillStyle = this._options.labelBackgroundColor, o.roundRect(i - r / 2 - l, s - n / 2, r + l * 2, n, 4), o.fill(), o.beginPath(), o.fillStyle = this._options.labelTextColor, o.textBaseline = "middle", o.textAlign = "center", o.fillText(e, i, s), o.textAlign = "left";
+    const n = 4 * t.horizontalPixelRatio, r = o.measureText(e).width, l = 16 * t.verticalPixelRatio;
+    o.fillStyle = this._options.labelBackgroundColor, o.roundRect(i - r / 2 - n, s - l / 2, r + n * 2, l, 4), o.fill(), o.beginPath(), o.fillStyle = this._options.labelTextColor, o.textBaseline = "middle", o.textAlign = "center", o.fillText(e, i, s), o.textAlign = "left";
   }
 }
-class ve {
+class we {
   _source;
   _x = null;
   constructor(t) {
@@ -606,7 +606,7 @@ class ve {
     this._x = t.logicalToCoordinate(this._source._logical);
   }
   renderer() {
-    return new ye(
+    return new Te(
       this._x,
       "",
       // Could show time/date here if needed
@@ -615,7 +615,7 @@ class ve {
     );
   }
 }
-const Te = {
+const Ce = {
   lineColor: "#2962FF",
   width: 2,
   lineStyle: 0,
@@ -635,9 +635,9 @@ class Z {
   _locked = !1;
   constructor(t, e, i, s) {
     this._chart = t, this._series = e, this._logical = i, this._options = {
-      ...Te,
+      ...Ce,
       ...s
-    }, this._paneViews = [new ve(this)];
+    }, this._paneViews = [new we(this)];
   }
   /**
    * Update the logical position of the vertical line
@@ -673,7 +673,7 @@ class Z {
     return this._paneViews;
   }
 }
-class we {
+class be {
   _p1;
   _p2;
   _options;
@@ -685,12 +685,12 @@ class we {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = l - s, a = r - o;
-      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.backgroundColor, F(i, this._options.lineStyle), i.beginPath(), i.rect(s, o, n, a), i.fill(), i.stroke(), this._selected && (y(e, s, o), y(e, l, r), y(e, s, r), y(e, l, o));
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = n - s, a = r - o;
+      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.backgroundColor, z(i, this._options.lineStyle), i.beginPath(), i.rect(s, o, l, a), i.fill(), i.stroke(), this._selected && (y(e, s, o), y(e, n, r), y(e, s, r), y(e, n, o));
     });
   }
 }
-class Ce {
+class Pe {
   _source;
   _p1 = { x: null, y: null };
   _p2 = { x: null, y: null };
@@ -709,7 +709,7 @@ class Ce {
     );
   }
   renderer() {
-    return new we(
+    return new be(
       this._p1,
       this._p2,
       this._source._options,
@@ -717,14 +717,14 @@ class Ce {
     );
   }
 }
-const Pe = {
+const Se = {
   lineColor: "rgb(41, 98, 255)",
   width: 2,
   backgroundColor: "rgba(41, 98, 255, 0.2)",
   lineStyle: 0,
   locked: !1
 };
-class ot {
+class J {
   _chart;
   _series;
   _p1;
@@ -735,9 +735,9 @@ class ot {
   _locked = !1;
   constructor(t, e, i, s, o) {
     this._chart = t, this._series = e, this._p1 = i, this._p2 = s, this._options = {
-      ...Pe,
+      ...Se,
       ...o
-    }, this._paneViews = [new Ce(this)];
+    }, this._paneViews = [new Pe(this)];
   }
   /**
    * Update both anchor points of the rectangle
@@ -769,10 +769,10 @@ class ot {
    * @returns Hit test result indicating what was clicked
    */
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price);
-    if (o === null || l === null || r === null || n === null) return null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price);
+    if (o === null || n === null || r === null || l === null) return null;
     const a = 8;
-    return Math.hypot(t - o, e - l) < a ? { hit: !0, type: "point", index: 0 } : Math.hypot(t - r, e - n) < a ? { hit: !0, type: "point", index: 1 } : Math.hypot(t - r, e - l) < a ? { hit: !0, type: "point", index: 2 } : Math.hypot(t - o, e - n) < a ? { hit: !0, type: "point", index: 3 } : gt({ x: t, y: e }, { x1: o, y1: l, x2: r, y2: n }) ? { hit: !0, type: "shape" } : null;
+    return Math.hypot(t - o, e - n) < a ? { hit: !0, type: "point", index: 0 } : Math.hypot(t - r, e - l) < a ? { hit: !0, type: "point", index: 1 } : Math.hypot(t - r, e - n) < a ? { hit: !0, type: "point", index: 2 } : Math.hypot(t - o, e - l) < a ? { hit: !0, type: "point", index: 3 } : mt({ x: t, y: e }, { x1: o, y1: n, x2: r, y2: l }) ? { hit: !0, type: "shape" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -784,7 +784,7 @@ class ot {
     return this._paneViews;
   }
 }
-class be {
+class Me {
   _point;
   _text;
   _options;
@@ -800,7 +800,7 @@ class be {
     });
   }
 }
-class Se {
+class ke {
   _source;
   _point = { x: null, y: null };
   constructor(t) {
@@ -814,7 +814,7 @@ class Se {
     );
   }
   renderer() {
-    return new be(
+    return new Me(
       this._point,
       this._source._text,
       this._source._options,
@@ -822,13 +822,13 @@ class Se {
     );
   }
 }
-const Me = {
+const Re = {
   color: "rgb(0, 0, 0)",
   fontSize: 14,
   fontFamily: "Arial",
   locked: !1
 };
-class Re {
+class bt {
   _chart;
   _series;
   _point;
@@ -837,11 +837,12 @@ class Re {
   _options;
   _selected = !1;
   _locked = !1;
+  _onTextEdit = null;
   constructor(t, e, i, s, o) {
     this._chart = t, this._series = e, this._point = i, this._text = s, this._options = {
-      ...Me,
+      ...Re,
       ...o
-    }, this._paneViews = [new Se(this)];
+    }, this._paneViews = [new ke(this)];
   }
   /**
    * Update the position of the text
@@ -854,6 +855,18 @@ class Re {
    */
   updateText(t) {
     this._text = t, this.updateAllViews();
+  }
+  /**
+   * Set callback for text editing
+   */
+  setOnTextEdit(t) {
+    this._onTextEdit = t;
+  }
+  /**
+   * Trigger text edit dialog
+   */
+  editText() {
+    this._onTextEdit && this._onTextEdit(this._text);
   }
   /**
    * Set selection state and update visuals
@@ -877,10 +890,10 @@ class Re {
    * @returns Hit test result indicating if text was clicked
    */
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._point.logical), l = s.priceToCoordinate(this._point.price);
-    if (o === null || l === null) return null;
-    const r = this._options.fontSize, n = r * 0.6, a = this._text.length * n, c = r;
-    return t >= o && t <= o + a && e >= l - c / 2 && e <= l + c / 2 ? { hit: !0, type: "point", index: 0 } : Math.hypot(t - o, e - l) < 8 ? { hit: !0, type: "point", index: 0 } : null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._point.logical), n = s.priceToCoordinate(this._point.price);
+    if (o === null || n === null) return null;
+    const r = this._options.fontSize, l = r * 0.6, a = this._text.length * l, c = r;
+    return t >= o && t <= o + a && e >= n - c / 2 && e <= n + c / 2 ? { hit: !0, type: "point", index: 0 } : Math.hypot(t - o, e - n) < 8 ? { hit: !0, type: "point", index: 0 } : null;
   }
   updateAllViews() {
     this._paneViews.forEach((t) => t.update());
@@ -889,7 +902,7 @@ class Re {
     return this._paneViews;
   }
 }
-class ke {
+class Ee {
   _p1;
   _p2;
   _p3;
@@ -902,18 +915,18 @@ class ke {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null || this._p3.x === null || this._p3.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = x(this._p3.x, e.horizontalPixelRatio), a = x(this._p3.y, e.verticalPixelRatio), c = s, p = o, _ = l, f = r;
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = m(this._p3.x, e.horizontalPixelRatio), a = m(this._p3.y, e.verticalPixelRatio), c = s, p = o, _ = n, u = r;
       let d = 0;
-      if (l !== s) {
-        const C = (r - o) / (l - s), M = o + C * (n - s);
+      if (n !== s) {
+        const b = (r - o) / (n - s), M = o + b * (l - s);
         d = a - M;
       }
-      const u = o + d, g = r + d, m = s, v = l, P = o + d / 2, L = r + d / 2;
-      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.backgroundColor, F(i, this._options.lineStyle), i.beginPath(), i.moveTo(c, p), i.lineTo(_, f), i.lineTo(v, g), i.lineTo(m, u), i.closePath(), i.fill(), i.beginPath(), i.moveTo(c, p), i.lineTo(_, f), i.stroke(), i.beginPath(), i.moveTo(m, u), i.lineTo(v, g), i.stroke(), i.beginPath(), i.moveTo(c, p), i.lineTo(m, u), i.stroke(), i.beginPath(), i.moveTo(_, f), i.lineTo(v, g), i.stroke(), this._options.showMiddle && (i.setLineDash([5 * e.horizontalPixelRatio, 5 * e.horizontalPixelRatio]), i.beginPath(), i.moveTo(s, P), i.lineTo(l, L), i.stroke(), i.setLineDash([])), this._selected && (y(e, c, p), y(e, _, f), y(e, m, u), y(e, v, g));
+      const f = o + d, g = r + d, x = s, v = n, C = o + d / 2, V = r + d / 2;
+      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.backgroundColor, z(i, this._options.lineStyle), i.beginPath(), i.moveTo(c, p), i.lineTo(_, u), i.lineTo(v, g), i.lineTo(x, f), i.closePath(), i.fill(), i.beginPath(), i.moveTo(c, p), i.lineTo(_, u), i.stroke(), i.beginPath(), i.moveTo(x, f), i.lineTo(v, g), i.stroke(), i.beginPath(), i.moveTo(c, p), i.lineTo(x, f), i.stroke(), i.beginPath(), i.moveTo(_, u), i.lineTo(v, g), i.stroke(), this._options.showMiddle && (i.setLineDash([5 * e.horizontalPixelRatio, 5 * e.horizontalPixelRatio]), i.beginPath(), i.moveTo(s, C), i.lineTo(n, V), i.stroke(), i.setLineDash([])), this._selected && (y(e, c, p), y(e, _, u), y(e, x, f), y(e, v, g));
     });
   }
 }
-class Ve {
+class Le {
   _source;
   _p1 = { x: null, y: null };
   _p2 = { x: null, y: null };
@@ -937,7 +950,7 @@ class Ve {
     );
   }
   renderer() {
-    return new ke(
+    return new Ee(
       this._p1,
       this._p2,
       this._p3,
@@ -946,7 +959,7 @@ class Ve {
     );
   }
 }
-const Ae = {
+const Ve = {
   lineColor: "rgb(33, 150, 243)",
   backgroundColor: "rgba(33, 150, 243, 0.2)",
   width: 1,
@@ -964,11 +977,11 @@ class N {
   _options;
   _selected = !1;
   _locked = !1;
-  constructor(t, e, i, s, o, l) {
+  constructor(t, e, i, s, o, n) {
     this._chart = t, this._series = e, this._p1 = i, this._p2 = s, this._p3 = o, this._options = {
-      ...Ae,
-      ...l
-    }, this._paneViews = [new Ve(this)];
+      ...Ve,
+      ...n
+    }, this._paneViews = [new Le(this)];
   }
   /**
    * Update all three points of the channel
@@ -1000,26 +1013,26 @@ class N {
    * @returns Hit test result indicating what was clicked
    */
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
-    if (o === null || l === null || r === null || n === null || a === null || c === null)
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
+    if (o === null || n === null || r === null || l === null || a === null || c === null)
       return null;
     let p = 0;
     if (r !== o) {
-      const m = (n - l) / (r - o), v = l + m * (a - o);
+      const x = (l - n) / (r - o), v = n + x * (a - o);
       p = c - v;
     } else
-      p = c - l;
+      p = c - n;
     const _ = 8;
-    if (Math.hypot(t - o, e - l) < _)
+    if (Math.hypot(t - o, e - n) < _)
       return { hit: !0, type: "point", index: 0 };
-    if (Math.hypot(t - r, e - n) < _)
+    if (Math.hypot(t - r, e - l) < _)
       return { hit: !0, type: "point", index: 1 };
-    if (Math.hypot(t - o, e - (l + p)) < _)
+    if (Math.hypot(t - o, e - (n + p)) < _)
       return { hit: !0, type: "point", index: 2 };
-    if (Math.hypot(t - r, e - (n + p)) < _)
+    if (Math.hypot(t - r, e - (l + p)) < _)
       return { hit: !0, type: "point", index: 2 };
-    const f = Math.min(o, r), d = Math.max(o, r), u = Math.min(l, n, l + p, n + p), g = Math.max(l, n, l + p, n + p);
-    return t >= f && t <= d && e >= u && e <= g ? { hit: !0, type: "shape" } : null;
+    const u = Math.min(o, r), d = Math.max(o, r), f = Math.min(n, l, n + p, l + p), g = Math.max(n, l, n + p, l + p);
+    return t >= u && t <= d && e >= f && e <= g ? { hit: !0, type: "shape" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -1031,7 +1044,7 @@ class N {
     return this._paneViews;
   }
 }
-class Le {
+class Ae {
   _p1;
   _p2;
   _p1Price;
@@ -1039,27 +1052,27 @@ class Le {
   _priceToCoordinate;
   _options;
   _selected;
-  constructor(t, e, i, s, o, l, r) {
-    this._p1 = t, this._p2 = e, this._p1Price = i, this._p2Price = s, this._priceToCoordinate = o, this._options = l, this._selected = r;
+  constructor(t, e, i, s, o, n, r) {
+    this._p1 = t, this._p2 = e, this._p1Price = i, this._p2Price = s, this._priceToCoordinate = o, this._options = n, this._selected = r;
   }
   draw(t) {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p2.x, e.horizontalPixelRatio), l = x(this._p1.y, e.verticalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio);
-      i.lineWidth = 1, i.strokeStyle = "rgba(120, 120, 120, 0.5)", i.setLineDash([5, 5]), i.beginPath(), i.moveTo(s, l), i.lineTo(o, r), i.stroke(), i.setLineDash([]);
-      const n = this._p2Price - this._p1Price, a = Math.min(s, o), c = Math.max(s, o);
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p2.x, e.horizontalPixelRatio), n = m(this._p1.y, e.verticalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio);
+      i.lineWidth = 1, i.strokeStyle = "rgba(120, 120, 120, 0.5)", i.setLineDash([5, 5]), i.beginPath(), i.moveTo(s, n), i.lineTo(o, r), i.stroke(), i.setLineDash([]);
+      const l = this._p2Price - this._p1Price, a = Math.min(s, o), c = Math.max(s, o);
       this._options.levels.forEach((p) => {
-        const _ = this._p2Price - n * p.coeff, f = this._priceToCoordinate(_);
-        if (f !== null) {
-          const d = x(f, e.verticalPixelRatio);
+        const _ = this._p2Price - l * p.coeff, u = this._priceToCoordinate(_);
+        if (u !== null) {
+          const d = m(u, e.verticalPixelRatio);
           i.lineWidth = this._options.width, i.strokeStyle = p.color, i.beginPath(), i.moveTo(a, d), i.lineTo(c, d), i.stroke(), i.font = "10px Arial", i.fillStyle = p.color, i.fillText(`${p.coeff} (${_.toFixed(2)})`, a + 2, d - 2);
         }
-      }), this._selected && (y(e, s, l), y(e, o, r));
+      }), this._selected && (y(e, s, n), y(e, o, r));
     });
   }
 }
-class Ee {
+class De {
   _source;
   _p1 = { x: null, y: null };
   _p2 = { x: null, y: null };
@@ -1078,7 +1091,7 @@ class Ee {
     );
   }
   renderer() {
-    return new Le(
+    return new Ae(
       this._p1,
       this._p2,
       this._source._p1.price,
@@ -1102,7 +1115,7 @@ const Oe = {
     { coeff: 1.618, color: "#2962ff" }
   ]
 };
-class Ct {
+class Pt {
   _chart;
   _series;
   _p1;
@@ -1114,7 +1127,7 @@ class Ct {
     this._chart = t, this._series = e, this._p1 = i, this._p2 = s, this._options = {
       ...Oe,
       ...o
-    }, this._paneViews = [new Ee(this)];
+    }, this._paneViews = [new De(this)];
   }
   /**
    * Update both anchor points
@@ -1146,19 +1159,19 @@ class Ct {
    * @returns Hit test result indicating what was clicked
    */
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price);
-    if (o === null || l === null || r === null || n === null) return null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price);
+    if (o === null || n === null || r === null || l === null) return null;
     const a = 8;
-    if (Math.hypot(t - o, e - l) < a)
+    if (Math.hypot(t - o, e - n) < a)
       return { hit: !0, type: "point", index: 0 };
-    if (Math.hypot(t - r, e - n) < a)
+    if (Math.hypot(t - r, e - l) < a)
       return { hit: !0, type: "point", index: 1 };
-    if (A({ x: t, y: e }, { x: o, y: l }, { x: r, y: n }) < 5)
+    if (L({ x: t, y: e }, { x: o, y: n }, { x: r, y: l }) < 5)
       return { hit: !0, type: "line" };
-    const p = this._p2.price - this._p1.price, _ = Math.min(o, r), f = Math.max(o, r);
+    const p = this._p2.price - this._p1.price, _ = Math.min(o, r), u = Math.max(o, r);
     for (const d of this._options.levels) {
-      const u = this._p2.price - p * d.coeff, g = s.priceToCoordinate(u);
-      if (g !== null && Math.abs(e - g) < 5 && t >= _ && t <= f)
+      const f = this._p2.price - p * d.coeff, g = s.priceToCoordinate(f);
+      if (g !== null && Math.abs(e - g) < 5 && t >= _ && t <= u)
         return { hit: !0, type: "line" };
     }
     return null;
@@ -1183,12 +1196,12 @@ class ze {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null || this._p3.x === null || this._p3.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = x(this._p3.x, e.horizontalPixelRatio), a = x(this._p3.y, e.verticalPixelRatio);
-      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.backgroundColor, F(i, this._options.lineStyle), i.beginPath(), i.moveTo(s, o), i.lineTo(l, r), i.lineTo(n, a), i.closePath(), i.fill(), i.stroke(), this._selected && (y(e, s, o), y(e, l, r), y(e, n, a));
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = m(this._p3.x, e.horizontalPixelRatio), a = m(this._p3.y, e.verticalPixelRatio);
+      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.backgroundColor, z(i, this._options.lineStyle), i.beginPath(), i.moveTo(s, o), i.lineTo(n, r), i.lineTo(l, a), i.closePath(), i.fill(), i.stroke(), this._selected && (y(e, s, o), y(e, n, r), y(e, l, a));
     });
   }
 }
-class Fe {
+class He {
   _source;
   _p1 = { x: null, y: null };
   _p2 = { x: null, y: null };
@@ -1221,14 +1234,14 @@ class Fe {
     );
   }
 }
-const De = {
+const Fe = {
   lineColor: "rgb(33, 150, 243)",
   backgroundColor: "rgba(33, 150, 243, 0.2)",
   width: 1,
   lineStyle: 0,
   locked: !1
 };
-class ct {
+class pt {
   _chart;
   _series;
   _p1;
@@ -1238,11 +1251,11 @@ class ct {
   _options;
   _selected = !1;
   _locked = !1;
-  constructor(t, e, i, s, o, l) {
+  constructor(t, e, i, s, o, n) {
     this._chart = t, this._series = e, this._p1 = i, this._p2 = s, this._p3 = o, this._options = {
-      ...De,
-      ...l
-    }, this._paneViews = [new Fe(this)];
+      ...Fe,
+      ...n
+    }, this._paneViews = [new He(this)];
   }
   /**
    * Update all three points of the triangle
@@ -1274,11 +1287,11 @@ class ct {
    * @returns Hit test result indicating what was clicked
    */
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
-    if (o === null || l === null || r === null || n === null || a === null || c === null)
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
+    if (o === null || n === null || r === null || l === null || a === null || c === null)
       return null;
     const p = 8;
-    return Math.hypot(t - o, e - l) < p ? { hit: !0, type: "point", index: 0 } : Math.hypot(t - r, e - n) < p ? { hit: !0, type: "point", index: 1 } : Math.hypot(t - a, e - c) < p ? { hit: !0, type: "point", index: 2 } : this._isPointInTriangle({ x: t, y: e }, { x: o, y: l }, { x: r, y: n }, { x: a, y: c }) ? { hit: !0, type: "shape" } : null;
+    return Math.hypot(t - o, e - n) < p ? { hit: !0, type: "point", index: 0 } : Math.hypot(t - r, e - l) < p ? { hit: !0, type: "point", index: 1 } : Math.hypot(t - a, e - c) < p ? { hit: !0, type: "point", index: 2 } : this._isPointInTriangle({ x: t, y: e }, { x: o, y: n }, { x: r, y: l }, { x: a, y: c }) ? { hit: !0, type: "shape" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -1287,8 +1300,8 @@ class ct {
    * Check if a point is inside a triangle using barycentric coordinates
    */
   _isPointInTriangle(t, e, i, s) {
-    const o = 0.5 * (-i.y * s.x + e.y * (-i.x + s.x) + e.x * (i.y - s.y) + i.x * s.y), l = 1 / (2 * o) * (e.y * s.x - e.x * s.y + (s.y - e.y) * t.x + (e.x - s.x) * t.y), r = 1 / (2 * o) * (e.x * i.y - e.y * i.x + (e.y - i.y) * t.x + (i.x - e.x) * t.y);
-    return l >= 0 && r >= 0 && l + r <= 1;
+    const o = 0.5 * (-i.y * s.x + e.y * (-i.x + s.x) + e.x * (i.y - s.y) + i.x * s.y), n = 1 / (2 * o) * (e.y * s.x - e.x * s.y + (s.y - e.y) * t.x + (e.x - s.x) * t.y), r = 1 / (2 * o) * (e.x * i.y - e.y * i.x + (e.y - i.y) * t.x + (i.x - e.x) * t.y);
+    return n >= 0 && r >= 0 && n + r <= 1;
   }
   updateAllViews() {
     this._paneViews.forEach((t) => t.update());
@@ -1297,7 +1310,7 @@ class ct {
     return this._paneViews;
   }
 }
-class He {
+class Ie {
   _points;
   _options;
   _selected;
@@ -1319,8 +1332,8 @@ class He {
       const s = [];
       for (const o of this._points)
         o.x === null || o.y === null || s.push({
-          x: x(o.x, e.horizontalPixelRatio),
-          y: x(o.y, e.verticalPixelRatio)
+          x: m(o.x, e.horizontalPixelRatio),
+          y: m(o.y, e.verticalPixelRatio)
         });
       if (!(s.length < 2)) {
         if (i.beginPath(), i.moveTo(s[0].x, s[0].y), s.length === 2)
@@ -1332,8 +1345,8 @@ class He {
           i.moveTo(s[0].x, s[0].y);
           let o = 1;
           for (; o < s.length - 2; o++) {
-            const l = (s[o].x + s[o + 1].x) / 2, r = (s[o].y + s[o + 1].y) / 2;
-            i.quadraticCurveTo(s[o].x, s[o].y, l, r);
+            const n = (s[o].x + s[o + 1].x) / 2, r = (s[o].y + s[o + 1].y) / 2;
+            i.quadraticCurveTo(s[o].x, s[o].y, n, r);
           }
           i.quadraticCurveTo(
             s[o].x,
@@ -1345,7 +1358,7 @@ class He {
         if (i.stroke(), this._selected && !this._options.useSmoothCurve)
           for (const o of s)
             y(e, o.x, o.y);
-        mt(i);
+        yt(i);
       }
     });
   }
@@ -1357,17 +1370,17 @@ class Be {
     this._source = t;
   }
   update() {
-    this._points = ft(
+    this._points = gt(
       this._source._points,
       this._source._chart,
       this._source._series
     );
   }
   renderer() {
-    return new He(this._points, this._source._options, this._source._selected);
+    return new Ie(this._points, this._source._options, this._source._selected);
   }
 }
-const Pt = {
+const St = {
   brush: {
     lineColor: "rgba(0, 0, 0, 0.8)",
     width: 2,
@@ -1389,14 +1402,14 @@ const Pt = {
     useSmoothCurve: !1
     // Straight lines for path tool
   }
-}, Ie = {
+}, We = {
   lineColor: "rgba(0, 0, 0, 0.8)",
   width: 2,
   opacity: 1,
   useSmoothCurve: !0,
   locked: !1
 };
-class I {
+class B {
   _chart;
   _series;
   _points;
@@ -1406,7 +1419,7 @@ class I {
   _locked = !1;
   constructor(t, e, i, s) {
     this._chart = t, this._series = e, this._points = i, this._options = {
-      ...Ie,
+      ...We,
       ...s
     }, this._paneViews = [new Be(this)];
   }
@@ -1427,20 +1440,20 @@ class I {
   }
   toolHitTest(t, e) {
     const i = this._chart.timeScale(), s = this._series, o = this._points.map((r) => {
-      const n = i.logicalToCoordinate(r.logical), a = s.priceToCoordinate(r.price);
-      return { x: n, y: a };
+      const l = i.logicalToCoordinate(r.logical), a = s.priceToCoordinate(r.price);
+      return { x: l, y: a };
     });
     if (!this._options.useSmoothCurve)
-      for (let n = 0; n < o.length; n++) {
-        const a = o[n];
+      for (let l = 0; l < o.length; l++) {
+        const a = o[l];
         if (!(a.x === null || a.y === null) && Math.hypot(t - a.x, e - a.y) < 8)
-          return { hit: !0, type: "point", index: n };
+          return { hit: !0, type: "point", index: l };
       }
-    const l = Math.max(5, this._options.width / 2 + 2);
+    const n = Math.max(5, this._options.width / 2 + 2);
     for (let r = 0; r < o.length - 1; r++) {
-      const n = o[r], a = o[r + 1];
-      if (n.x === null || n.y === null || a.x === null || a.y === null) continue;
-      if (A({ x: t, y: e }, n, a) < l)
+      const l = o[r], a = o[r + 1];
+      if (l.x === null || l.y === null || a.x === null || a.y === null) continue;
+      if (L({ x: t, y: e }, l, a) < n)
         return { hit: !0, type: "line" };
     }
     return null;
@@ -1452,7 +1465,7 @@ class I {
     return this._paneViews;
   }
 }
-class We {
+class Ne {
   _p1;
   _p2;
   _text;
@@ -1465,14 +1478,14 @@ class We {
     t.useMediaCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null)
         return;
-      const i = e.context, s = this._p1.x, o = this._p1.y, l = this._p2.x, r = this._p2.y;
-      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.lineColor, i.beginPath(), i.moveTo(s, o), i.lineTo(l, r), i.stroke(), i.beginPath(), i.arc(s, o, 3, 0, 2 * Math.PI), i.fill(), i.font = `${this._options.fontSize}px ${this._options.fontFamily}`;
-      const a = i.measureText(this._text).width, c = this._options.fontSize * 1.2, p = 5, _ = l, f = r - c / 2;
-      i.fillStyle = this._options.backgroundColor, i.fillRect(_, f - p, a + p * 2, c + p * 2), i.strokeRect(_, f - p, a + p * 2, c + p * 2), i.fillStyle = this._options.textColor, i.textBaseline = "middle", i.fillText(this._text, _ + p, f + c / 2), this._selected && (i.fillStyle = "#FFFFFF", i.strokeStyle = "#2962FF", i.lineWidth = 2, i.beginPath(), i.arc(s, o, 6, 0, 2 * Math.PI), i.fill(), i.stroke(), i.beginPath(), i.arc(l, r, 6, 0, 2 * Math.PI), i.fill(), i.stroke());
+      const i = e.context, s = this._p1.x, o = this._p1.y, n = this._p2.x, r = this._p2.y;
+      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.lineColor, i.beginPath(), i.moveTo(s, o), i.lineTo(n, r), i.stroke(), i.beginPath(), i.arc(s, o, 3, 0, 2 * Math.PI), i.fill(), i.font = `${this._options.fontSize}px ${this._options.fontFamily}`;
+      const a = i.measureText(this._text).width, c = this._options.fontSize * 1.2, p = 8, _ = 6, u = n, d = r - c / 2, f = a + p * 2, g = c + p * 2;
+      i.fillStyle = this._options.backgroundColor, i.beginPath(), i.moveTo(u + _, d - p), i.lineTo(u + f - _, d - p), i.arcTo(u + f, d - p, u + f, d - p + _, _), i.lineTo(u + f, d - p + g - _), i.arcTo(u + f, d - p + g, u + f - _, d - p + g, _), i.lineTo(u + _, d - p + g), i.arcTo(u, d - p + g, u, d - p + g - _, _), i.lineTo(u, d - p + _), i.arcTo(u, d - p, u + _, d - p, _), i.closePath(), i.fill(), i.stroke(), i.fillStyle = this._options.textColor, i.textBaseline = "middle", i.fillText(this._text, u + p, d + c / 2), this._selected && (i.fillStyle = "#FFFFFF", i.strokeStyle = "#2962FF", i.lineWidth = 2, i.beginPath(), i.arc(s, o, 6, 0, 2 * Math.PI), i.fill(), i.stroke(), i.beginPath(), i.arc(n, r, 6, 0, 2 * Math.PI), i.fill(), i.stroke());
     });
   }
 }
-class Ne {
+class $e {
   _source;
   _p1 = { x: null, y: null };
   _p2 = { x: null, y: null };
@@ -1491,7 +1504,7 @@ class Ne {
     );
   }
   renderer() {
-    return new We(
+    return new Ne(
       this._p1,
       this._p2,
       this._source._text,
@@ -1500,7 +1513,7 @@ class Ne {
     );
   }
 }
-const $e = {
+const Xe = {
   lineColor: "rgb(33, 150, 243)",
   backgroundColor: "rgba(255, 255, 255, 0.9)",
   textColor: "rgb(0, 0, 0)",
@@ -1508,7 +1521,7 @@ const $e = {
   fontSize: 12,
   fontFamily: "Arial"
 };
-class Xe {
+class st {
   _chart;
   _series;
   _p1;
@@ -1519,11 +1532,12 @@ class Xe {
   _paneViews;
   _options;
   _selected = !1;
-  constructor(t, e, i, s, o, l) {
+  _onTextEdit = null;
+  constructor(t, e, i, s, o, n) {
     this._chart = t, this._series = e, this._p1 = i, this._p2 = s, this._text = o, this._options = {
-      ...$e,
-      ...l
-    }, this._paneViews = [new Ne(this)];
+      ...Xe,
+      ...n
+    }, this._paneViews = [new $e(this)];
   }
   /**
    * Update both points
@@ -1544,6 +1558,18 @@ class Xe {
     this._text = t, this.updateAllViews();
   }
   /**
+   * Set callback for text editing
+   */
+  setOnTextEdit(t) {
+    this._onTextEdit = t;
+  }
+  /**
+   * Trigger text edit dialog
+   */
+  editText() {
+    this._onTextEdit && this._onTextEdit(this._text);
+  }
+  /**
    * Set selection state and update visuals
    */
   setSelected(t) {
@@ -1559,15 +1585,15 @@ class Xe {
    * @returns Hit test result indicating what was clicked
    */
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price);
-    if (o === null || l === null || r === null || n === null) return null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price);
+    if (o === null || n === null || r === null || l === null) return null;
     const a = 8;
-    if (Math.hypot(t - o, e - l) < a)
+    if (Math.hypot(t - o, e - n) < a)
       return { hit: !0, type: "point", index: 0 };
-    if (Math.hypot(t - r, e - n) < a)
+    if (Math.hypot(t - r, e - l) < a)
       return { hit: !0, type: "point", index: 1 };
     const c = this._options.fontSize, p = this._text.length * c * 0.6 + 20, _ = c * 1.2 + 10;
-    return t >= r && t <= r + p && e >= n - _ / 2 && e <= n + _ / 2 ? { hit: !0, type: "point", index: 1 } : A({ x: t, y: e }, { x: o, y: l }, { x: r, y: n }) < 5 ? { hit: !0, type: "line" } : null;
+    return t >= r && t <= r + p && e >= l - _ / 2 && e <= l + _ / 2 ? { hit: !0, type: "point", index: 1 } : L({ x: t, y: e }, { x: o, y: n }, { x: r, y: l }) < 5 ? { hit: !0, type: "line" } : null;
   }
   updateAllViews() {
     this._paneViews.forEach((t) => t.update());
@@ -1586,8 +1612,8 @@ class Ue {
   draw(t) {
     t.useBitmapCoordinateSpace((e) => {
       if (this._point.x === null || this._point.y === null) return;
-      const i = e.context, s = x(this._point.x, e.horizontalPixelRatio), o = x(this._point.y, e.verticalPixelRatio), l = e.mediaSize.width * e.horizontalPixelRatio, r = e.mediaSize.height * e.verticalPixelRatio;
-      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, F(i, this._options.lineStyle), i.beginPath(), i.moveTo(0, o), i.lineTo(l, o), i.stroke(), i.beginPath(), i.moveTo(s, 0), i.lineTo(s, r), i.stroke(), i.setLineDash([]), this._selected && y(e, s, o);
+      const i = e.context, s = m(this._point.x, e.horizontalPixelRatio), o = m(this._point.y, e.verticalPixelRatio), n = e.mediaSize.width * e.horizontalPixelRatio, r = e.mediaSize.height * e.verticalPixelRatio;
+      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, z(i, this._options.lineStyle), i.beginPath(), i.moveTo(0, o), i.lineTo(n, o), i.stroke(), i.beginPath(), i.moveTo(s, 0), i.lineTo(s, r), i.stroke(), i.setLineDash([]), this._selected && y(e, s, o);
     });
   }
 }
@@ -1612,12 +1638,12 @@ class Ye {
     );
   }
 }
-const je = {
+const qe = {
   lineColor: "#2962FF",
   width: 2,
   lineStyle: 2
 };
-class Wt {
+class $t {
   _chart;
   _series;
   _point;
@@ -1626,7 +1652,7 @@ class Wt {
   _selected = !1;
   constructor(t, e, i, s) {
     this._chart = t, this._series = e, this._point = i, this._options = {
-      ...je,
+      ...qe,
       ...s
     }, this._paneViews = [new Ye(this)];
   }
@@ -1652,10 +1678,10 @@ class Wt {
    * @returns Hit test result indicating if crosshair was clicked
    */
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._point.logical), l = s.priceToCoordinate(this._point.price);
-    if (o === null || l === null) return null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._point.logical), n = s.priceToCoordinate(this._point.price);
+    if (o === null || n === null) return null;
     const r = 5;
-    return Math.abs(e - l) < r ? { hit: !0, type: "line" } : Math.abs(t - o) < r ? { hit: !0, type: "line" } : Math.hypot(t - o, e - l) < 8 ? { hit: !0, type: "point" } : null;
+    return Math.abs(e - n) < r ? { hit: !0, type: "line" } : Math.abs(t - o) < r ? { hit: !0, type: "line" } : Math.hypot(t - o, e - n) < 8 ? { hit: !0, type: "point" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -1667,7 +1693,7 @@ class Wt {
     return this._paneViews;
   }
 }
-class qe {
+class je {
   _p1;
   // Center
   _p2;
@@ -1681,8 +1707,8 @@ class qe {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = l - s, a = r - o, c = Math.sqrt(n * n + a * a);
-      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.backgroundColor, F(i, this._options.lineStyle), i.beginPath(), i.arc(s, o, c, 0, 2 * Math.PI), i.fill(), i.stroke(), this._selected && (y(e, s, o), y(e, l, r));
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = n - s, a = r - o, c = Math.sqrt(l * l + a * a);
+      i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.lineWidth = this._options.width, i.strokeStyle = this._options.lineColor, i.fillStyle = this._options.backgroundColor, z(i, this._options.lineStyle), i.beginPath(), i.arc(s, o, c, 0, 2 * Math.PI), i.fill(), i.stroke(), this._selected && (y(e, s, o), y(e, n, r));
     });
   }
 }
@@ -1705,7 +1731,7 @@ class Ze {
     );
   }
   renderer() {
-    return new qe(
+    return new je(
       this._p1,
       this._p2,
       this._source._options,
@@ -1720,7 +1746,7 @@ const Je = {
   lineStyle: 0,
   locked: !1
 };
-class bt {
+class Mt {
   _chart;
   _series;
   _p1;
@@ -1767,10 +1793,10 @@ class bt {
    * @returns Hit test result indicating what was clicked
    */
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price);
-    if (o === null || l === null || r === null || n === null) return null;
-    const a = r - o, c = n - l, p = Math.hypot(a, c), _ = 8;
-    return Math.hypot(t - o, e - l) < _ ? { hit: !0, type: "point", index: 0 } : Math.hypot(t - r, e - n) < _ ? { hit: !0, type: "point", index: 1 } : ee({ x: t, y: e }, { x: o, y: l }, p) ? { hit: !0, type: "shape" } : null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price);
+    if (o === null || n === null || r === null || l === null) return null;
+    const a = r - o, c = l - n, p = Math.hypot(a, c), _ = 8;
+    return Math.hypot(t - o, e - n) < _ ? { hit: !0, type: "point", index: 0 } : Math.hypot(t - r, e - l) < _ ? { hit: !0, type: "point", index: 1 } : se({ x: t, y: e }, { x: o, y: n }, p) ? { hit: !0, type: "shape" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -1795,21 +1821,21 @@ class Ge {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = Math.min(s, l), a = Math.max(s, l), c = Math.min(o, r), p = Math.max(o, r), _ = a - n, f = p - c;
-      this._options.backgroundColor && (i.fillStyle = this._options.backgroundColor, i.fillRect(n, c, _, f)), i.strokeStyle = this._options.borderColor, i.lineWidth = this._options.borderWidth * e.verticalPixelRatio, i.strokeRect(n, c, _, f);
-      const d = (s + l) / 2, u = 10 * e.verticalPixelRatio;
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = Math.min(s, n), a = Math.max(s, n), c = Math.min(o, r), p = Math.max(o, r), _ = a - l, u = p - c;
+      this._options.backgroundColor && (i.fillStyle = this._options.backgroundColor, i.fillRect(l, c, _, u)), i.strokeStyle = this._options.borderColor, i.lineWidth = this._options.borderWidth * e.verticalPixelRatio, i.strokeRect(l, c, _, u);
+      const d = (s + n) / 2, f = 10 * e.verticalPixelRatio;
       i.beginPath(), i.moveTo(d, c), i.lineTo(d, p);
       const g = r - o;
-      if (Math.abs(g) > u) {
-        let b;
-        g > 0 ? (b = p, i.moveTo(d - u, b - u), i.lineTo(d, b), i.lineTo(d + u, b - u)) : (b = c, i.moveTo(d - u, b + u), i.lineTo(d, b), i.lineTo(d + u, b + u));
+      if (Math.abs(g) > f) {
+        let P;
+        g > 0 ? (P = p, i.moveTo(d - f, P - f), i.lineTo(d, P), i.lineTo(d + f, P - f)) : (P = c, i.moveTo(d - f, P + f), i.lineTo(d, P), i.lineTo(d + f, P + f));
       }
       i.stroke();
-      const m = this._source._p1.price, v = this._source._p2.price, P = Math.abs(v - m), L = m !== 0 ? (v - m) / m * 100 : 0, M = `${v > m ? "+" : ""}${P.toFixed(2)} (${Math.abs(L).toFixed(2)}%)`, D = v > m ? c - 10 * e.verticalPixelRatio : p + 25 * e.verticalPixelRatio;
-      if (i.font = `bold ${14 * e.verticalPixelRatio}px sans-serif`, i.fillStyle = this._options.borderColor, i.textAlign = "center", i.textBaseline = v > m ? "bottom" : "top", i.fillText(M, d, D), this._selected) {
-        y(e, s, o), y(e, l, r), y(e, s, r), y(e, l, o);
-        const b = (o + r) / 2;
-        y(e, d, o), y(e, d, r), y(e, s, b), y(e, l, b);
+      const x = this._source._p1.price, v = this._source._p2.price, C = Math.abs(v - x), V = x !== 0 ? (v - x) / x * 100 : 0, M = `${v > x ? "+" : ""}${C.toFixed(2)} (${Math.abs(V).toFixed(2)}%)`, H = v > x ? c - 10 * e.verticalPixelRatio : p + 25 * e.verticalPixelRatio;
+      if (i.font = `bold ${14 * e.verticalPixelRatio}px sans-serif`, i.fillStyle = this._options.borderColor, i.textAlign = "center", i.textBaseline = v > x ? "bottom" : "top", i.fillText(M, d, H), this._selected) {
+        y(e, s, o), y(e, n, r), y(e, s, r), y(e, n, o);
+        const P = (o + r) / 2;
+        y(e, d, o), y(e, d, r), y(e, s, P), y(e, n, P);
       }
     });
   }
@@ -1850,7 +1876,7 @@ const Qe = {
   extendRight: !1,
   locked: !1
 };
-class St {
+class kt {
   _chart;
   _series;
   _p1;
@@ -1898,30 +1924,30 @@ class St {
     Object.assign(this._options, t), this.updateAllViews(), this._chart.timeScale().applyOptions({});
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price);
-    if (o === null || l === null || r === null || n === null) return null;
-    const a = 8, c = Math.min(o, r), p = Math.max(o, r), _ = Math.min(l, n), f = Math.max(l, n), d = (o + r) / 2, u = (l + n) / 2, g = [
-      { x: o, y: l, index: 0 },
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price);
+    if (o === null || n === null || r === null || l === null) return null;
+    const a = 8, c = Math.min(o, r), p = Math.max(o, r), _ = Math.min(n, l), u = Math.max(n, l), d = (o + r) / 2, f = (n + l) / 2, g = [
+      { x: o, y: n, index: 0 },
       // corner 1
-      { x: r, y: n, index: 1 },
+      { x: r, y: l, index: 1 },
       // corner 2
-      { x: o, y: n, index: 2 },
+      { x: o, y: l, index: 2 },
       // corner 3
-      { x: r, y: l, index: 3 },
+      { x: r, y: n, index: 3 },
       // corner 4
       { x: d, y: _, index: 4 },
       // top center
-      { x: d, y: f, index: 5 },
+      { x: d, y: u, index: 5 },
       // bottom center
-      { x: c, y: u, index: 6 },
+      { x: c, y: f, index: 6 },
       // left center
-      { x: p, y: u, index: 7 }
+      { x: p, y: f, index: 7 }
       // right center
     ];
-    for (const m of g)
-      if (Math.hypot(t - m.x, e - m.y) < a)
-        return { hit: !0, type: "point", index: m.index };
-    return gt({ x: t, y: e }, { x1: o, y1: l, x2: r, y2: n }) ? { hit: !0, type: "shape" } : null;
+    for (const x of g)
+      if (Math.hypot(t - x.x, e - x.y) < a)
+        return { hit: !0, type: "point", index: x.index };
+    return mt({ x: t, y: e }, { x1: o, y1: n, x2: r, y2: l }) ? { hit: !0, type: "shape" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -1949,8 +1975,8 @@ class ti {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null || this._p3.x === null || this._p3.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = x(this._p3.x, e.horizontalPixelRatio), a = x(this._p3.y, e.verticalPixelRatio), c = Math.min(s, l, n), p = Math.max(s, l, n), _ = Math.max(p - c, 50 * e.horizontalPixelRatio), f = c + _;
-      i.fillStyle = this._options.profitColor, i.globalAlpha = this._options.zoneOpacity, i.fillRect(c, Math.min(o, a), _, Math.abs(a - o)), i.fillStyle = this._options.lossColor, i.fillRect(c, Math.min(o, r), _, Math.abs(r - o)), i.globalAlpha = 1, i.lineWidth = this._options.lineWidth, i.lineCap = "butt", i.strokeStyle = this._options.lineColor, i.beginPath(), i.moveTo(c, o), i.lineTo(f, o), i.stroke(), i.strokeStyle = this._options.profitLineColor, i.beginPath(), i.moveTo(c, a), i.lineTo(f, a), i.stroke(), i.strokeStyle = this._options.lossLineColor, i.beginPath(), i.moveTo(c, r), i.lineTo(f, r), i.stroke(), this._selected && (y(e, s, o, "#FFFFFF", "#2962FF"), y(e, l, r, "#FFFFFF", "#FF0000"), y(e, n, a, "#FFFFFF", "#00FF00"));
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = m(this._p3.x, e.horizontalPixelRatio), a = m(this._p3.y, e.verticalPixelRatio), c = Math.min(s, n, l), p = Math.max(s, n, l), _ = Math.max(p - c, 50 * e.horizontalPixelRatio), u = c + _;
+      i.fillStyle = this._options.profitColor, i.globalAlpha = this._options.zoneOpacity, i.fillRect(c, Math.min(o, a), _, Math.abs(a - o)), i.fillStyle = this._options.lossColor, i.fillRect(c, Math.min(o, r), _, Math.abs(r - o)), i.globalAlpha = 1, i.lineWidth = this._options.lineWidth, i.lineCap = "butt", i.strokeStyle = this._options.lineColor, i.beginPath(), i.moveTo(c, o), i.lineTo(u, o), i.stroke(), i.strokeStyle = this._options.profitLineColor, i.beginPath(), i.moveTo(c, a), i.lineTo(u, a), i.stroke(), i.strokeStyle = this._options.lossLineColor, i.beginPath(), i.moveTo(c, r), i.lineTo(u, r), i.stroke(), this._selected && (y(e, s, o, "#FFFFFF", "#2962FF"), y(e, n, r, "#FFFFFF", "#FF0000"), y(e, l, a, "#FFFFFF", "#00FF00"));
     });
   }
 }
@@ -1986,7 +2012,7 @@ const ii = {
   textColor: "#FFFFFF",
   locked: !1
 };
-class ht {
+class _t {
   _chart;
   _series;
   _p1;
@@ -1999,10 +2025,10 @@ class ht {
   _options;
   _selected = !1;
   _locked = !1;
-  constructor(t, e, i, s, o, l) {
+  constructor(t, e, i, s, o, n) {
     this._chart = t, this._series = e, this._p1 = i, this._p2 = s, this._p3 = o, this._options = {
       ...ii,
-      ...l
+      ...n
     }, this._paneViews = [new ei(this)];
   }
   updatePoints(t, e, i) {
@@ -2019,14 +2045,14 @@ class ht {
     this._selected = t, this.updateAllViews();
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
-    if (o === null || l === null || r === null || n === null || a === null || c === null) return null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
+    if (o === null || n === null || r === null || l === null || a === null || c === null) return null;
     const p = 8;
-    if (Math.hypot(t - o, e - l) < p) return { hit: !0, type: "point", index: 0 };
-    if (Math.hypot(t - r, e - n) < p) return { hit: !0, type: "point", index: 1 };
+    if (Math.hypot(t - o, e - n) < p) return { hit: !0, type: "point", index: 0 };
+    if (Math.hypot(t - r, e - l) < p) return { hit: !0, type: "point", index: 1 };
     if (Math.hypot(t - a, e - c) < p) return { hit: !0, type: "point", index: 2 };
-    const _ = Math.min(o, r, a), f = Math.max(o, r, a), d = window.devicePixelRatio || 1, u = Math.max(f - _, 50 * d), g = _ + u, m = Math.min(l, n, c), v = Math.max(l, n, c);
-    return t >= _ && t <= g && e >= m && e <= v ? { hit: !0, type: "shape" } : null;
+    const _ = Math.min(o, r, a), u = Math.max(o, r, a), d = window.devicePixelRatio || 1, f = Math.max(u - _, 50 * d), g = _ + f, x = Math.min(n, l, c), v = Math.max(n, l, c);
+    return t >= _ && t <= g && e >= x && e <= v ? { hit: !0, type: "shape" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -2054,8 +2080,8 @@ class si {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null || this._p3.x === null || this._p3.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = x(this._p3.x, e.horizontalPixelRatio), a = x(this._p3.y, e.verticalPixelRatio), c = Math.min(s, l, n), p = Math.max(s, l, n), _ = Math.max(p - c, 50 * e.horizontalPixelRatio), f = c + _;
-      i.fillStyle = this._options.profitColor, i.globalAlpha = this._options.zoneOpacity, i.fillRect(c, Math.min(o, a), _, Math.abs(a - o)), i.fillStyle = this._options.lossColor, i.fillRect(c, Math.min(o, r), _, Math.abs(r - o)), i.globalAlpha = 1, i.lineWidth = this._options.lineWidth, i.lineCap = "butt", i.strokeStyle = this._options.lineColor, i.beginPath(), i.moveTo(c, o), i.lineTo(f, o), i.stroke(), i.strokeStyle = this._options.profitLineColor, i.beginPath(), i.moveTo(c, a), i.lineTo(f, a), i.stroke(), i.strokeStyle = this._options.lossLineColor, i.beginPath(), i.moveTo(c, r), i.lineTo(f, r), i.stroke(), this._selected && (y(e, s, o, "#FFFFFF", "#2962FF"), y(e, l, r, "#FFFFFF", "#FF0000"), y(e, n, a, "#FFFFFF", "#00FF00"));
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = m(this._p3.x, e.horizontalPixelRatio), a = m(this._p3.y, e.verticalPixelRatio), c = Math.min(s, n, l), p = Math.max(s, n, l), _ = Math.max(p - c, 50 * e.horizontalPixelRatio), u = c + _;
+      i.fillStyle = this._options.profitColor, i.globalAlpha = this._options.zoneOpacity, i.fillRect(c, Math.min(o, a), _, Math.abs(a - o)), i.fillStyle = this._options.lossColor, i.fillRect(c, Math.min(o, r), _, Math.abs(r - o)), i.globalAlpha = 1, i.lineWidth = this._options.lineWidth, i.lineCap = "butt", i.strokeStyle = this._options.lineColor, i.beginPath(), i.moveTo(c, o), i.lineTo(u, o), i.stroke(), i.strokeStyle = this._options.profitLineColor, i.beginPath(), i.moveTo(c, a), i.lineTo(u, a), i.stroke(), i.strokeStyle = this._options.lossLineColor, i.beginPath(), i.moveTo(c, r), i.lineTo(u, r), i.stroke(), this._selected && (y(e, s, o, "#FFFFFF", "#2962FF"), y(e, n, r, "#FFFFFF", "#FF0000"), y(e, l, a, "#FFFFFF", "#00FF00"));
     });
   }
 }
@@ -2091,7 +2117,7 @@ const ni = {
   textColor: "#FFFFFF",
   locked: !1
 };
-class pt {
+class dt {
   _chart;
   _series;
   _p1;
@@ -2104,10 +2130,10 @@ class pt {
   _options;
   _selected = !1;
   _locked = !1;
-  constructor(t, e, i, s, o, l) {
+  constructor(t, e, i, s, o, n) {
     this._chart = t, this._series = e, this._p1 = i, this._p2 = s, this._p3 = o, this._options = {
       ...ni,
-      ...l
+      ...n
     }, this._paneViews = [new oi(this)];
   }
   updatePoints(t, e, i) {
@@ -2124,14 +2150,14 @@ class pt {
     this._selected = t, this.updateAllViews();
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
-    if (o === null || l === null || r === null || n === null || a === null || c === null) return null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
+    if (o === null || n === null || r === null || l === null || a === null || c === null) return null;
     const p = 8;
-    if (Math.hypot(t - o, e - l) < p) return { hit: !0, type: "point", index: 0 };
-    if (Math.hypot(t - r, e - n) < p) return { hit: !0, type: "point", index: 1 };
+    if (Math.hypot(t - o, e - n) < p) return { hit: !0, type: "point", index: 0 };
+    if (Math.hypot(t - r, e - l) < p) return { hit: !0, type: "point", index: 1 };
     if (Math.hypot(t - a, e - c) < p) return { hit: !0, type: "point", index: 2 };
-    const _ = Math.min(o, r, a), f = Math.max(o, r, a), d = window.devicePixelRatio || 1, u = Math.max(f - _, 50 * d), g = _ + u, m = Math.min(l, n, c), v = Math.max(l, n, c);
-    return t >= _ && t <= g && e >= m && e <= v ? { hit: !0, type: "shape" } : null;
+    const _ = Math.min(o, r, a), u = Math.max(o, r, a), d = window.devicePixelRatio || 1, f = Math.max(u - _, 50 * d), g = _ + f, x = Math.min(n, l, c), v = Math.max(n, l, c);
+    return t >= _ && t <= g && e >= x && e <= v ? { hit: !0, type: "shape" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -2163,25 +2189,25 @@ class li {
         globalAlpha: 1
       });
       const s = [];
-      for (const l of this._points)
-        l.x === null || l.y === null || s.push({
-          x: x(l.x, e.horizontalPixelRatio),
-          y: x(l.y, e.verticalPixelRatio)
+      for (const n of this._points)
+        n.x === null || n.y === null || s.push({
+          x: m(n.x, e.horizontalPixelRatio),
+          y: m(n.y, e.verticalPixelRatio)
         });
       if (s.length < 2) return;
       i.beginPath(), i.moveTo(s[0].x, s[0].y);
-      for (let l = 1; l < s.length; l++)
-        i.lineTo(s[l].x, s[l].y);
+      for (let n = 1; n < s.length; n++)
+        i.lineTo(s[n].x, s[n].y);
       i.stroke(), i.font = "12px Arial", i.textAlign = "center", i.textBaseline = "middle", i.fillStyle = this._options.textColor;
       const o = ["(0)", "1", "2", "3", "4", "5"];
-      for (let l = 0; l < s.length && !(l >= o.length); l++) {
-        const r = s[l], n = o[l], a = i.measureText(n).width, c = 4;
-        i.fillStyle = "rgba(255, 255, 255, 0.8)", i.fillRect(r.x - a / 2 - c, r.y - 12, a + c * 2, 24), i.fillStyle = this._options.textColor, i.fillText(n, r.x, r.y);
+      for (let n = 0; n < s.length && !(n >= o.length); n++) {
+        const r = s[n], l = o[n], a = i.measureText(l).width, c = 4;
+        i.fillStyle = "rgba(255, 255, 255, 0.8)", i.fillRect(r.x - a / 2 - c, r.y - 12, a + c * 2, 24), i.fillStyle = this._options.textColor, i.fillText(l, r.x, r.y);
       }
       if (this._selected)
-        for (const l of s)
-          y(e, l.x, l.y);
-      mt(i);
+        for (const n of s)
+          y(e, n.x, n.y);
+      yt(i);
     });
   }
 }
@@ -2192,7 +2218,7 @@ class ri {
     this._source = t;
   }
   update() {
-    this._points = ft(
+    this._points = gt(
       this._source._points,
       this._source._chart,
       this._source._series
@@ -2207,7 +2233,7 @@ const ai = {
   width: 2,
   textColor: "#2962FF"
 };
-class Mt {
+class Rt {
   _chart;
   _series;
   _points;
@@ -2236,20 +2262,20 @@ class Mt {
     Object.assign(this._options, t), this.updateAllViews(), this._chart.timeScale().applyOptions({});
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = this._points.map((n) => {
-      const a = i.logicalToCoordinate(n.logical), c = s.priceToCoordinate(n.price);
+    const i = this._chart.timeScale(), s = this._series, o = this._points.map((l) => {
+      const a = i.logicalToCoordinate(l.logical), c = s.priceToCoordinate(l.price);
       return { x: a, y: c };
-    }), l = 8;
-    for (let n = 0; n < o.length; n++) {
-      const a = o[n];
-      if (!(a.x === null || a.y === null) && Math.hypot(t - a.x, e - a.y) < l)
-        return { hit: !0, type: "point", index: n };
+    }), n = 8;
+    for (let l = 0; l < o.length; l++) {
+      const a = o[l];
+      if (!(a.x === null || a.y === null) && Math.hypot(t - a.x, e - a.y) < n)
+        return { hit: !0, type: "point", index: l };
     }
     const r = 5;
-    for (let n = 0; n < o.length - 1; n++) {
-      const a = o[n], c = o[n + 1];
+    for (let l = 0; l < o.length - 1; l++) {
+      const a = o[l], c = o[l + 1];
       if (a.x === null || a.y === null || c.x === null || c.y === null) continue;
-      if (A({ x: t, y: e }, a, c) < r)
+      if (L({ x: t, y: e }, a, c) < r)
         return { hit: !0, type: "line" };
     }
     return null;
@@ -2281,25 +2307,25 @@ class ci {
         globalAlpha: 1
       });
       const s = [];
-      for (const l of this._points)
-        l.x === null || l.y === null || s.push({
-          x: x(l.x, e.horizontalPixelRatio),
-          y: x(l.y, e.verticalPixelRatio)
+      for (const n of this._points)
+        n.x === null || n.y === null || s.push({
+          x: m(n.x, e.horizontalPixelRatio),
+          y: m(n.y, e.verticalPixelRatio)
         });
       if (s.length < 2) return;
       i.beginPath(), i.moveTo(s[0].x, s[0].y);
-      for (let l = 1; l < s.length; l++)
-        i.lineTo(s[l].x, s[l].y);
+      for (let n = 1; n < s.length; n++)
+        i.lineTo(s[n].x, s[n].y);
       i.stroke(), i.font = "12px Arial", i.textAlign = "center", i.textBaseline = "middle", i.fillStyle = this._options.textColor;
       const o = ["(0)", "A", "B", "C"];
-      for (let l = 0; l < s.length && !(l >= o.length); l++) {
-        const r = s[l], n = o[l], a = i.measureText(n).width, c = 4;
-        i.fillStyle = "rgba(255, 255, 255, 0.8)", i.fillRect(r.x - a / 2 - c, r.y - 12, a + c * 2, 24), i.fillStyle = this._options.textColor, i.fillText(n, r.x, r.y);
+      for (let n = 0; n < s.length && !(n >= o.length); n++) {
+        const r = s[n], l = o[n], a = i.measureText(l).width, c = 4;
+        i.fillStyle = "rgba(255, 255, 255, 0.8)", i.fillRect(r.x - a / 2 - c, r.y - 12, a + c * 2, 24), i.fillStyle = this._options.textColor, i.fillText(l, r.x, r.y);
       }
       if (this._selected)
-        for (const l of s)
-          y(e, l.x, l.y);
-      mt(i);
+        for (const n of s)
+          y(e, n.x, n.y);
+      yt(i);
     });
   }
 }
@@ -2310,7 +2336,7 @@ class hi {
     this._source = t;
   }
   update() {
-    this._points = ft(
+    this._points = gt(
       this._source._points,
       this._source._chart,
       this._source._series
@@ -2325,7 +2351,7 @@ const pi = {
   width: 2,
   textColor: "#2962FF"
 };
-class Rt {
+class Et {
   _chart;
   _series;
   _points;
@@ -2354,20 +2380,20 @@ class Rt {
     Object.assign(this._options, t), this.updateAllViews(), this._chart.timeScale().applyOptions({});
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = this._points.map((n) => {
-      const a = i.logicalToCoordinate(n.logical), c = s.priceToCoordinate(n.price);
+    const i = this._chart.timeScale(), s = this._series, o = this._points.map((l) => {
+      const a = i.logicalToCoordinate(l.logical), c = s.priceToCoordinate(l.price);
       return { x: a, y: c };
-    }), l = 8;
-    for (let n = 0; n < o.length; n++) {
-      const a = o[n];
-      if (!(a.x === null || a.y === null) && Math.hypot(t - a.x, e - a.y) < l)
-        return { hit: !0, type: "point", index: n };
+    }), n = 8;
+    for (let l = 0; l < o.length; l++) {
+      const a = o[l];
+      if (!(a.x === null || a.y === null) && Math.hypot(t - a.x, e - a.y) < n)
+        return { hit: !0, type: "point", index: l };
     }
     const r = 5;
-    for (let n = 0; n < o.length - 1; n++) {
-      const a = o[n], c = o[n + 1];
+    for (let l = 0; l < o.length - 1; l++) {
+      const a = o[l], c = o[l + 1];
       if (a.x === null || a.y === null || c.x === null || c.y === null) continue;
-      if (A({ x: t, y: e }, a, c) < r)
+      if (L({ x: t, y: e }, a, c) < r)
         return { hit: !0, type: "line" };
     }
     return null;
@@ -2392,18 +2418,18 @@ class _i {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = Math.min(s, l), a = Math.max(s, l), c = a - n, p = Math.min(o, r), f = Math.max(o, r) - p;
-      this._options.backgroundColor && (i.fillStyle = this._options.backgroundColor, i.fillRect(n, p, c, f)), i.strokeStyle = this._options.borderColor, i.lineWidth = this._options.borderWidth * e.verticalPixelRatio, i.strokeRect(n, p, c, f);
-      const d = (o + r) / 2, u = 10 * e.verticalPixelRatio;
-      i.beginPath(), i.moveTo(n, d), i.lineTo(a, d);
-      const g = l - s;
-      if (Math.abs(g) > u) {
-        let C;
-        g > 0 ? (C = a, i.moveTo(C - u, d - u), i.lineTo(C, d), i.lineTo(C - u, d + u)) : (C = n, i.moveTo(C + u, d - u), i.lineTo(C, d), i.lineTo(C + u, d + u));
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = Math.min(s, n), a = Math.max(s, n), c = a - l, p = Math.min(o, r), u = Math.max(o, r) - p;
+      this._options.backgroundColor && (i.fillStyle = this._options.backgroundColor, i.fillRect(l, p, c, u)), i.strokeStyle = this._options.borderColor, i.lineWidth = this._options.borderWidth * e.verticalPixelRatio, i.strokeRect(l, p, c, u);
+      const d = (o + r) / 2, f = 10 * e.verticalPixelRatio;
+      i.beginPath(), i.moveTo(l, d), i.lineTo(a, d);
+      const g = n - s;
+      if (Math.abs(g) > f) {
+        let b;
+        g > 0 ? (b = a, i.moveTo(b - f, d - f), i.lineTo(b, d), i.lineTo(b - f, d + f)) : (b = l, i.moveTo(b + f, d - f), i.lineTo(b, d), i.lineTo(b + f, d + f));
       }
       i.stroke();
-      const m = this._source._p1.logical, v = this._source._p2.logical, L = `${Math.abs(v - m)} bars`;
-      i.font = `bold ${14 * e.verticalPixelRatio}px sans-serif`, i.fillStyle = this._options.borderColor, i.textAlign = "center", i.textBaseline = "bottom", i.fillText(L, (n + a) / 2, p - 5 * e.verticalPixelRatio), this._selected && (y(e, s, o), y(e, l, r), y(e, s, r), y(e, l, o));
+      const x = this._source._p1.logical, v = this._source._p2.logical, V = `${Math.abs(v - x)} bars`;
+      i.font = `bold ${14 * e.verticalPixelRatio}px sans-serif`, i.fillStyle = this._options.borderColor, i.textAlign = "center", i.textBaseline = "bottom", i.fillText(V, (l + a) / 2, p - 5 * e.verticalPixelRatio), this._selected && (y(e, s, o), y(e, n, r), y(e, s, r), y(e, n, o));
     });
   }
 }
@@ -2440,7 +2466,7 @@ const ui = {
   borderColor: "rgb(41, 98, 255)",
   borderWidth: 2
 };
-class kt {
+class Lt {
   _chart;
   _series;
   _p1;
@@ -2467,15 +2493,15 @@ class kt {
     Object.assign(this._options, t), this.updateAllViews(), this._chart.timeScale().applyOptions({});
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price);
-    if (o === null || l === null || r === null || n === null) return null;
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price);
+    if (o === null || n === null || r === null || l === null) return null;
     const a = 8;
-    if (Math.hypot(t - o, e - l) < a) return { hit: !0, type: "point", index: 0 };
-    if (Math.hypot(t - r, e - n) < a) return { hit: !0, type: "point", index: 1 };
-    if (Math.hypot(t - r, e - l) < a) return { hit: !0, type: "point", index: 1 };
     if (Math.hypot(t - o, e - n) < a) return { hit: !0, type: "point", index: 0 };
-    const c = Math.min(o, r), p = Math.max(o, r), _ = Math.min(l, n), f = Math.max(l, n);
-    return t >= c && t <= p && e >= _ && e <= f ? { hit: !0, type: "shape" } : null;
+    if (Math.hypot(t - r, e - l) < a) return { hit: !0, type: "point", index: 1 };
+    if (Math.hypot(t - r, e - n) < a) return { hit: !0, type: "point", index: 1 };
+    if (Math.hypot(t - o, e - l) < a) return { hit: !0, type: "point", index: 0 };
+    const c = Math.min(o, r), p = Math.max(o, r), _ = Math.min(n, l), u = Math.max(n, l);
+    return t >= c && t <= p && e >= _ && e <= u ? { hit: !0, type: "shape" } : null;
   }
   updateAllViews() {
     this._paneViews.forEach((t) => t.update());
@@ -2494,25 +2520,25 @@ class fi {
   _priceToCoordinate;
   _options;
   _selected;
-  constructor(t, e, i, s, o, l, r, n, a) {
-    this._p1 = t, this._p2 = e, this._p3 = i, this._p1Price = s, this._p2Price = o, this._p3Price = l, this._priceToCoordinate = r, this._options = n, this._selected = a;
+  constructor(t, e, i, s, o, n, r, l, a) {
+    this._p1 = t, this._p2 = e, this._p3 = i, this._p1Price = s, this._p2Price = o, this._p3Price = n, this._priceToCoordinate = r, this._options = l, this._selected = a;
   }
   draw(t) {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null || this._p3.x === null || this._p3.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p2.x, e.horizontalPixelRatio), l = x(this._p3.x, e.horizontalPixelRatio), r = x(this._p1.y, e.verticalPixelRatio), n = x(this._p2.y, e.verticalPixelRatio), a = x(this._p3.y, e.verticalPixelRatio);
-      i.lineWidth = 1, i.strokeStyle = "rgba(120, 120, 120, 0.5)", i.setLineDash([5, 5]), i.beginPath(), i.moveTo(s, r), i.lineTo(o, n), i.stroke(), i.beginPath(), i.moveTo(o, n), i.lineTo(l, a), i.stroke(), i.setLineDash([]);
-      const c = this._p2Price - this._p1Price, p = Math.min(s, o, l), _ = Math.max(s, o, l);
-      this._options.levels.forEach((f) => {
-        const d = this._p3Price + c * f.coeff, u = this._priceToCoordinate(d);
-        if (u !== null) {
-          const g = x(u, e.verticalPixelRatio);
-          i.lineWidth = this._options.width, i.strokeStyle = f.color, i.beginPath(), i.moveTo(p, g), i.lineTo(_, g), i.stroke(), i.font = "10px Arial", i.fillStyle = f.color;
-          const m = (f.coeff * 100).toFixed(1);
-          i.fillText(`${m}% (${d.toFixed(2)})`, p + 2, g - 2);
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p2.x, e.horizontalPixelRatio), n = m(this._p3.x, e.horizontalPixelRatio), r = m(this._p1.y, e.verticalPixelRatio), l = m(this._p2.y, e.verticalPixelRatio), a = m(this._p3.y, e.verticalPixelRatio);
+      i.lineWidth = 1, i.strokeStyle = "rgba(120, 120, 120, 0.5)", i.setLineDash([5, 5]), i.beginPath(), i.moveTo(s, r), i.lineTo(o, l), i.stroke(), i.beginPath(), i.moveTo(o, l), i.lineTo(n, a), i.stroke(), i.setLineDash([]);
+      const c = this._p2Price - this._p1Price, p = Math.min(s, o, n), _ = Math.max(s, o, n);
+      this._options.levels.forEach((u) => {
+        const d = this._p3Price + c * u.coeff, f = this._priceToCoordinate(d);
+        if (f !== null) {
+          const g = m(f, e.verticalPixelRatio);
+          i.lineWidth = this._options.width, i.strokeStyle = u.color, i.beginPath(), i.moveTo(p, g), i.lineTo(_, g), i.stroke(), i.font = "10px Arial", i.fillStyle = u.color;
+          const x = (u.coeff * 100).toFixed(1);
+          i.fillText(`${x}% (${d.toFixed(2)})`, p + 2, g - 2);
         }
-      }), this._selected && (y(e, s, r), y(e, o, n), y(e, l, a));
+      }), this._selected && (y(e, s, r), y(e, o, l), y(e, n, a));
     });
   }
 }
@@ -2553,7 +2579,7 @@ class gi {
     );
   }
 }
-const xi = {
+const mi = {
   width: 1,
   levels: [
     { coeff: 0, color: "#787b86" },
@@ -2564,7 +2590,7 @@ const xi = {
     { coeff: 4.236, color: "#ff9800" }
   ]
 };
-class _t {
+class ut {
   _chart;
   _series;
   _p1;
@@ -2573,10 +2599,10 @@ class _t {
   _paneViews;
   _options;
   _selected = !1;
-  constructor(t, e, i, s, o, l) {
+  constructor(t, e, i, s, o, n) {
     this._chart = t, this._series = e, this._p1 = i, this._p2 = s, this._p3 = o, this._options = {
-      ...xi,
-      ...l
+      ...mi,
+      ...n
     }, this._paneViews = [new gi(this)];
   }
   updatePoints(t, e, i) {
@@ -2589,23 +2615,23 @@ class _t {
     this._selected = t, this.updateAllViews();
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
-    if (o === null || l === null || r === null || n === null || a === null || c === null)
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price), a = i.logicalToCoordinate(this._p3.logical), c = s.priceToCoordinate(this._p3.price);
+    if (o === null || n === null || r === null || l === null || a === null || c === null)
       return null;
     const p = 8;
-    if (Math.hypot(t - o, e - l) < p)
+    if (Math.hypot(t - o, e - n) < p)
       return { hit: !0, type: "point", index: 0 };
-    if (Math.hypot(t - r, e - n) < p)
+    if (Math.hypot(t - r, e - l) < p)
       return { hit: !0, type: "point", index: 1 };
     if (Math.hypot(t - a, e - c) < p)
       return { hit: !0, type: "point", index: 2 };
-    const _ = A({ x: t, y: e }, { x: o, y: l }, { x: r, y: n }), f = A({ x: t, y: e }, { x: r, y: n }, { x: a, y: c });
-    if (_ < 5 || f < 5)
+    const _ = L({ x: t, y: e }, { x: o, y: n }, { x: r, y: l }), u = L({ x: t, y: e }, { x: r, y: l }, { x: a, y: c });
+    if (_ < 5 || u < 5)
       return { hit: !0, type: "line" };
-    const d = this._p2.price - this._p1.price, u = Math.min(o, r, a), g = Math.max(o, r, a);
-    for (const m of this._options.levels) {
-      const v = this._p3.price + d * m.coeff, P = s.priceToCoordinate(v);
-      if (P !== null && Math.abs(e - P) < 5 && t >= u && t <= g)
+    const d = this._p2.price - this._p1.price, f = Math.min(o, r, a), g = Math.max(o, r, a);
+    for (const x of this._options.levels) {
+      const v = this._p3.price + d * x.coeff, C = s.priceToCoordinate(v);
+      if (C !== null && Math.abs(e - C) < 5 && t >= f && t <= g)
         return { hit: !0, type: "line" };
     }
     return null;
@@ -2617,8 +2643,8 @@ class _t {
     return this._paneViews;
   }
 }
-const Vt = "lineTool_templates", Nt = 20;
-class it {
+const Vt = "lineTool_templates", Xt = 20;
+class ot {
   /**
    * Generate a unique ID for templates
    */
@@ -2644,8 +2670,8 @@ class it {
   static saveTemplate(t, e) {
     try {
       const i = this.loadTemplates();
-      if (i.length >= Nt)
-        return console.warn(`Maximum ${Nt} templates reached`), null;
+      if (i.length >= Xt)
+        return console.warn(`Maximum ${Xt} templates reached`), null;
       const s = {
         id: this.generateId(),
         name: t.trim() || `Template ${i.length + 1}`,
@@ -2708,6 +2734,14 @@ class S {
   _manager;
   _activeTool = null;
   _savedPosition = null;
+  _positionPending = !1;
+  // RC-3
+  _activeDropdownHandlers = /* @__PURE__ */ new Set();
+  // ML-6
+  _activeDragHandlers = null;
+  // ML-7
+  _currentToolType = null;
+  // B-7
   // Icons matching the "thin stroke" style of the provided images
   static ICONS = {
     // 6-dot grid handle (Standard TV style)
@@ -2747,75 +2781,100 @@ class S {
     this._activeTool = t, this._renderExpanded(t), this._positionToolbar();
   }
   hide() {
-    this._container.classList.add("hidden"), this._closeAllDropdowns();
+    this._container && this._container.classList.add("hidden"), this._closeAllDropdowns();
+  }
+  destroy() {
+    this.hide(), this._closeAllDropdowns(), this._activeDropdownHandlers.forEach((t) => {
+      document.removeEventListener("click", t);
+    }), this._activeDropdownHandlers.clear(), this._activeDragHandlers && (document.removeEventListener("mousemove", this._activeDragHandlers.move), document.removeEventListener("mouseup", this._activeDragHandlers.up), this._activeDragHandlers = null), this._container && this._container.parentNode && this._container.parentNode.removeChild(this._container), this._container = null, this._manager = null;
   }
   _positionToolbar() {
-    if (this._savedPosition)
-      this._show(this._savedPosition.x, this._savedPosition.y);
-    else {
-      const t = this._manager.getChartRect(), e = this._container.getBoundingClientRect();
-      if (t) {
-        const i = t.right - e.width - 100, s = t.top + 15;
-        this._show(i, s);
-      } else {
-        const i = window.innerWidth - e.width - 100;
-        this._show(i, 100);
+    this._positionPending || (this._positionPending = !0, requestAnimationFrame(() => {
+      if (!this._container) {
+        this._positionPending = !1;
+        return;
       }
-    }
+      if (this._savedPosition)
+        this._show(this._savedPosition.x, this._savedPosition.y);
+      else if (this._container && this._manager) {
+        const t = this._manager.getChartRect(), e = this._container.getBoundingClientRect();
+        if (t) {
+          const i = t.right - e.width - 100, s = t.top + 15;
+          this._show(i, s);
+        } else {
+          const i = window.innerWidth - e.width - 100;
+          this._show(i, 100);
+        }
+      } else
+        this._positionPending = !1;
+      this._positionPending = !1;
+    }));
   }
   updatePosition(t, e) {
-    if (this._container.classList.contains("hidden")) return;
+    if (!this._container || !this._manager || this._container.classList.contains("hidden")) return;
     const i = this._container.getBoundingClientRect(), s = this._manager.getChartRect();
-    let o = 10, l = 10, r = window.innerWidth - i.width - 10, n = window.innerHeight - i.height - 10;
-    s && (o = s.left, l = s.top, r = s.right - i.width, n = s.bottom - i.height);
-    const a = Math.min(Math.max(o, t), r), c = Math.min(Math.max(l, e), n);
+    let o = 10, n = 10, r = window.innerWidth - i.width - 10, l = window.innerHeight - i.height - 10;
+    s && (o = s.left, n = s.top, r = s.right - i.width, l = s.bottom - i.height);
+    const a = Math.min(Math.max(o, t), r), c = Math.min(Math.max(n, e), l);
     this._container.style.left = `${a}px`, this._container.style.top = `${c}px`;
   }
   _show(t, e) {
-    this._container.classList.remove("hidden"), this.updatePosition(t, e);
+    this._container && (this._container.classList.remove("hidden"), this.updatePosition(t, e));
   }
   _renderCollapsed(t) {
-    this._container.innerHTML = "", this._container.dataset.tool = t, this._container.appendChild(this._createDragHandle());
+    if (!this._container || this._currentToolType === t && this._container.children.length > 0)
+      return;
+    this._currentToolType = t, this._container.innerHTML = "", this._container.dataset.tool = t, this._container.appendChild(this._createDragHandle());
     let e = S.ICONS.brush;
     t === "Text" && (e = S.ICONS.text), t === "UserPriceAlerts" && (e = S.ICONS.alert), t === "Eraser" && (e = S.ICONS.eraser);
     const i = this._createButton(e, t);
     i.classList.add("active"), this._container.appendChild(i);
   }
   _renderExpanded(t) {
+    if (!this._container || !this._manager) return;
     this._container.innerHTML = "", this._container.appendChild(this._createDragHandle());
     const e = this._createToolWrapper(), i = this._createButton(S.ICONS.template, "Templates");
-    i.addEventListener("click", (p) => this._toggleDropdown(p, e, (_) => this._createTemplateList(_, t))), e.appendChild(i), this._container.appendChild(e);
-    const s = t._options || {}, o = this._createToolWrapper(), l = s.lineColor || s.borderColor || s.color || "#2962ff", r = this._createFillButton(S.ICONS.brush, "Line Color", l);
-    if (r.addEventListener("click", (p) => this._toggleDropdown(p, o, (_) => this._createColorGrid(_, t, "line", r))), o.appendChild(r), this._container.appendChild(o), s.backgroundColor !== void 0) {
-      const p = this._createToolWrapper(), _ = this._createFillButton(S.ICONS.fill, "Fill Color", s.backgroundColor);
-      _.addEventListener("click", (f) => this._toggleDropdown(f, p, (d) => this._createColorGrid(d, t, "fill", _))), p.appendChild(_), this._container.appendChild(p);
+    i.addEventListener("click", (a) => this._toggleDropdown(a, e, (c) => this._createTemplateList(c, t))), e.appendChild(i), this._container.appendChild(e);
+    const s = t._options || {}, o = t.constructor.name === "Text" || t.constructor.name === "Callout";
+    if (!o) {
+      const a = this._createToolWrapper(), c = s.lineColor || s.borderColor || s.color || "#2962ff", p = this._createFillButton(S.ICONS.brush, "Line Color", c);
+      p.addEventListener("click", (_) => this._toggleDropdown(_, a, (u) => this._createColorGrid(u, t, "line", p))), a.appendChild(p), this._container.appendChild(a);
     }
-    if (t.toolType === "Text" || s.textColor !== void 0 && s.backgroundColor !== void 0) {
-      const p = this._createToolWrapper(), _ = s.textColor || "#131722", f = this._createFillButton(S.ICONS.text, "Text Color", _);
-      f.addEventListener("click", (d) => this._toggleDropdown(d, p, (u) => this._createColorGrid(u, t, "text", f))), p.appendChild(f), this._container.appendChild(p);
+    if (s.backgroundColor !== void 0) {
+      const a = this._createToolWrapper(), c = this._createFillButton(S.ICONS.fill, "Fill Color", s.backgroundColor);
+      c.addEventListener("click", (p) => this._toggleDropdown(p, a, (_) => this._createColorGrid(_, t, "fill", c))), a.appendChild(c), this._container.appendChild(a);
     }
-    if (this._addSeparator(), s.lineWidth !== void 0 || s.width !== void 0) {
-      const p = this._createToolWrapper(), _ = document.createElement("div");
-      _.className = "stroke-width-trigger", _.title = "Line Width";
-      const f = s.lineWidth || s.width || 1, d = document.createElement("div");
-      d.className = "stroke-width-preview", d.style.height = `${Math.max(1, f)}px`;
+    if (s.textColor !== void 0 || o && s.color !== void 0) {
+      const a = this._createToolWrapper(), c = s.textColor || s.color || "#131722", p = this._createFillButton(S.ICONS.text, "Text Color", c);
+      p.addEventListener("click", (_) => this._toggleDropdown(_, a, (u) => this._createColorGrid(u, t, "text", p))), a.appendChild(p), this._container.appendChild(a);
+    }
+    if (this._addSeparator(), o && s.fontSize !== void 0) {
+      const a = this._createToolWrapper(), c = document.createElement("div");
+      c.className = "font-size-trigger", c.title = "Font Size";
+      const p = s.fontSize || 14, _ = document.createElement("span");
+      _.textContent = `${p}`, c.appendChild(_), c.addEventListener("click", (u) => this._toggleDropdown(u, a, (d) => this._createFontSizeList(d, t, _))), a.appendChild(c), this._container.appendChild(a);
+    } else if (!o && (s.lineWidth !== void 0 || s.width !== void 0)) {
+      const a = this._createToolWrapper(), c = document.createElement("div");
+      c.className = "stroke-width-trigger", c.title = "Line Width";
+      const p = s.lineWidth || s.width || 1, _ = document.createElement("div");
+      _.className = "stroke-width-preview", _.style.height = `${Math.max(1, p)}px`;
       const u = document.createElement("span");
-      u.textContent = `${f}px`, _.appendChild(d), _.appendChild(u), _.addEventListener("click", (g) => this._toggleDropdown(g, p, (m) => this._createWidthList(m, t, d, u))), p.appendChild(_), this._container.appendChild(p);
+      u.textContent = `${p}px`, c.appendChild(_), c.appendChild(u), c.addEventListener("click", (d) => this._toggleDropdown(d, a, (f) => this._createWidthList(f, t, _, u))), a.appendChild(c), this._container.appendChild(a);
     }
-    if (this._addSeparator(), this._manager.toolSupportsAlerts(t)) {
-      const p = this._createButton(S.ICONS.alert, "Add Alert");
-      p.addEventListener("click", (_) => {
-        _.stopPropagation(), _.preventDefault(), this._activeTool && this._manager.createAlertForTool(this._activeTool);
-      }), this._container.appendChild(p);
+    if (this._addSeparator(), this._manager && this._manager.toolSupportsAlerts(t)) {
+      const a = this._createButton(S.ICONS.alert, "Add Alert");
+      a.addEventListener("click", (c) => {
+        c.stopPropagation(), c.preventDefault(), this._activeTool && this._manager && this._manager.createAlertForTool(this._activeTool);
+      }), this._container.appendChild(a);
     }
     const n = this._createButton(S.ICONS.lock, "Lock");
-    (t._locked || !1) && n.classList.add("active"), n.addEventListener("click", (p) => {
-      p.stopPropagation(), p.preventDefault(), this._activeTool && (this._manager.toggleToolLock(this._activeTool), this._activeTool._locked ? n.classList.add("active") : n.classList.remove("active"));
+    (t._locked || !1) && n.classList.add("active"), n.addEventListener("click", (a) => {
+      a.stopPropagation(), a.preventDefault(), this._activeTool && this._manager && (this._manager.toggleToolLock(this._activeTool), this._activeTool._locked ? n.classList.add("active") : n.classList.remove("active"));
     }), this._container.appendChild(n);
-    const c = this._createButton(S.ICONS.delete, "Remove");
-    c.addEventListener("click", (p) => {
-      p.stopPropagation(), p.preventDefault(), this._activeTool && this._manager.deleteTool(this._activeTool);
-    }), this._container.appendChild(c), this._container.appendChild(this._createButton(S.ICONS.more, "More"));
+    const l = this._createButton(S.ICONS.delete, "Remove");
+    l.addEventListener("click", (a) => {
+      a.stopPropagation(), a.preventDefault(), this._activeTool && this._manager && this._manager.deleteTool(this._activeTool);
+    }), this._container.appendChild(l), this._container.appendChild(this._createButton(S.ICONS.more, "More"));
   }
   _createDragHandle() {
     const t = document.createElement("div");
@@ -2834,14 +2893,15 @@ class S {
     s.className = "tool-btn fill-btn", s.title = e;
     const o = document.createElement("div");
     o.className = "fill-btn-wrap";
-    const l = document.createElement("span");
-    l.className = "fill-btn-icon", l.innerHTML = t;
+    const n = document.createElement("span");
+    n.className = "fill-btn-icon", n.innerHTML = t;
     const r = document.createElement("div");
     r.className = "fill-btn-color-bg";
-    const n = document.createElement("div");
-    return n.className = "fill-btn-color", n.style.backgroundColor = i, r.appendChild(n), o.appendChild(l), o.appendChild(r), s.appendChild(o), s;
+    const l = document.createElement("div");
+    return l.className = "fill-btn-color", l.style.backgroundColor = i, r.appendChild(l), o.appendChild(n), o.appendChild(r), s.appendChild(o), s;
   }
   _addSeparator() {
+    if (!this._container) return;
     const t = document.createElement("div");
     t.className = "divider", this._container.appendChild(t);
   }
@@ -2854,26 +2914,40 @@ class S {
     }
     this._closeAllDropdowns();
     let o = e.querySelector(".tv-floating-toolbar__dropdown");
-    o || (o = document.createElement("div"), o.className = "tv-floating-toolbar__dropdown", e.appendChild(o)), o.innerHTML = "", i(o), requestAnimationFrame(() => o.classList.add("visible"));
-    const l = () => {
-      o.classList.remove("visible"), document.removeEventListener("click", l);
+    o || (o = document.createElement("div"), o.className = "tv-floating-toolbar__dropdown", e.appendChild(o)), o.innerHTML = "", i(o);
+    const n = () => {
+      o.classList.remove("visible"), document.removeEventListener("click", n), this._activeDropdownHandlers.delete(n);
     };
-    setTimeout(() => document.addEventListener("click", l), 0), o.addEventListener("click", (r) => r.stopPropagation());
+    this._activeDropdownHandlers.add(n), requestAnimationFrame(() => {
+      this._activeDropdownHandlers.has(n) && (o.classList.add("visible"), setTimeout(() => {
+        this._activeDropdownHandlers.has(n) && document.addEventListener("click", n);
+      }, 0));
+    }), o.addEventListener("click", (r) => r.stopPropagation());
   }
   _closeAllDropdowns() {
+    if (!this._container) return;
     this._container.querySelectorAll(".tv-floating-toolbar__dropdown.visible").forEach((e) => e.classList.remove("visible"));
   }
   // --- Content Generators ---
   _createWidthList(t, e, i, s) {
-    const o = [1, 2, 3, 4], l = e._options?.lineWidth || e._options?.width || 1;
+    const o = [1, 2, 3, 4], n = e._options?.lineWidth || e._options?.width || 1;
     o.forEach((r) => {
-      const n = document.createElement("div");
-      n.className = "tv-width-picker__item", r === l && n.classList.add("active"), n.innerHTML = `
+      const l = document.createElement("div");
+      l.className = "tv-width-picker__item", r === n && l.classList.add("active"), l.innerHTML = `
                 <div class="tv-width-picker__line" style="height: ${r}px"></div>
                 <div class="tv-width-picker__text">${r}px</div>
-            `, n.addEventListener("click", () => {
+            `, l.addEventListener("click", () => {
         this._applyWidth(e, r), i.style.height = `${r}px`, s.textContent = `${r}px`, t.classList.remove("visible");
-      }), t.appendChild(n);
+      }), t.appendChild(l);
+    });
+  }
+  _createFontSizeList(t, e, i) {
+    const s = [8, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 40], o = e._options?.fontSize || 14;
+    s.forEach((n) => {
+      const r = document.createElement("div");
+      r.className = "tv-font-size-picker__item", n === o && r.classList.add("active"), r.innerHTML = `<div class="tv-font-size-picker__text">${n}</div>`, r.addEventListener("click", () => {
+        this._applyFontSize(e, n), i.textContent = `${n}`, t.classList.remove("visible");
+      }), t.appendChild(r);
     });
   }
   _createTemplateList(t, e) {
@@ -2883,19 +2957,19 @@ class S {
     }), t.appendChild(i);
     const s = document.createElement("div");
     s.className = "tv-template-item", s.innerHTML = "<span>Apply Default Drawing Template</span>", t.appendChild(s);
-    const o = it.loadTemplates();
+    const o = ot.loadTemplates();
     if (o.length > 0) {
-      const l = document.createElement("div");
-      l.className = "tv-dropdown-separator", t.appendChild(l), o.forEach((r) => {
-        const n = document.createElement("div");
-        n.className = "tv-template-item", n.innerHTML = `
+      const n = document.createElement("div");
+      n.className = "tv-dropdown-separator", t.appendChild(n), o.forEach((r) => {
+        const l = document.createElement("div");
+        l.className = "tv-template-item", l.innerHTML = `
                     <span class="tv-template-item__name">${this._escapeHtml(r.name)}</span>
                     <button class="tv-template-item__delete" title="Delete template">×</button>
-                `, n.querySelector(".tv-template-item__name")?.addEventListener("click", () => {
-          it.applyTemplate(r.id, e) && this._renderExpanded(e);
-        }), n.querySelector(".tv-template-item__delete")?.addEventListener("click", (a) => {
-          a.stopPropagation(), it.deleteTemplate(r.id) && (t.innerHTML = "", this._createTemplateList(t, e));
-        }), t.appendChild(n);
+                `, l.querySelector(".tv-template-item__name")?.addEventListener("click", () => {
+          ot.applyTemplate(r.id, e) && this._renderExpanded(e);
+        }), l.querySelector(".tv-template-item__delete")?.addEventListener("click", (a) => {
+          a.stopPropagation(), ot.deleteTemplate(r.id) && (t.innerHTML = "", this._createTemplateList(t, e));
+        }), t.appendChild(l);
       });
     }
   }
@@ -2965,18 +3039,18 @@ class S {
       "#1976d2",
       "#512da8",
       "#7b1fa2"
-    ], l = document.createElement("div");
-    l.className = "tv-color-picker__grid";
+    ], n = document.createElement("div");
+    n.className = "tv-color-picker__grid";
     const r = e._options || {};
-    let n = i === "line" ? r.lineColor || r.borderColor || r.color || "#2962ff" : i === "text" ? r.textColor || "#131722" : r.backgroundColor || "#2962ff";
+    let l = i === "line" ? r.lineColor || r.borderColor || r.color || "#2962ff" : i === "text" ? r.textColor || "#131722" : r.backgroundColor || "#2962ff";
     o.forEach((_) => {
-      const f = document.createElement("div");
-      f.className = "tv-color-picker__swatch", f.style.backgroundColor = _, n.toLowerCase().startsWith(_.toLowerCase()) && f.classList.add("active"), f.addEventListener("click", () => {
+      const u = document.createElement("div");
+      u.className = "tv-color-picker__swatch", u.style.backgroundColor = _, l.toLowerCase().startsWith(_.toLowerCase()) && u.classList.add("active"), u.addEventListener("click", () => {
         this._applyColor(e, _, i);
         const d = s.querySelector(".fill-btn-color");
         d && (d.style.backgroundColor = _), this._updateOpacitySlider(t, _);
-      }), l.appendChild(f);
-    }), t.appendChild(l);
+      }), n.appendChild(u);
+    }), t.appendChild(n);
     const a = document.createElement("div");
     a.className = "tv-dropdown-separator", t.appendChild(a);
     const c = document.createElement("div");
@@ -2984,8 +3058,8 @@ class S {
     const p = document.createElement("input");
     p.type = "color", p.className = "tv-color-picker__input", p.addEventListener("input", (_) => {
       this._applyColor(e, _.target.value, i);
-      const f = s.querySelector(".fill-btn-color");
-      f && (f.style.backgroundColor = _.target.value), this._updateOpacitySlider(t, _.target.value);
+      const u = s.querySelector(".fill-btn-color");
+      u && (u.style.backgroundColor = _.target.value), this._updateOpacitySlider(t, _.target.value);
     }), c.appendChild(p), t.appendChild(c), this._renderOpacitySlider(t, e, i);
   }
   _renderOpacitySlider(t, e, i) {
@@ -2993,35 +3067,35 @@ class S {
     s.className = "tv-opacity-slider";
     const o = document.createElement("div");
     o.className = "tv-opacity-slider__label", o.textContent = "Opacity", s.appendChild(o);
-    const l = document.createElement("div");
-    l.className = "tv-opacity-slider__controls";
+    const n = document.createElement("div");
+    n.className = "tv-opacity-slider__controls";
     const r = document.createElement("div");
     r.className = "tv-opacity-slider__track";
-    const n = document.createElement("div");
-    n.className = "tv-opacity-slider__thumb", r.appendChild(n), l.appendChild(r);
+    const l = document.createElement("div");
+    l.className = "tv-opacity-slider__thumb", r.appendChild(l), n.appendChild(r);
     const a = document.createElement("div");
-    a.className = "tv-opacity-slider__value", l.appendChild(a), s.appendChild(l), t.appendChild(s);
+    a.className = "tv-opacity-slider__value", n.appendChild(a), s.appendChild(n), t.appendChild(s);
     const c = e._options || {};
     let p = i === "line" ? c.lineColor || c.borderColor || c.color || "#2962ff" : c.backgroundColor || "#2962ff", _ = 1;
     if (p.startsWith("rgba")) {
-      const u = p.match(/rgba?\([^,]+,[^,]+,[^,]+,\s*([^)]+)\)/);
-      u && (_ = parseFloat(u[1]));
+      const f = p.match(/rgba?\([^,]+,[^,]+,[^,]+,\s*([^)]+)\)/);
+      f && (_ = parseFloat(f[1]));
     }
-    const f = Math.round(_ * 100);
-    n.style.left = `${f}%`, a.innerText = `${f}%`;
-    const d = (u) => {
+    const u = Math.round(_ * 100);
+    l.style.left = `${u}%`, a.innerText = `${u}%`;
+    const d = (f) => {
       const g = r.getBoundingClientRect();
-      let m = u - g.left;
-      m = Math.max(0, Math.min(m, g.width));
-      const v = Math.round(m / g.width * 100);
-      n.style.left = `${v}%`, a.innerText = `${v}%`, this._applyOpacity(e, v / 100, i);
+      let x = f - g.left;
+      x = Math.max(0, Math.min(x, g.width));
+      const v = Math.round(x / g.width * 100);
+      l.style.left = `${v}%`, a.innerText = `${v}%`, this._applyOpacity(e, v / 100, i);
     };
-    r.addEventListener("mousedown", (u) => {
-      d(u.clientX);
-      const g = (v) => d(v.clientX), m = () => {
-        document.removeEventListener("mousemove", g), document.removeEventListener("mouseup", m);
+    r.addEventListener("mousedown", (f) => {
+      this._activeDragHandlers && (document.removeEventListener("mousemove", this._activeDragHandlers.move), document.removeEventListener("mouseup", this._activeDragHandlers.up)), d(f.clientX);
+      const g = (v) => d(v.clientX), x = () => {
+        document.removeEventListener("mousemove", g), document.removeEventListener("mouseup", x), this._activeDragHandlers = null;
       };
-      document.addEventListener("mousemove", g), document.addEventListener("mouseup", m), u.preventDefault();
+      this._activeDragHandlers = { move: g, up: x }, document.addEventListener("mousemove", g), document.addEventListener("mouseup", x), f.preventDefault();
     });
   }
   _updateOpacitySlider(t, e) {
@@ -3032,63 +3106,78 @@ class S {
     const s = t._options || {};
     let o = i === "line" ? s.lineColor || s.borderColor || s.color || "#2962ff" : i === "text" ? s.textColor || "#131722" : s.backgroundColor || "#2962ff";
     if (o.startsWith("#")) {
-      const l = parseInt(o.slice(1, 3), 16), r = parseInt(o.slice(3, 5), 16), n = parseInt(o.slice(5, 7), 16);
-      o = `rgba(${l}, ${r}, ${n}, ${e})`;
+      const n = parseInt(o.slice(1, 3), 16), r = parseInt(o.slice(3, 5), 16), l = parseInt(o.slice(5, 7), 16);
+      o = `rgba(${n}, ${r}, ${l}, ${e})`;
     } else o.startsWith("rgb") && (o = o.replace(/[\d\.]+\)$/g, `${e})`));
     this._applyColor(t, o, i);
   }
   _applyColor(t, e, i) {
     const s = t._options || {};
-    let o = i === "line" ? s.lineColor || s.borderColor || s.color || "#2962ff" : s.backgroundColor || "#2962ff";
+    let o = i === "line" ? s.lineColor || s.borderColor || s.color || "#2962ff" : i === "text" ? s.textColor || s.color || "#131722" : s.backgroundColor || "#2962ff";
     if (!e.startsWith("rgba")) {
-      let n = 1;
+      let r = 1;
       if (o.startsWith("rgba")) {
-        const a = o.match(/rgba?\([^,]+,[^,]+,[^,]+,\s*([^)]+)\)/);
-        a && (n = parseFloat(a[1]));
+        const l = o.match(/rgba?\([^,]+,[^,]+,[^,]+,\s*([^)]+)\)/);
+        l && (r = parseFloat(l[1]));
       }
-      if (n < 1 && e.startsWith("#")) {
-        const a = parseInt(e.slice(1, 3), 16), c = parseInt(e.slice(3, 5), 16), p = parseInt(e.slice(5, 7), 16);
-        e = `rgba(${a}, ${c}, ${p}, ${n})`;
+      if (r < 1 && e.startsWith("#")) {
+        const l = parseInt(e.slice(1, 3), 16), a = parseInt(e.slice(3, 5), 16), c = parseInt(e.slice(5, 7), 16);
+        e = `rgba(${l}, ${a}, ${c}, ${r})`;
       }
     }
-    const l = {};
-    i === "line" ? (s.lineColor !== void 0 && (l.lineColor = e), s.borderColor !== void 0 && (l.borderColor = e), s.color !== void 0 && (l.color = e), s.textColor !== void 0 && s.backgroundColor === void 0 && (l.textColor = e)) : i === "text" ? s.textColor !== void 0 && (l.textColor = e) : s.backgroundColor !== void 0 && (l.backgroundColor = e), t.applyOptions(l);
-    const r = t.toolType || t.constructor.name;
-    this._manager.updateToolOptions(r, l);
+    const n = {};
+    if (i === "line" ? (s.lineColor !== void 0 && (n.lineColor = e), s.borderColor !== void 0 && (n.borderColor = e), s.color !== void 0 && s.textColor === void 0 && (n.color = e), s.textColor !== void 0 && s.backgroundColor === void 0 && (n.textColor = e)) : i === "text" ? (s.textColor !== void 0 && (n.textColor = e), s.color !== void 0 && s.textColor === void 0 && (n.color = e)) : s.backgroundColor !== void 0 && (n.backgroundColor = e), t.applyOptions(n), this._manager) {
+      const r = t.toolType || t.constructor.name;
+      this._manager.updateToolOptions(r, n);
+    }
   }
   _applyWidth(t, e) {
+    if (!this._manager) return;
     const i = {};
     t._options?.lineWidth !== void 0 && (i.lineWidth = e), t._options?.width !== void 0 && (i.width = e), t.applyOptions(i);
+    const s = t.toolType || t.constructor.name;
+    this._manager.updateToolOptions(s, i);
+  }
+  _applyFontSize(t, e) {
+    if (!this._manager) return;
+    const i = { fontSize: e };
+    t.applyOptions(i);
     const s = t.toolType || t.constructor.name;
     this._manager.updateToolOptions(s, i);
   }
   _saveTemplate(t) {
     const e = prompt("Enter template name:");
     if (!e) return;
-    const i = it.extractStyles(t);
-    it.saveTemplate(e, i);
+    const i = ot.extractStyles(t);
+    ot.saveTemplate(e, i);
   }
   _escapeHtml(t) {
     const e = document.createElement("div");
     return e.textContent = t, e.innerHTML;
   }
   _startDrag(t) {
+    if (!this._container || !this._manager) return;
     t.preventDefault();
-    const e = t.clientX, i = t.clientY, s = this._container.getBoundingClientRect(), o = s.left, l = s.top, r = (a) => {
+    const e = t.clientX, i = t.clientY, s = this._container.getBoundingClientRect(), o = s.left, n = s.top, r = (a) => {
+      if (!this._container || !this._manager) {
+        document.removeEventListener("mousemove", r), document.removeEventListener("mouseup", l);
+        return;
+      }
       const c = a.clientX - e, p = a.clientY - i;
-      let _ = o + c, f = l + p;
-      const d = this._manager.getChartRect();
-      let u = 0, g = 0, m = window.innerWidth - s.width, v = window.innerHeight - s.height;
-      d && (u = d.left, g = d.top, m = d.right - s.width, v = d.bottom - s.height), _ = Math.max(u, Math.min(_, m)), f = Math.max(g, Math.min(f, v)), this._container.style.left = `${_}px`, this._container.style.top = `${f}px`;
-    }, n = () => {
-      document.removeEventListener("mousemove", r), document.removeEventListener("mouseup", n);
-      const a = this._container.getBoundingClientRect();
-      this._savedPosition = { x: a.left, y: a.top };
+      let _ = o + c, u = n + p;
+      const d = this._manager.getChartRect(), f = this._container.getBoundingClientRect();
+      let g = 0, x = 0, v = window.innerWidth - f.width, C = window.innerHeight - f.height;
+      d && (g = d.left, x = d.top, v = d.right - f.width, C = d.bottom - f.height), _ = Math.max(g, Math.min(_, v)), u = Math.max(x, Math.min(u, C)), this._container.style.left = `${_}px`, this._container.style.top = `${u}px`;
+    }, l = () => {
+      if (document.removeEventListener("mousemove", r), document.removeEventListener("mouseup", l), this._container) {
+        const a = this._container.getBoundingClientRect();
+        this._savedPosition = { x: a.left, y: a.top };
+      }
     };
-    document.addEventListener("mousemove", r), document.addEventListener("mouseup", n);
+    document.addEventListener("mousemove", r), document.addEventListener("mouseup", l);
   }
 }
-class mi {
+class xi {
   _viewData;
   constructor(t) {
     this._viewData = t;
@@ -3096,13 +3185,13 @@ class mi {
   draw(t) {
     const e = this._viewData.data;
     t.useBitmapCoordinateSpace((i) => {
-      const s = i.context, o = 0, l = i.bitmapSize.height, r = i.horizontalPixelRatio * this._viewData.barWidth / 2, n = -1 * (r + 1), a = i.bitmapSize.width;
+      const s = i.context, o = 0, n = i.bitmapSize.height, r = i.horizontalPixelRatio * this._viewData.barWidth / 2, l = -1 * (r + 1), a = i.bitmapSize.width;
       e.forEach((c) => {
         const p = c.x * i.horizontalPixelRatio;
-        if (p < n) return;
+        if (p < l) return;
         s.fillStyle = c.color || "rgba(0, 0, 0, 0)";
-        const _ = Math.max(0, Math.round(p - r)), f = Math.min(a, Math.round(p + r));
-        s.fillRect(_, o, f - _, l);
+        const _ = Math.max(0, Math.round(p - r)), u = Math.min(a, Math.round(p + r));
+        s.fillRect(_, o, u - _, n);
       });
     });
   }
@@ -3125,14 +3214,14 @@ class yi {
     })), this._data.data.length > 1 ? this._data.barWidth = this._data.data[1].x - this._data.data[0].x : this._data.barWidth = 6;
   }
   renderer() {
-    return new mi(this._data);
+    return new xi(this._data);
   }
   zOrder() {
     return "bottom";
   }
 }
 const vi = {};
-class $t extends Zt {
+class Ut extends Gt {
   _paneViews;
   _seriesData = [];
   _backgroundColors = [];
@@ -3157,13 +3246,13 @@ class $t extends Zt {
     })), this.requestUpdate();
   }
 }
-const dt = 21, Gt = 21, Ti = 17, At = 4, wi = 2, Xt = 13, Ut = 13, Yt = 50, Kt = 5.81, $ = 26, Qt = 20, Ft = 9, Ci = [
+const ft = 21, Qt = 21, Ti = 17, At = 4, wi = 2, Yt = 13, qt = 13, jt = 50, te = 5.81, $ = 26, ee = 20, Ft = 9, Ci = [
   new Path2D(
     "M5.34004 1.12254C4.7902 0.438104 3.94626 0 3 0C1.34315 0 0 1.34315 0 3C0 3.94626 0.438104 4.7902 1.12254 5.34004C1.04226 5.714 1 6.10206 1 6.5C1 9.36902 3.19675 11.725 6 11.9776V10.9725C3.75002 10.7238 2 8.81628 2 6.5C2 4.01472 4.01472 2 6.5 2C8.81628 2 10.7238 3.75002 10.9725 6H11.9776C11.9574 5.77589 11.9237 5.55565 11.8775 5.34011C12.562 4.79026 13.0001 3.9463 13.0001 3C13.0001 1.34315 11.6569 0 10.0001 0C9.05382 0 8.20988 0.438111 7.66004 1.12256C7.28606 1.04227 6.89797 1 6.5 1C6.10206 1 5.714 1.04226 5.34004 1.12254ZM4.28255 1.46531C3.93534 1.17484 3.48809 1 3 1C1.89543 1 1 1.89543 1 3C1 3.48809 1.17484 3.93534 1.46531 4.28255C2.0188 3.02768 3.02768 2.0188 4.28255 1.46531ZM8.71751 1.46534C9.97237 2.01885 10.9812 3.02774 11.5347 4.28262C11.8252 3.93541 12.0001 3.48812 12.0001 3C12.0001 1.89543 11.1047 1 10.0001 1C9.51199 1 9.06472 1.17485 8.71751 1.46534Z"
   ),
   new Path2D("M7 7V4H8V8H5V7H7Z"),
   new Path2D("M10 8V10H8V11H10V13H11V11H13V10H11V8H10Z")
-], Pi = [
+], bi = [
   new Path2D(
     "M5.11068 1.65894C3.38969 2.08227 1.98731 3.31569 1.33103 4.93171C0.938579 4.49019 0.700195 3.90868 0.700195 3.27148C0.700195 1.89077 1.81948 0.771484 3.2002 0.771484C3.9664 0.771484 4.65209 1.11617 5.11068 1.65894Z"
   ),
@@ -3176,10 +3265,10 @@ const dt = 21, Gt = 21, Ti = 17, At = 4, wi = 2, Xt = 13, Ut = 13, Yt = 50, Kt =
   new Path2D(
     "M4.08902 0.934101C4.4888 1.08621 4.83946 1.33793 5.11068 1.65894C5.06565 1.67001 5.02084 1.68164 4.97625 1.69382C4.65623 1.78123 4.34783 1.89682 4.0539 2.03776C3.16224 2.4653 2.40369 3.12609 1.8573 3.94108C1.64985 4.2505 1.47298 4.58216 1.33103 4.93171C1.05414 4.6202 0.853937 4.23899 0.760047 3.81771C0.720863 3.6419 0.700195 3.45911 0.700195 3.27148C0.700195 1.89077 1.81948 0.771484 3.2002 0.771484C3.51324 0.771484 3.81285 0.829023 4.08902 0.934101ZM12.3317 4.27515C12.4404 3.99488 12.5 3.69015 12.5 3.37148C12.5 1.99077 11.3807 0.871484 10 0.871484C9.66727 0.871484 9.34974 0.936485 9.05938 1.05448C8.68236 1.20769 8.35115 1.45027 8.09208 1.7559C8.43923 1.8659 8.77146 2.00942 9.08499 2.18265C9.96762 2.67034 10.702 3.39356 11.2032 4.26753C11.3815 4.57835 11.5303 4.90824 11.6458 5.25338C11.947 4.98973 12.1844 4.65488 12.3317 4.27515ZM9.18112 3.43939C8.42029 2.85044 7.46556 2.49994 6.42896 2.49994C3.94367 2.49994 1.92896 4.51466 1.92896 6.99994C1.92896 9.48522 3.94367 11.4999 6.42896 11.4999C8.91424 11.4999 10.929 9.48522 10.929 6.99994C10.929 5.55126 10.2444 4.26246 9.18112 3.43939ZM6.00024 3.99994H7.00024V7.99994H4.00024V6.99994H6.00024V3.99994Z"
   )
-], bi = 10, Si = new Path2D(
+], Pi = 10, Si = new Path2D(
   "M9.35359 1.35359C9.11789 1.11789 8.88219 0.882187 8.64648 0.646484L5.00004 4.29293L1.35359 0.646484C1.11791 0.882212 0.882212 1.11791 0.646484 1.35359L4.29293 5.00004L0.646484 8.64648C0.882336 8.88204 1.11804 9.11774 1.35359 9.35359L5.00004 5.70714L8.64648 9.35359C8.88217 9.11788 9.11788 8.88217 9.35359 8.64649L5.70714 5.00004L9.35359 1.35359Z"
 );
-class z {
+class O {
   _listeners = [];
   subscribe(t, e, i) {
     const s = {
@@ -3219,10 +3308,10 @@ class Mi {
   _chart = void 0;
   _series = void 0;
   _unSubscribers = [];
-  _clicked = new z();
-  _mouseMoved = new z();
-  _mouseDown = new z();
-  _mouseUp = new z();
+  _clicked = new O();
+  _mouseMoved = new O();
+  _mouseDown = new O();
+  _mouseUp = new O();
   attached(t, e) {
     this._chart = t, this._series = e;
     const i = this._chart.chartElement();
@@ -3290,30 +3379,30 @@ class Mi {
   }
   _determineMousePosition(t) {
     if (!this._chart || !this._series) return null;
-    const e = this._chart.chartElement(), i = e.getBoundingClientRect(), s = this._series.priceScale().width(), o = this._chart.timeScale().height(), l = t.clientX - i.x, r = t.clientY - i.y, n = r > e.clientHeight - o, a = e.clientWidth - s - l, c = a < 0;
+    const e = this._chart.chartElement(), i = e.getBoundingClientRect(), s = this._series.priceScale().width(), o = this._chart.timeScale().height(), n = t.clientX - i.x, r = t.clientY - i.y, l = r > e.clientHeight - o, a = e.clientWidth - s - n, c = a < 0;
     return {
-      x: l,
+      x: n,
       y: r,
       xPositionRelativeToPriceScale: a,
       overPriceScale: c,
-      overTimeScale: n
+      overTimeScale: l
     };
   }
 }
-class te {
+class ie {
   _data = null;
   update(t) {
     this._data = t;
   }
 }
-function Ri(h) {
+function ki(h) {
   return Math.floor(h * 0.5);
 }
 function Y(h, t, e = 1, i) {
-  const s = Math.round(t * h), o = Math.round(e * t), l = Ri(o);
-  return { position: s - l, length: o };
+  const s = Math.round(t * h), o = Math.round(e * t), n = ki(o);
+  return { position: s - n, length: o };
 }
-class ki extends te {
+class Ri extends ie {
   draw(t) {
     t.useBitmapCoordinateSpace((e) => {
       if (!this._data) return;
@@ -3331,9 +3420,9 @@ class ki extends te {
         e.lineWidth
       ), o = s.position + s.length / 2;
       i.save(), i.beginPath(), i.lineWidth = e.lineWidth, i.strokeStyle = e.color;
-      const l = 4 * t.horizontalPixelRatio;
-      i.setLineDash([l, l]), i.moveTo(0, o), i.lineTo(
-        (e.width - dt) * t.horizontalPixelRatio,
+      const n = 4 * t.horizontalPixelRatio;
+      i.setLineDash([n, n]), i.moveTo(0, o), i.lineTo(
+        (e.width - ft) * t.horizontalPixelRatio,
         o
       ), i.stroke();
     } finally {
@@ -3362,7 +3451,7 @@ class ki extends te {
         y: s.y,
         roundedCorners: 2,
         icon: i,
-        iconScaling: Ut / Xt,
+        iconScaling: qt / Yt,
         padding: {
           left: At,
           top: wi
@@ -3372,7 +3461,7 @@ class ki extends te {
     });
   }
   _calculateLabelWidth(t) {
-    return Ft * 2 + $ + t * Kt;
+    return Ft * 2 + $ + t * te;
   }
   _drawAlertLabel(t) {
     if (!this._data?.alerts) return;
@@ -3382,44 +3471,44 @@ class ki extends te {
       t.mediaSize.width / 2,
       t.horizontalPixelRatio,
       s
-    ), l = Y(
+    ), n = Y(
       i.y,
       t.verticalPixelRatio,
-      Qt
+      ee
     );
     e.save();
     try {
       const r = 4 * t.horizontalPixelRatio;
       e.beginPath(), e.roundRect(
         o.position,
-        l.position,
+        n.position,
         o.length,
-        l.length,
+        n.length,
         r
       ), e.fillStyle = "#FFFFFF", e.fill();
-      const n = o.position + o.length - $ * t.horizontalPixelRatio;
+      const l = o.position + o.length - $ * t.horizontalPixelRatio;
       i.hoverRemove && (e.beginPath(), e.roundRect(
-        n,
-        l.position,
+        l,
+        n.position,
         $ * t.horizontalPixelRatio,
-        l.length,
+        n.length,
         [0, r, r, 0]
       ), e.fillStyle = "#F0F3FA", e.fill()), e.beginPath();
       const a = Y(
-        n / t.horizontalPixelRatio,
+        l / t.horizontalPixelRatio,
         t.horizontalPixelRatio,
         1
       );
       e.fillStyle = "#F1F3FB", e.fillRect(
         a.position,
-        l.position,
+        n.position,
         a.length,
-        l.length
+        n.length
       ), e.beginPath(), e.roundRect(
         o.position,
-        l.position,
+        n.position,
         o.length,
-        l.length,
+        n.length,
         r
       ), e.strokeStyle = "#131722", e.lineWidth = 1 * t.horizontalPixelRatio, e.stroke(), e.beginPath(), e.fillStyle = "#131722", e.textBaseline = "middle", e.font = `${Math.round(12 * t.verticalPixelRatio)}px sans-serif`, e.fillText(
         i.text,
@@ -3428,10 +3517,10 @@ class ki extends te {
       ), e.beginPath();
       const c = 9;
       e.translate(
-        n + t.horizontalPixelRatio * ($ - c) / 2,
+        l + t.horizontalPixelRatio * ($ - c) / 2,
         (i.y - 5) * t.verticalPixelRatio
       );
-      const p = c / bi * t.horizontalPixelRatio;
+      const p = c / Pi * t.horizontalPixelRatio;
       e.scale(p, p), e.fillStyle = "#131722", e.fill(Si, "evenodd");
     } finally {
       e.restore();
@@ -3448,11 +3537,11 @@ class ki extends te {
   _drawCrosshairLabelButton(t) {
     !this._data?.button || !this._data?.crosshair || this._drawLabel(t, {
       width: t.mediaSize.width,
-      labelHeight: Gt,
+      labelHeight: Qt,
       y: this._data.crosshair.y,
       roundedCorners: [2, 0, 0, 2],
       icon: this._data.button.crosshairLabelIcon,
-      iconScaling: Ut / Xt,
+      iconScaling: qt / Yt,
       padding: {
         left: At,
         top: At
@@ -3468,31 +3557,31 @@ class ki extends te {
         e.y,
         t.verticalPixelRatio,
         e.labelHeight
-      ), o = (e.width - (dt + 1)) * t.horizontalPixelRatio;
+      ), o = (e.width - (ft + 1)) * t.horizontalPixelRatio;
       i.roundRect(
         o,
         s.position,
-        dt * t.horizontalPixelRatio,
+        ft * t.horizontalPixelRatio,
         s.length,
-        Vi(e.roundedCorners, t.horizontalPixelRatio)
+        Ei(e.roundedCorners, t.horizontalPixelRatio)
       ), i.fillStyle = e.color, i.fill(), i.beginPath(), i.translate(
         o + e.padding.left * t.horizontalPixelRatio,
         s.position + e.padding.top * t.verticalPixelRatio
       ), i.scale(
         e.iconScaling * t.horizontalPixelRatio,
         e.iconScaling * t.verticalPixelRatio
-      ), i.fillStyle = "#FFFFFF", e.icon.forEach((l) => {
-        i.beginPath(), i.fill(l, "evenodd");
+      ), i.fillStyle = "#FFFFFF", e.icon.forEach((n) => {
+        i.beginPath(), i.fill(n, "evenodd");
       });
     } finally {
       i.restore();
     }
   }
 }
-function Vi(h, t) {
+function Ei(h, t) {
   return typeof h == "number" ? h * t : h.map((e) => e * t);
 }
-class Ai extends te {
+class Li extends ie {
   draw(t) {
     t.useBitmapCoordinateSpace((e) => {
       this._data && this._drawCrosshairLabel(e);
@@ -3504,13 +3593,13 @@ class Ai extends te {
     try {
       const s = t.bitmapSize.width - 8 * t.horizontalPixelRatio;
       e.save(), e.beginPath(), e.fillStyle = this._data.color;
-      const o = Y(this._data.crosshair.y, t.verticalPixelRatio, Gt), l = 2 * t.horizontalPixelRatio;
+      const o = Y(this._data.crosshair.y, t.verticalPixelRatio, Qt), n = 2 * t.horizontalPixelRatio;
       e.roundRect(
         0,
         o.position,
         s,
         o.length,
-        [0, l, l, 0]
+        [0, n, n, 0]
       ), e.fill(), e.beginPath(), e.fillStyle = "#FFFFFF", e.textBaseline = "middle", e.textAlign = "right", e.font = `${Math.round(12 * t.verticalPixelRatio)}px sans-serif`;
       const r = e.measureText(this._data.crosshair.text);
       e.fillText(
@@ -3523,10 +3612,10 @@ class Ai extends te {
     }
   }
 }
-class jt {
+class Zt {
   _renderer;
   constructor(t) {
-    this._renderer = t ? new Ai() : new ki();
+    this._renderer = t ? new Li() : new Ri();
   }
   zOrder() {
     return "top";
@@ -3538,11 +3627,11 @@ class jt {
     this._renderer.update(t);
   }
 }
-class Li {
-  _alertAdded = new z();
-  _alertRemoved = new z();
-  _alertChanged = new z();
-  _alertsChanged = new z();
+class Vi {
+  _alertAdded = new O();
+  _alertRemoved = new O();
+  _alertChanged = new O();
+  _alertsChanged = new O();
   _alerts;
   constructor() {
     this._alerts = /* @__PURE__ */ new Map(), this._alertsChanged.subscribe(() => {
@@ -3600,10 +3689,12 @@ class Li {
     return t;
   }
 }
-class Ei {
+class Ai {
   _overlay = null;
   _onSave = null;
   _currentData = null;
+  _overlayClickHandler = null;
+  // B-9
   constructor() {
     this._injectStyles();
   }
@@ -3748,12 +3839,12 @@ class Ei {
     this._currentData = { ...t }, this._onSave = e, this._createOverlay(), document.body.appendChild(this._overlay);
   }
   hide() {
-    this._overlay && this._overlay.parentNode && this._overlay.parentNode.removeChild(this._overlay), this._overlay = null, this._onSave = null, this._currentData = null;
+    this._overlay && (this._overlayClickHandler && (this._overlay.removeEventListener("click", this._overlayClickHandler), this._overlayClickHandler = null), this._overlay.parentNode && this._overlay.parentNode.removeChild(this._overlay)), this._overlay = null, this._onSave = null, this._currentData = null;
   }
   _createOverlay() {
-    this._overlay = document.createElement("div"), this._overlay.className = "alert-edit-dialog-overlay", this._overlay.addEventListener("click", (u) => {
-      u.target === this._overlay && this.hide();
-    });
+    this._overlay = document.createElement("div"), this._overlay.className = "alert-edit-dialog-overlay", this._overlayClickHandler = (f) => {
+      f.target === this._overlay && this.hide();
+    }, this._overlay.addEventListener("click", this._overlayClickHandler);
     const t = document.createElement("div");
     t.className = "alert-edit-dialog", this._overlay.appendChild(t);
     const e = document.createElement("div");
@@ -3764,12 +3855,12 @@ class Ei {
     s.className = "alert-edit-dialog-close", s.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path fill="currentColor" d="M9 7.586L14.293 2.293l1.414 1.414L10.414 9l5.293 5.293-1.414 1.414L9 10.414l-5.293 5.293-1.414-1.414L7.586 9 2.293 3.707l1.414-1.414L9 7.586z"/></svg>', s.addEventListener("click", () => this.hide()), e.appendChild(s), t.appendChild(e);
     const o = document.createElement("div");
     o.className = "alert-edit-dialog-content";
-    const l = document.createElement("div");
-    l.className = "alert-edit-form-group";
+    const n = document.createElement("div");
+    n.className = "alert-edit-form-group";
     const r = document.createElement("label");
-    r.className = "alert-edit-label", r.textContent = "Condition", l.appendChild(r);
-    const n = document.createElement("select");
-    n.className = "alert-edit-select";
+    r.className = "alert-edit-label", r.textContent = "Condition", n.appendChild(r);
+    const l = document.createElement("select");
+    l.className = "alert-edit-select";
     const a = [
       { value: "crossing", label: "Crossing" },
       { value: "crossing_up", label: "Crossing Up" },
@@ -3780,79 +3871,79 @@ class Ei {
       { value: "outside", label: "Outside" }
     ];
     let c = a;
-    this._currentData?.toolType === "vertical" ? c = a.filter((u) => u.value === "crossing") : this._currentData?.toolType === "shape" ? c = a.filter((u) => ["entering", "exiting", "inside", "outside"].includes(u.value)) : c = a.filter((u) => ["crossing", "crossing_up", "crossing_down"].includes(u.value)), c.forEach((u) => {
+    this._currentData?.toolType === "vertical" ? c = a.filter((f) => f.value === "crossing") : this._currentData?.toolType === "shape" ? c = a.filter((f) => ["entering", "exiting", "inside", "outside"].includes(f.value)) : c = a.filter((f) => ["crossing", "crossing_up", "crossing_down"].includes(f.value)), c.forEach((f) => {
       const g = document.createElement("option");
-      g.value = u.value, g.textContent = u.label, u.value === this._currentData?.condition && (g.selected = !0), n.appendChild(g);
-    }), l.appendChild(n), o.appendChild(l);
+      g.value = f.value, g.textContent = f.label, f.value === this._currentData?.condition && (g.selected = !0), l.appendChild(g);
+    }), n.appendChild(l), o.appendChild(n);
     let p = null;
     if (!this._currentData?.isTrendline) {
-      const u = document.createElement("div");
-      u.className = "alert-edit-form-group";
+      const f = document.createElement("div");
+      f.className = "alert-edit-form-group";
       const g = document.createElement("label");
-      g.className = "alert-edit-label", g.textContent = "Value", u.appendChild(g), p = document.createElement("input"), p.className = "alert-edit-input", p.type = "number", p.step = "0.01", p.value = this._currentData?.price.toFixed(2) || "", u.appendChild(p), o.appendChild(u);
+      g.className = "alert-edit-label", g.textContent = "Value", f.appendChild(g), p = document.createElement("input"), p.className = "alert-edit-input", p.type = "number", p.step = "0.01", p.value = this._currentData?.price.toFixed(2) || "", f.appendChild(p), o.appendChild(f);
     }
     t.appendChild(o);
     const _ = document.createElement("div");
     _.className = "alert-edit-dialog-footer";
-    const f = document.createElement("button");
-    f.className = "alert-edit-btn alert-edit-btn-cancel", f.textContent = "Cancel", f.addEventListener("click", () => this.hide()), _.appendChild(f);
+    const u = document.createElement("button");
+    u.className = "alert-edit-btn alert-edit-btn-cancel", u.textContent = "Cancel", u.addEventListener("click", () => this.hide()), _.appendChild(u);
     const d = document.createElement("button");
     d.className = "alert-edit-btn alert-edit-btn-save", d.textContent = "Save", d.addEventListener("click", () => {
       this._onSave && this._currentData && this._onSave({
         ...this._currentData,
-        condition: n.value,
+        condition: l.value,
         price: p ? parseFloat(p.value) : this._currentData.price
       }), this.hide();
     }), _.appendChild(d), t.appendChild(_);
   }
 }
-class Lt {
+class Dt {
   /**
    * Calculate the price on the line tool at a specific logical index
    * Only applicable for line-like tools (TrendLine, HorizontalLine, HorizontalRay)
    */
   static getPriceAtLogical(t, e) {
-    return t instanceof W ? t.getPriceAtLogical(e) : t instanceof j ? t._price : t instanceof q && e >= t._point.logical ? t._point.price : null;
+    return t instanceof W ? t.getPriceAtLogical(e) : t instanceof q ? t._price : t instanceof j && e >= t._point.logical ? t._point.price : null;
   }
   /**
    * Check if a bar triggers an alert condition for a given tool
    */
   static checkAlert(t, e, i, s) {
-    return t instanceof W || t instanceof j || t instanceof q ? this.checkLineCrossing(t, e, i, s) : t instanceof Z ? this.checkVerticalCrossing(t, i, s) : t instanceof ot ? this.checkRectangleAlert(t, e, i, s) : t instanceof N ? this.checkChannelAlert(t, e, i, s) : !1;
+    return t instanceof W || t instanceof q || t instanceof j ? this.checkLineCrossing(t, e, i, s) : t instanceof Z ? this.checkVerticalCrossing(t, i, s) : t instanceof J ? this.checkRectangleAlert(t, e, i, s) : t instanceof N ? this.checkChannelAlert(t, e, i, s) : !1;
   }
   static checkLineCrossing(t, e, i, s) {
     const o = this.getPriceAtLogical(t, i);
     if (o === null) return !1;
-    const l = o >= e.low && o <= e.high;
-    return s === "crossing" ? l : s === "crossing_up" ? l && e.close >= o : s === "crossing_down" ? l && e.close <= o : !1;
+    const n = o >= e.low && o <= e.high;
+    return s === "crossing" ? n : s === "crossing_up" ? n && e.close >= o : s === "crossing_down" ? n && e.close <= o : !1;
   }
   static checkVerticalCrossing(t, e, i) {
     return i !== "crossing" ? !1 : Math.round(e) === Math.round(t._logical);
   }
   static checkRectangleAlert(t, e, i, s) {
-    const o = t._p1, l = t._p2;
-    if (o.logical === null || o.price === null || l.logical === null || l.price === null) return !1;
-    const r = Math.min(o.logical, l.logical), n = Math.max(o.logical, l.logical), a = Math.min(o.price, l.price), c = Math.max(o.price, l.price);
-    if (i < r || i > n)
+    const o = t._p1, n = t._p2;
+    if (o.logical === null || o.price === null || n.logical === null || n.price === null) return !1;
+    const r = Math.min(o.logical, n.logical), l = Math.max(o.logical, n.logical), a = Math.min(o.price, n.price), c = Math.max(o.price, n.price);
+    if (i < r || i > l)
       return s === "outside";
     const p = e.close >= a && e.close <= c, _ = e.open >= a && e.open <= c;
     return s === "inside" ? p : s === "outside" ? !p : s === "entering" ? !_ && p : s === "exiting" ? _ && !p : !1;
   }
   static checkChannelAlert(t, e, i, s) {
-    const o = t._p1, l = t._p2, r = t._p3;
-    if (o.logical === null || o.price === null || l.logical === null || l.price === null || r.logical === null || r.price === null) return !1;
-    const n = Math.min(o.logical, l.logical), a = Math.max(o.logical, l.logical);
-    if (i < n || i > a) return !1;
+    const o = t._p1, n = t._p2, r = t._p3;
+    if (o.logical === null || o.price === null || n.logical === null || n.price === null || r.logical === null || r.price === null) return !1;
+    const l = Math.min(o.logical, n.logical), a = Math.max(o.logical, n.logical);
+    if (i < l || i > a) return !1;
     let c, p;
-    if (o.logical === l.logical)
+    if (o.logical === n.logical)
       return !1;
-    const _ = (l.price - o.price) / (l.logical - o.logical), f = o.price + _ * (i - o.logical), d = o.price + _ * (r.logical - o.logical), u = r.price - d;
-    c = f, p = f + u;
-    const g = Math.max(c, p), m = Math.min(c, p), v = e.close >= m && e.close <= g, P = e.open >= m && e.open <= g;
-    return s === "inside" ? v : s === "outside" ? !v : s === "entering" ? !P && v : s === "exiting" ? P && !v : !1;
+    const _ = (n.price - o.price) / (n.logical - o.logical), u = o.price + _ * (i - o.logical), d = o.price + _ * (r.logical - o.logical), f = r.price - d;
+    c = u, p = u + f;
+    const g = Math.max(c, p), x = Math.min(c, p), v = e.close >= x && e.close <= g, C = e.open >= x && e.open <= g;
+    return s === "inside" ? v : s === "outside" ? !v : s === "entering" ? !C && v : s === "exiting" ? C && !v : !1;
   }
 }
-class Oi extends Li {
+class Di extends Vi {
   _chart = void 0;
   _series = void 0;
   _mouseHandlers;
@@ -3863,24 +3954,26 @@ class Oi extends Li {
   _symbolName = "";
   _dragState = null;
   _hasDragged = !1;
-  _onAlertTriggered = new z();
+  _onAlertTriggered = new O();
   _editDialog;
   _requestUpdate;
+  _onDataChangedBound;
+  // RC-2
   constructor() {
-    super(), this._mouseHandlers = new Mi(), this._editDialog = new Ei();
+    super(), this._mouseHandlers = new Mi(), this._editDialog = new Ai();
   }
   attached({ chart: t, series: e, requestUpdate: i }) {
-    this._chart = t, this._series = e, this._requestUpdate = i, this._paneViews = [new jt(!1)], this._pricePaneViews = [new jt(!0)], this._mouseHandlers.attached(t, e), this._mouseHandlers.mouseMoved().subscribe((s) => {
+    this._chart = t, this._series = e, this._requestUpdate = i, this._paneViews = [new Zt(!1)], this._pricePaneViews = [new Zt(!0)], this._mouseHandlers.attached(t, e), this._mouseHandlers.mouseMoved().subscribe((s) => {
       this._lastMouseUpdate = s, i();
-    }, this), this._series.subscribeDataChanged(this._onDataChanged.bind(this)), this._mouseHandlers.clicked().subscribe((s) => {
+    }, this), this._onDataChangedBound = this._onDataChanged.bind(this), this._series.subscribeDataChanged(this._onDataChangedBound), this._mouseHandlers.clicked().subscribe((s) => {
       if (this._hasDragged) {
         this._hasDragged = !1;
         return;
       }
       if (s && this._series) {
         if (this._isHovering(s)) {
-          const l = this._series.coordinateToPrice(s.y);
-          l && (this.openEditDialog("new", { price: l, condition: "crossing" }), i());
+          const n = this._series.coordinateToPrice(s.y);
+          n && (this.openEditDialog("new", { price: n, condition: "crossing" }), i());
         }
         if (this._hoveringID) {
           this.removeAlert(this._hoveringID), i();
@@ -3905,7 +3998,7 @@ class Oi extends Li {
     }, this);
   }
   detached() {
-    this._series && this._series.unsubscribeDataChanged(this._onDataChanged.bind(this)), this._mouseHandlers.mouseMoved().unsubscribeAll(this), this._mouseHandlers.clicked().unsubscribeAll(this), this._mouseHandlers.mouseDown().unsubscribeAll(this), this._mouseHandlers.mouseUp().unsubscribeAll(this), this._mouseHandlers.detached(), this._series = void 0, this._requestUpdate = void 0;
+    this._series && this._onDataChangedBound && this._series.unsubscribeDataChanged(this._onDataChangedBound), this._mouseHandlers.mouseMoved().unsubscribeAll(this), this._mouseHandlers.clicked().unsubscribeAll(this), this._mouseHandlers.mouseDown().unsubscribeAll(this), this._mouseHandlers.mouseUp().unsubscribeAll(this), this._mouseHandlers.detached(), this._series = void 0, this._requestUpdate = void 0, this._onDataChangedBound = void 0;
   }
   paneViews() {
     return this._paneViews;
@@ -3926,13 +4019,13 @@ class Oi extends Li {
     if (this._chart && this._series) {
       const i = this._series.data?.();
       if (i && i.length > 0) {
-        const s = i[i.length - 1], o = this._chart.timeScale(), l = o.timeToCoordinate(s.time);
-        if (l !== null) {
-          const r = o.coordinateToLogical(l);
-          r !== null && this.alerts().forEach((n) => {
-            if (n.type === "tool" && n.toolRef) {
-              const a = Lt.getPriceAtLogical(n.toolRef, r);
-              a !== null && (n.price = a);
+        const s = i[i.length - 1], o = this._chart.timeScale(), n = o.timeToCoordinate(s.time);
+        if (n !== null) {
+          const r = o.coordinateToLogical(n);
+          r !== null && this.alerts().forEach((l) => {
+            if (l.type === "tool" && l.toolRef) {
+              const a = Dt.getPriceAtLogical(l.toolRef, r);
+              a !== null && (l.price = a);
             }
           });
         }
@@ -3977,7 +4070,7 @@ class Oi extends Li {
     let e = 0;
     "_p2" in t && t._p2 && typeof t._p2.price == "number" ? e = t._p2.price : "_price" in t && typeof t._price == "number" ? e = t._price : "_point" in t && t._point && typeof t._point.price == "number" && (e = t._point.price);
     let i = "line";
-    t instanceof Z ? i = "vertical" : (t instanceof ot || t instanceof N) && (i = "shape");
+    t instanceof Z ? i = "vertical" : (t instanceof J || t instanceof N) && (i = "shape");
     const s = {
       alertId: "new_tool",
       price: e,
@@ -3988,8 +4081,8 @@ class Oi extends Li {
       toolType: i
     };
     this._editDialog.show(s, (o) => {
-      const l = this.addToolAlert(t, o.condition);
-      "setAlertId" in t && t.setAlertId(l);
+      const n = this.addToolAlert(t, o.condition);
+      "setAlertId" in t && t.setAlertId(n);
     });
   }
   alertTriggered() {
@@ -4000,21 +4093,21 @@ class Oi extends Li {
    */
   checkPriceCrossings(t) {
     if (!t) return;
-    const e = t.high !== void 0 ? t.high : t.value !== void 0 ? t.value : t.close, i = t.low !== void 0 ? t.low : t.value !== void 0 ? t.value : t.close, s = t.close !== void 0 ? t.close : t.value !== void 0 ? t.value : e, o = this.alerts(), l = [];
+    const e = t.high !== void 0 ? t.high : t.value !== void 0 ? t.value : t.close, i = t.low !== void 0 ? t.low : t.value !== void 0 ? t.value : t.close, s = t.close !== void 0 ? t.close : t.value !== void 0 ? t.value : e, o = this.alerts(), n = [];
     for (const r of o) {
-      let n = !1;
+      let l = !1;
       const a = r.condition || "crossing";
       if (r.type === "tool" && r.toolRef) {
         const c = this._chart?.timeScale();
         if (c && t.time) {
           const p = c.coordinateToLogical(c.timeToCoordinate(t.time) || 0);
-          p !== null && (n = Lt.checkAlert(r.toolRef, t, p, a));
+          p !== null && (l = Dt.checkAlert(r.toolRef, t, p, a));
         }
       } else {
         const c = r.price >= i && r.price <= e;
-        a === "crossing" ? n = c : a === "crossing_up" ? n = c && s >= r.price : a === "crossing_down" && (n = c && s <= r.price);
+        a === "crossing" ? l = c : a === "crossing_up" ? l = c && s >= r.price : a === "crossing_down" && (l = c && s <= r.price);
       }
-      if (n) {
+      if (l) {
         const c = {
           alertId: r.id,
           alertPrice: r.price,
@@ -4023,17 +4116,17 @@ class Oi extends Li {
           condition: r.condition || "crossing",
           timestamp: Date.now()
         };
-        this._onAlertTriggered.fire(c), l.push(r.id);
+        this._onAlertTriggered.fire(c), n.push(r.id);
       }
     }
-    l.forEach((r) => this.removeAlert(r));
+    n.forEach((r) => this.removeAlert(r));
   }
   _isHovering(t) {
-    return !!(t && t.xPositionRelativeToPriceScale >= 1 && t.xPositionRelativeToPriceScale < dt);
+    return !!(t && t.xPositionRelativeToPriceScale >= 1 && t.xPositionRelativeToPriceScale < ft);
   }
   _isHoveringRemoveButton(t, e, i, s) {
-    if (!t || !e || Math.abs(t.y - i) > Qt / 2) return !1;
-    const l = Ft * 2 + $ + s * Kt, r = (e + l - $) * 0.5;
+    if (!t || !e || Math.abs(t.y - i) > ee / 2) return !1;
+    const n = Ft * 2 + $ + s * te, r = (e + n - $) * 0.5;
     return Math.abs(t.x - r) <= $ / 2;
   }
   _hoveringID = "";
@@ -4044,37 +4137,37 @@ class Oi extends Li {
    */
   _calculateRendererData(t, e) {
     if (!this._series) return null;
-    const i = this._series.priceFormatter(), s = e && !e.overTimeScale, o = s, l = e && this._series.coordinateToPrice(e.y), r = i.format(l ?? -100);
-    let n = 1 / 0, a = -1;
+    const i = this._series.priceFormatter(), s = e && !e.overTimeScale, o = s, n = e && this._series.coordinateToPrice(e.y), r = i.format(n ?? -100);
+    let l = 1 / 0, a = -1;
     const c = t.map((p, _) => {
-      const f = this._series.priceToCoordinate(p.price) ?? -100;
-      if (e?.y && f >= 0) {
-        const d = Math.abs(e.y - f);
-        d < n && (a = _, n = d);
+      const u = this._series.priceToCoordinate(p.price) ?? -100;
+      if (e?.y && u >= 0) {
+        const d = Math.abs(e.y - u);
+        d < l && (a = _, l = d);
       }
       return {
-        y: f,
+        y: u,
         showHover: !1,
         price: p.price,
         id: p.id
       };
     });
-    if (this._hoveringID = "", a >= 0 && n < Yt) {
-      const p = this._chart?.timeScale().width() ?? 0, _ = c[a], f = `${this._symbolName} crossing ${this._series.priceFormatter().format(_.price)}`, d = this._isHoveringRemoveButton(
+    if (this._hoveringID = "", a >= 0 && l < jt) {
+      const p = this._chart?.timeScale().width() ?? 0, _ = c[a], u = `${this._symbolName} crossing ${this._series.priceFormatter().format(_.price)}`, d = this._isHoveringRemoveButton(
         e,
         p,
         _.y,
-        f.length
+        u.length
       );
       c[a] = {
         ...c[a],
         showHover: !0,
-        text: f,
+        text: u,
         hoverRemove: d
       }, d && (this._hoveringID = _.id);
     }
     return {
-      alertIcon: Pi,
+      alertIcon: bi,
       alerts: c,
       button: o ? {
         hovering: this._isHovering(e),
@@ -4095,17 +4188,17 @@ class Oi extends Li {
     if (!t || !this._series || !this._chart) return null;
     const i = this.alerts();
     let s = 1 / 0, o = -1;
-    for (let l = 0; l < i.length; l++) {
-      const r = this._series.priceToCoordinate(i[l].price) ?? -100;
+    for (let n = 0; n < i.length; n++) {
+      const r = this._series.priceToCoordinate(i[n].price) ?? -100;
       if (r >= 0) {
-        const n = Math.abs(t.y - r);
-        n < s && (o = l, s = n);
+        const l = Math.abs(t.y - r);
+        l < s && (o = n, s = l);
       }
     }
-    if (o >= 0 && s < Yt) {
+    if (o >= 0 && s < jt) {
       if (e) {
-        const l = this._chart.timeScale().width(), r = i[o], n = this._series.priceToCoordinate(r.price) ?? -100, a = `${this._symbolName} crossing ${this._series.priceFormatter().format(r.price)}`;
-        if (!this._isHoveringRemoveButton(t, l, n, a.length)) return null;
+        const n = this._chart.timeScale().width(), r = i[o], l = this._series.priceToCoordinate(r.price) ?? -100, a = `${this._symbolName} crossing ${this._series.priceFormatter().format(r.price)}`;
+        if (!this._isHoveringRemoveButton(t, n, l, a.length)) return null;
       }
       return i[o].id;
     }
@@ -4115,13 +4208,13 @@ class Oi extends Li {
     const i = this._getNewId();
     let s = 0;
     if ("_p2" in t && t._p2 && typeof t._p2.price == "number" ? s = t._p2.price : "_price" in t && typeof t._price == "number" ? s = t._price : "_point" in t && t._point && typeof t._point.price == "number" && (s = t._point.price), this._series && this._chart) {
-      const l = this._series.data?.();
-      if (l && l.length > 0) {
-        const r = l[l.length - 1], n = this._chart.timeScale(), a = n.timeToCoordinate(r.time);
+      const n = this._series.data?.();
+      if (n && n.length > 0) {
+        const r = n[n.length - 1], l = this._chart.timeScale(), a = l.timeToCoordinate(r.time);
         if (a !== null) {
-          const c = n.coordinateToLogical(a);
+          const c = l.coordinateToLogical(a);
           if (c !== null) {
-            const p = Lt.getPriceAtLogical(t, c);
+            const p = Dt.getPriceAtLogical(t, c);
             p !== null && (s = p);
           }
         }
@@ -4137,10 +4230,12 @@ class Oi extends Li {
     return this._alerts.set(i, o), this._alertAdded.fire(o), this._alertsChanged.fire(), i;
   }
 }
-class zi {
+class Oi {
   _container;
   _notifications = /* @__PURE__ */ new Map();
   _manager;
+  _dismissTimeouts = /* @__PURE__ */ new Map();
+  // RC-5
   constructor(t) {
     this._manager = t, this._injectStyles(), this._container = this._createContainer(), document.body.appendChild(this._container);
   }
@@ -4265,11 +4360,14 @@ class zi {
         `, document.head.appendChild(e);
   }
   show(t) {
+    if (!this._container) return;
     this._updatePosition(), this._notifications.has(t.alertId) && this.dismiss(t.alertId);
     const e = this._createNotification(t);
-    this._container.appendChild(e), this._notifications.set(t.alertId, e), setTimeout(() => {
-      this.dismiss(t.alertId);
-    }, 6e4), this._playAlarm();
+    this._container.appendChild(e), this._notifications.set(t.alertId, e);
+    const i = window.setTimeout(() => {
+      this._dismissTimeouts.delete(t.alertId), this.dismiss(t.alertId);
+    }, 6e4);
+    this._dismissTimeouts.set(t.alertId, i), this._playAlarm();
   }
   _playAlarm() {
     try {
@@ -4278,16 +4376,17 @@ class zi {
       const e = new t(), i = e.createOscillator(), s = e.createGain();
       i.connect(s), s.connect(e.destination), i.type = "square", i.frequency.value = 2048;
       const o = e.currentTime;
-      for (let l = 0; l < 10; l++) {
-        const r = o + l * 0.3;
+      for (let n = 0; n < 10; n++) {
+        const r = o + n * 0.3;
         s.gain.setValueAtTime(1, r), s.gain.setValueAtTime(0, r + 0.15);
       }
-      i.start(o), i.stop(o + 1), i.onended = () => e.close();
+      i.start(o), i.stop(o + 3.1), i.onended = () => e.close();
     } catch (t) {
       console.error("Alarm sound failed:", t);
     }
   }
   _updatePosition() {
+    if (!this._container || !this._manager) return;
     const t = this._manager.getChartRect();
     if (t) {
       const e = t.left + 15, i = window.innerHeight - t.bottom + 30;
@@ -4296,15 +4395,19 @@ class zi {
       this._container.style.left = "20px", this._container.style.bottom = "20px", this._container.style.top = "auto", this._container.style.right = "auto";
   }
   dismiss(t) {
-    const e = this._notifications.get(t);
-    e && (e.classList.add("dismissing"), setTimeout(() => {
-      e.parentNode && e.parentNode.removeChild(e), this._notifications.delete(t);
+    const e = this._dismissTimeouts.get(t);
+    e && (clearTimeout(e), this._dismissTimeouts.delete(t));
+    const i = this._notifications.get(t);
+    i && (i.classList.add("dismissing"), setTimeout(() => {
+      i.parentNode && i.parentNode.removeChild(i), this._notifications.delete(t);
     }, 300));
   }
   destroy() {
-    this._notifications.forEach((t, e) => {
+    this._dismissTimeouts.forEach((t) => {
+      clearTimeout(t);
+    }), this._dismissTimeouts.clear(), this._notifications.forEach((t, e) => {
       this.dismiss(e);
-    }), this._container.parentNode && this._container.parentNode.removeChild(this._container);
+    }), this._container && this._container.parentNode && this._container.parentNode.removeChild(this._container), this._container = null, this._manager = null;
   }
   _createContainer() {
     const t = document.createElement("div");
@@ -4319,18 +4422,18 @@ class zi {
     s.className = "alert-notification-content";
     const o = document.createElement("div");
     o.className = "alert-notification-header", o.textContent = `Alert on ${t.symbol}`, s.appendChild(o);
-    const l = document.createElement("div");
-    l.className = "alert-notification-message";
-    let r = "Crossing";
-    t.condition === "crossing_up" ? r = "Crossing Up" : t.condition === "crossing_down" ? r = "Crossing Down" : t.condition === "entering" ? r = "Entering" : t.condition === "exiting" ? r = "Exiting" : t.condition === "inside" ? r = "Inside" : t.condition === "outside" && (r = "Outside"), l.textContent = `${t.symbol} ${r} ${t.price}`, s.appendChild(l);
     const n = document.createElement("div");
-    n.className = "alert-notification-footer";
+    n.className = "alert-notification-message";
+    let r = "Crossing";
+    t.condition === "crossing_up" ? r = "Crossing Up" : t.condition === "crossing_down" ? r = "Crossing Down" : t.condition === "entering" ? r = "Entering" : t.condition === "exiting" ? r = "Exiting" : t.condition === "inside" ? r = "Inside" : t.condition === "outside" && (r = "Outside"), n.textContent = `${t.symbol} ${r} ${t.price}`, s.appendChild(n);
+    const l = document.createElement("div");
+    l.className = "alert-notification-footer";
     const a = document.createElement("a");
     a.className = "alert-notification-edit", a.href = "#", a.textContent = "Edit alert", a.addEventListener("click", (_) => {
       _.preventDefault(), t.onEdit && t.onEdit(t);
-    }), n.appendChild(a);
+    }), l.appendChild(a);
     const c = document.createElement("span");
-    c.className = "alert-notification-timestamp", c.textContent = this._formatTime(t.timestamp), n.appendChild(c), s.appendChild(n), e.appendChild(s);
+    c.className = "alert-notification-timestamp", c.textContent = this._formatTime(t.timestamp), l.appendChild(c), s.appendChild(l), e.appendChild(s);
     const p = document.createElement("button");
     return p.className = "alert-notification-close", p.innerHTML = "×", p.addEventListener("click", (_) => {
       _.stopPropagation(), this.dismiss(t.alertId);
@@ -4341,9 +4444,16 @@ class zi {
     return `${i}:${s}:${o}`;
   }
 }
-class Fi {
+class zi {
   _chart;
   _toolbar = null;
+  _isDestroyed = !1;
+  _scrollInterval = null;
+  _handleMouseMove = null;
+  _handleMouseLeave = null;
+  _handleToolbarEnter = null;
+  _handleToolbarLeave = null;
+  _hideTimeout = null;
   constructor(t) {
     this._chart = t;
   }
@@ -4377,21 +4487,24 @@ class Fi {
                 </svg>
             </button>
         `, t.appendChild(this._toolbar);
-    let e = !1, i = null;
-    const s = () => {
-      e = !0, i !== null && (window.clearTimeout(i), i = null), this._toolbar && (this._toolbar.style.opacity = "1");
-    }, o = () => {
-      e = !1, i = window.setTimeout(() => {
-        !e && this._toolbar && (this._toolbar.style.opacity = "0");
-      }, 100);
-    }, l = (r) => {
-      const n = t.getBoundingClientRect(), a = r.clientY - n.top, c = n.height, p = r.clientX - n.left, _ = n.width, f = a > c - 150, d = p < _ - 70;
-      f && d ? s() : o();
+    let e = !1;
+    const i = () => {
+      this._isDestroyed || (e = !0, this._hideTimeout !== null && (window.clearTimeout(this._hideTimeout), this._hideTimeout = null), this._toolbar && (this._toolbar.style.opacity = "1"));
+    }, s = () => {
+      this._isDestroyed || (e = !1, this._hideTimeout = window.setTimeout(() => {
+        !e && this._toolbar && !this._isDestroyed && (this._toolbar.style.opacity = "0");
+      }, 100));
     };
-    t.addEventListener("mousemove", l), t.addEventListener("mouseleave", o), this._toolbar.addEventListener("mouseenter", s), this._toolbar.addEventListener("mouseleave", o), this._attachListeners();
+    this._handleMouseMove = (o) => {
+      if (this._isDestroyed) return;
+      const n = t.getBoundingClientRect(), r = o.clientY - n.top, l = n.height, a = o.clientX - n.left, c = n.width, p = r > l - 150, _ = a < c - 70;
+      p && _ ? i() : s();
+    }, this._handleMouseLeave = s, this._handleToolbarEnter = i, this._handleToolbarLeave = s, t.addEventListener("mousemove", this._handleMouseMove), t.addEventListener("mouseleave", this._handleMouseLeave), this._toolbar && (this._toolbar.addEventListener("mouseenter", this._handleToolbarEnter), this._toolbar.addEventListener("mouseleave", this._handleToolbarLeave)), this._attachListeners();
   }
   removeControls() {
-    this._toolbar && this._toolbar.parentNode && this._toolbar.parentNode.removeChild(this._toolbar), this._toolbar = null;
+    this._isDestroyed = !0, this._scrollInterval !== null && (this._scrollInterval > 1e3 ? window.clearInterval(this._scrollInterval) : window.clearTimeout(this._scrollInterval), this._scrollInterval = null), this._hideTimeout !== null && (window.clearTimeout(this._hideTimeout), this._hideTimeout = null);
+    const t = this._chart.chartElement?.();
+    t && this._handleMouseMove && (t.removeEventListener("mousemove", this._handleMouseMove), t.removeEventListener("mouseleave", this._handleMouseLeave), this._handleMouseMove = null, this._handleMouseLeave = null), this._toolbar && (this._handleToolbarEnter && (this._toolbar.removeEventListener("mouseenter", this._handleToolbarEnter), this._handleToolbarEnter = null), this._handleToolbarLeave && (this._toolbar.removeEventListener("mouseleave", this._handleToolbarLeave), this._handleToolbarLeave = null), this._toolbar.parentNode && this._toolbar.parentNode.removeChild(this._toolbar)), this._toolbar = null;
   }
   _applyStyles(t) {
     Object.assign(t.style, {
@@ -4446,43 +4559,49 @@ class Fi {
     if (!this._toolbar) return;
     const t = this._chart.timeScale();
     this._toolbar.querySelector("#nav-zoom-in-plugin")?.addEventListener("click", () => {
-      const r = t.getVisibleLogicalRange();
-      if (r) {
-        const n = r.to - r.from, a = (r.from + r.to) / 2, c = n * 0.8;
+      const n = t.getVisibleLogicalRange();
+      if (n) {
+        const r = n.to - n.from, l = (n.from + n.to) / 2, a = r * 0.8;
         t.setVisibleLogicalRange({
-          from: a - c / 2,
-          to: a + c / 2
+          from: l - a / 2,
+          to: l + a / 2
         });
       }
     }), this._toolbar.querySelector("#nav-zoom-out-plugin")?.addEventListener("click", () => {
-      const r = t.getVisibleLogicalRange();
-      if (r) {
-        const n = r.to - r.from, a = (r.from + r.to) / 2, c = n * 1.25;
+      const n = t.getVisibleLogicalRange();
+      if (n) {
+        const r = n.to - n.from, l = (n.from + n.to) / 2, a = r * 1.25;
         t.setVisibleLogicalRange({
-          from: a - c / 2,
-          to: a + c / 2
+          from: l - a / 2,
+          to: l + a / 2
         });
       }
     });
-    const e = this._toolbar.querySelector("#nav-scroll-left-plugin"), i = this._toolbar.querySelector("#nav-scroll-right-plugin");
-    let s = null;
-    const o = () => {
-      s !== null && (window.clearInterval(s), s = null);
-    }, l = (r) => {
-      o();
-      const n = () => {
-        const a = t.scrollPosition();
-        t.scrollToPosition(a + r, !1);
+    const e = this._toolbar.querySelector("#nav-scroll-left-plugin"), i = this._toolbar.querySelector("#nav-scroll-right-plugin"), s = () => {
+      this._scrollInterval !== null && (this._scrollInterval > 1e3 ? window.clearInterval(this._scrollInterval) : window.clearTimeout(this._scrollInterval), this._scrollInterval = null);
+    }, o = (n) => {
+      if (s(), this._isDestroyed || !this._chart) return;
+      const r = () => {
+        if (this._isDestroyed || !this._chart) {
+          s();
+          return;
+        }
+        try {
+          const l = this._chart.timeScale(), a = l.scrollPosition();
+          l.scrollToPosition(a + n, !1);
+        } catch (l) {
+          console.error("Error scrolling chart:", l), s();
+        }
       };
-      n(), s = window.setTimeout(() => {
-        s = window.setInterval(n, 100);
+      r(), this._scrollInterval = window.setTimeout(() => {
+        !this._isDestroyed && this._chart && (this._scrollInterval = window.setInterval(r, 100));
       }, 400);
     };
-    e && (e.addEventListener("mousedown", (r) => {
-      r.preventDefault(), l(1);
-    }), e.addEventListener("mouseup", o), e.addEventListener("mouseleave", o)), i && (i.addEventListener("mousedown", (r) => {
-      r.preventDefault(), l(-1);
-    }), i.addEventListener("mouseup", o), i.addEventListener("mouseleave", o)), this._toolbar.querySelector("#nav-reset-plugin")?.addEventListener("click", () => {
+    e && (e.addEventListener("mousedown", (n) => {
+      n.preventDefault(), o(1);
+    }), e.addEventListener("mouseup", s), e.addEventListener("mouseleave", s)), i && (i.addEventListener("mousedown", (n) => {
+      n.preventDefault(), o(-1);
+    }), i.addEventListener("mouseup", s), i.addEventListener("mouseleave", s)), this._toolbar.querySelector("#nav-reset-plugin")?.addEventListener("click", () => {
       this._defaultRange ? (t.setVisibleLogicalRange(this._defaultRange), t.applyOptions({ rightOffset: 10 }), this._chart.priceScale("right").applyOptions({
         autoScale: !0
       })) : (t.fitContent(), t.applyOptions({ rightOffset: 10 }));
@@ -4493,7 +4612,7 @@ class Fi {
     this._defaultRange = t;
   }
 }
-class Di {
+class Hi {
   _point;
   _text;
   _options;
@@ -4506,14 +4625,14 @@ class Di {
       if (this._point.x === null || this._point.y === null) return;
       const i = e.context, s = this._point.x, o = this._point.y;
       i.beginPath(), i.arc(s, o, 3, 0, 2 * Math.PI), i.strokeStyle = this._options.backgroundColor, i.lineWidth = 1, i.stroke(), i.font = `bold ${this._options.fontSize}px ${this._options.fontFamily}`;
-      const r = i.measureText(this._text).width, n = 8, a = 6, c = this._options.fontSize, p = r + n * 2, _ = c + a * 2, f = 20, d = s + f, u = o - f - _, g = 4;
-      i.fillStyle = this._options.backgroundColor, i.strokeStyle = this._options.backgroundColor, i.lineWidth = 1, i.beginPath(), i.moveTo(d + g, u + _);
-      const m = s + 4, v = o - 4;
-      i.lineTo(d + 10, u + _), i.lineTo(m, v), i.lineTo(d, u + _ - 10), i.lineTo(d, u + g), i.quadraticCurveTo(d, u, d + g, u), i.lineTo(d + p - g, u), i.quadraticCurveTo(d + p, u, d + p, u + g), i.lineTo(d + p, u + _ - g), i.quadraticCurveTo(d + p, u + _, d + p - g, u + _), i.lineTo(d + g, u + _), i.fill(), i.stroke(), i.fillStyle = this._options.textColor, i.textBaseline = "middle", i.textAlign = "left", i.fillText(this._text, d + n, u + _ / 2), this._selected && (i.strokeStyle = "#2962FF", i.lineWidth = 1, i.beginPath(), i.arc(s, o, 6, 0, 2 * Math.PI), i.stroke());
+      const r = i.measureText(this._text).width, l = 8, a = 6, c = this._options.fontSize, p = r + l * 2, _ = c + a * 2, u = 20, d = s + u, f = o - u - _, g = 4;
+      i.fillStyle = this._options.backgroundColor, i.strokeStyle = this._options.backgroundColor, i.lineWidth = 1, i.beginPath(), i.moveTo(d + g, f + _);
+      const x = s + 4, v = o - 4;
+      i.lineTo(d + 10, f + _), i.lineTo(x, v), i.lineTo(d, f + _ - 10), i.lineTo(d, f + g), i.quadraticCurveTo(d, f, d + g, f), i.lineTo(d + p - g, f), i.quadraticCurveTo(d + p, f, d + p, f + g), i.lineTo(d + p, f + _ - g), i.quadraticCurveTo(d + p, f + _, d + p - g, f + _), i.lineTo(d + g, f + _), i.fill(), i.stroke(), i.fillStyle = this._options.textColor, i.textBaseline = "middle", i.textAlign = "left", i.fillText(this._text, d + l, f + _ / 2), this._selected && (i.strokeStyle = "#2962FF", i.lineWidth = 1, i.beginPath(), i.arc(s, o, 6, 0, 2 * Math.PI), i.stroke());
     });
   }
 }
-class Hi {
+class Fi {
   _source;
   _point = { x: null, y: null };
   constructor(t) {
@@ -4527,7 +4646,7 @@ class Hi {
     );
   }
   renderer() {
-    return new Di(
+    return new Hi(
       this._point,
       this._source._text,
       this._source._options,
@@ -4535,13 +4654,13 @@ class Hi {
     );
   }
 }
-const Bi = {
+const Ii = {
   backgroundColor: "#2962FF",
   textColor: "#FFFFFF",
   fontSize: 12,
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
 };
-class Ii {
+class Bi {
   _chart;
   _series;
   _point;
@@ -4551,9 +4670,9 @@ class Ii {
   _selected = !1;
   constructor(t, e, i, s, o) {
     this._chart = t, this._series = e, this._point = i, this._text = s, this._options = {
-      ...Bi,
+      ...Ii,
       ...o
-    }, this._paneViews = [new Hi(this)];
+    }, this._paneViews = [new Fi(this)];
   }
   updatePoint(t) {
     this._point = t, this.updateAllViews();
@@ -4571,12 +4690,12 @@ class Ii {
     t === 0 && (this._point = e, this.updateAllViews());
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._point.logical), l = s.priceToCoordinate(this._point.price);
-    if (o === null || l === null) return null;
-    if (Math.hypot(t - o, e - l) < 10)
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._point.logical), n = s.priceToCoordinate(this._point.price);
+    if (o === null || n === null) return null;
+    if (Math.hypot(t - o, e - n) < 10)
       return { hit: !0, type: "point", index: 0 };
-    const r = 20, n = this._options.fontSize + 12, a = this._text.length * 8 + 16, c = o + r, p = l - r - n;
-    return t >= c && t <= c + a && e >= p && e <= p + n ? { hit: !0, type: "point", index: 0 } : null;
+    const r = 20, l = this._options.fontSize + 12, a = this._text.length * 8 + 16, c = o + r, p = n - r - l;
+    return t >= c && t <= c + a && e >= p && e <= p + l ? { hit: !0, type: "point", index: 0 } : null;
   }
   updateAllViews() {
     this._paneViews.forEach((t) => t.update());
@@ -4598,30 +4717,30 @@ class Wi {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = Math.min(s, l), a = Math.max(s, l), c = Math.min(o, r), p = Math.max(o, r), _ = a - n, f = p - c;
-      this._options.backgroundColor && (i.fillStyle = this._options.backgroundColor, i.fillRect(n, c, _, f)), i.strokeStyle = this._options.borderColor, i.lineWidth = this._options.borderWidth * e.verticalPixelRatio, i.strokeRect(n, c, _, f);
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = Math.min(s, n), a = Math.max(s, n), c = Math.min(o, r), p = Math.max(o, r), _ = a - l, u = p - c;
+      this._options.backgroundColor && (i.fillStyle = this._options.backgroundColor, i.fillRect(l, c, _, u)), i.strokeStyle = this._options.borderColor, i.lineWidth = this._options.borderWidth * e.verticalPixelRatio, i.strokeRect(l, c, _, u);
       const d = 10 * e.verticalPixelRatio;
       i.beginPath();
-      const u = (o + r) / 2;
-      i.moveTo(n, u), i.lineTo(a, u);
-      const g = l - s;
+      const f = (o + r) / 2;
+      i.moveTo(l, f), i.lineTo(a, f);
+      const g = n - s;
       if (Math.abs(g) > d) {
-        const V = g > 0 ? a : n, R = g > 0 ? -1 : 1;
-        i.moveTo(V + d * R, u - d), i.lineTo(V, u), i.lineTo(V + d * R, u + d);
+        const E = g > 0 ? a : l, k = g > 0 ? -1 : 1;
+        i.moveTo(E + d * k, f - d), i.lineTo(E, f), i.lineTo(E + d * k, f + d);
       }
-      const m = (s + l) / 2;
-      i.moveTo(m, c), i.lineTo(m, p);
+      const x = (s + n) / 2;
+      i.moveTo(x, c), i.lineTo(x, p);
       const v = r - o;
       if (Math.abs(v) > d) {
-        const V = v > 0 ? p : c, R = v > 0 ? -1 : 1;
-        i.moveTo(m - d, V + d * R), i.lineTo(m, V), i.lineTo(m + d, V + d * R);
+        const E = v > 0 ? p : c, k = v > 0 ? -1 : 1;
+        i.moveTo(x - d, E + d * k), i.lineTo(x, E), i.lineTo(x + d, E + d * k);
       }
       i.stroke();
-      const P = this._source._p1.price, C = this._source._p2.price - P, M = P !== 0 ? C / P * 100 : 0, D = this._source._p1.logical, b = this._source._p2.logical, X = Math.abs(b - D), G = this._source._series.priceFormatter().format(C), yt = C > 0 ? "+" : "", vt = M > 0 ? "+" : "", lt = `${yt}${G} (${vt}${M.toFixed(2)}%)`, K = `${X} bars`;
+      const C = this._source._p1.price, b = this._source._p2.price - C, M = C !== 0 ? b / C * 100 : 0, H = this._source._p1.logical, P = this._source._p2.logical, X = Math.abs(P - H), K = this._source._series.priceFormatter().format(b), vt = b > 0 ? "+" : "", Tt = M > 0 ? "+" : "", at = `${vt}${K} (${Tt}${M.toFixed(2)}%)`, Q = `${X} bars`;
       i.font = `${12 * e.verticalPixelRatio}px sans-serif`;
-      const E = 6 * e.verticalPixelRatio, Q = 16 * e.verticalPixelRatio, tt = i.measureText(lt), U = i.measureText(K), H = Math.max(tt.width, U.width) + E * 2, rt = Q * 2 + E * 2;
-      let O = m - H / 2, k = p + 10 * e.verticalPixelRatio;
-      O < 0 && (O = 0), O + H > e.mediaSize.width * e.horizontalPixelRatio && (O = e.mediaSize.width * e.horizontalPixelRatio - H), i.fillStyle = "white", i.shadowColor = "rgba(0,0,0,0.2)", i.shadowBlur = 4, i.shadowOffsetY = 2, i.fillRect(O, k, H, rt), i.shadowColor = "transparent", i.shadowBlur = 0, i.shadowOffsetY = 0, i.strokeStyle = "#ccc", i.lineWidth = 1, i.strokeRect(O, k, H, rt), i.fillStyle = "#333", i.textAlign = "left", i.textBaseline = "top", i.fillText(lt, O + E, k + E), i.fillText(K, O + E, k + E + Q), this._selected && (y(e, s, o), y(e, l, r), y(e, s, r), y(e, l, o), y(e, m, o), y(e, m, r), y(e, s, u), y(e, l, u));
+      const A = 6 * e.verticalPixelRatio, tt = 16 * e.verticalPixelRatio, et = i.measureText(at), U = i.measureText(Q), F = Math.max(et.width, U.width) + A * 2, ct = tt * 2 + A * 2;
+      let D = x - F / 2, R = p + 10 * e.verticalPixelRatio;
+      D < 0 && (D = 0), D + F > e.mediaSize.width * e.horizontalPixelRatio && (D = e.mediaSize.width * e.horizontalPixelRatio - F), i.fillStyle = "white", i.shadowColor = "rgba(0,0,0,0.2)", i.shadowBlur = 4, i.shadowOffsetY = 2, i.fillRect(D, R, F, ct), i.shadowColor = "transparent", i.shadowBlur = 0, i.shadowOffsetY = 0, i.strokeStyle = "#ccc", i.lineWidth = 1, i.strokeRect(D, R, F, ct), i.fillStyle = "#333", i.textAlign = "left", i.textBaseline = "top", i.fillText(at, D + A, R + A), i.fillText(Q, D + A, R + A + tt), this._selected && (y(e, s, o), y(e, n, r), y(e, s, r), y(e, n, o), y(e, x, o), y(e, x, r), y(e, s, f), y(e, n, f));
     });
   }
 }
@@ -4658,7 +4777,7 @@ const $i = {
   borderColor: "rgb(41, 98, 255)",
   borderWidth: 2
 };
-class Et {
+class Ot {
   _chart;
   _series;
   _p1;
@@ -4699,22 +4818,22 @@ class Et {
     Object.assign(this._options, t), this.updateAllViews(), this._chart.timeScale().applyOptions({});
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price);
-    if (o === null || l === null || r === null || n === null) return null;
-    const a = 8, c = Math.min(o, r), p = Math.max(o, r), _ = Math.min(l, n), f = Math.max(l, n), d = (o + r) / 2, u = (l + n) / 2, g = [
-      { x: o, y: l, index: 0 },
-      { x: r, y: n, index: 1 },
-      { x: o, y: n, index: 2 },
-      { x: r, y: l, index: 3 },
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price);
+    if (o === null || n === null || r === null || l === null) return null;
+    const a = 8, c = Math.min(o, r), p = Math.max(o, r), _ = Math.min(n, l), u = Math.max(n, l), d = (o + r) / 2, f = (n + l) / 2, g = [
+      { x: o, y: n, index: 0 },
+      { x: r, y: l, index: 1 },
+      { x: o, y: l, index: 2 },
+      { x: r, y: n, index: 3 },
       { x: d, y: _, index: 4 },
-      { x: d, y: f, index: 5 },
-      { x: c, y: u, index: 6 },
-      { x: p, y: u, index: 7 }
+      { x: d, y: u, index: 5 },
+      { x: c, y: f, index: 6 },
+      { x: p, y: f, index: 7 }
     ];
-    for (const m of g)
-      if (Math.hypot(t - m.x, e - m.y) < a)
-        return { hit: !0, type: "point", index: m.index };
-    return gt({ x: t, y: e }, { x1: o, y1: l, x2: r, y2: n }) ? { hit: !0, type: "shape" } : null;
+    for (const x of g)
+      if (Math.hypot(t - x.x, e - x.y) < a)
+        return { hit: !0, type: "point", index: x.index };
+    return mt({ x: t, y: e }, { x1: o, y1: n, x2: r, y2: l }) ? { hit: !0, type: "shape" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -4739,32 +4858,32 @@ class Xi {
     t.useBitmapCoordinateSpace((e) => {
       if (this._p1.x === null || this._p1.y === null || this._p2.x === null || this._p2.y === null)
         return;
-      const i = e.context, s = x(this._p1.x, e.horizontalPixelRatio), o = x(this._p1.y, e.verticalPixelRatio), l = x(this._p2.x, e.horizontalPixelRatio), r = x(this._p2.y, e.verticalPixelRatio), n = Math.min(s, l), a = Math.max(s, l), c = Math.min(o, r), p = Math.max(o, r), _ = a - n, f = p - c;
-      this._options.backgroundColor && (i.fillStyle = this._options.backgroundColor, i.fillRect(n, c, _, f)), i.strokeStyle = this._options.borderColor, i.lineWidth = this._options.borderWidth * e.verticalPixelRatio, i.strokeRect(n, c, _, f);
+      const i = e.context, s = m(this._p1.x, e.horizontalPixelRatio), o = m(this._p1.y, e.verticalPixelRatio), n = m(this._p2.x, e.horizontalPixelRatio), r = m(this._p2.y, e.verticalPixelRatio), l = Math.min(s, n), a = Math.max(s, n), c = Math.min(o, r), p = Math.max(o, r), _ = a - l, u = p - c;
+      this._options.backgroundColor && (i.fillStyle = this._options.backgroundColor, i.fillRect(l, c, _, u)), i.strokeStyle = this._options.borderColor, i.lineWidth = this._options.borderWidth * e.verticalPixelRatio, i.strokeRect(l, c, _, u);
       const d = 10 * e.verticalPixelRatio;
       i.beginPath();
-      const u = (o + r) / 2;
-      i.moveTo(n, u), i.lineTo(a, u);
-      const g = l - s;
+      const f = (o + r) / 2;
+      i.moveTo(l, f), i.lineTo(a, f);
+      const g = n - s;
       if (Math.abs(g) > d) {
-        const B = g > 0 ? a : n, et = g > 0 ? -1 : 1;
-        i.moveTo(B + d * et, u - d), i.lineTo(B, u), i.lineTo(B + d * et, u + d);
+        const I = g > 0 ? a : l, it = g > 0 ? -1 : 1;
+        i.moveTo(I + d * it, f - d), i.lineTo(I, f), i.lineTo(I + d * it, f + d);
       }
-      const m = (s + l) / 2;
-      i.moveTo(m, c), i.lineTo(m, p);
+      const x = (s + n) / 2;
+      i.moveTo(x, c), i.lineTo(x, p);
       const v = r - o;
       if (Math.abs(v) > d) {
-        const B = v > 0 ? p : c, et = v > 0 ? -1 : 1;
-        i.moveTo(m - d, B + d * et), i.lineTo(m, B), i.lineTo(m + d, B + d * et);
+        const I = v > 0 ? p : c, it = v > 0 ? -1 : 1;
+        i.moveTo(x - d, I + d * it), i.lineTo(x, I), i.lineTo(x + d, I + d * it);
       }
       i.stroke();
-      const P = this._source._p1.price, C = this._source._p2.price - P, M = P !== 0 ? C / P * 100 : 0, D = this._source._p1.logical, b = this._source._p2.logical, X = Math.abs(b - D), nt = X, yt = this._source._series.priceFormatter().format(C), vt = C > 0 ? "+" : "", lt = M > 0 ? "+" : "", K = `${vt}${yt} (${lt}${M.toFixed(2)}%)`, E = `${X} bars, ${nt}d`, Q = "Vol 14.27 B";
+      const C = this._source._p1.price, b = this._source._p2.price - C, M = C !== 0 ? b / C * 100 : 0, H = this._source._p1.logical, P = this._source._p2.logical, X = Math.abs(P - H), rt = X, vt = this._source._series.priceFormatter().format(b), Tt = b > 0 ? "+" : "", at = M > 0 ? "+" : "", Q = `${Tt}${vt} (${at}${M.toFixed(2)}%)`, A = `${X} bars, ${rt}d`, tt = "Vol 14.27 B";
       i.font = `${12 * e.verticalPixelRatio}px sans-serif`;
-      const tt = 8 * e.verticalPixelRatio, U = 16 * e.verticalPixelRatio, Dt = i.measureText(K), H = i.measureText(E), rt = i.measureText(Q), k = Math.max(Dt.width, H.width, rt.width) + tt * 2, V = U * 3 + tt * 2;
-      let R = m - k / 2, at = c - V - 10 * e.verticalPixelRatio;
-      at < 0 && (at = p + 10 * e.verticalPixelRatio), R < 0 && (R = 0), R + k > e.mediaSize.width * e.horizontalPixelRatio && (R = e.mediaSize.width * e.horizontalPixelRatio - k), i.fillStyle = "#2962FF", i.shadowColor = "rgba(0,0,0,0.2)", i.shadowBlur = 4, i.shadowOffsetY = 2, i.beginPath(), i.roundRect(R, at, k, V, 4 * e.verticalPixelRatio), i.fill(), i.shadowColor = "transparent", i.shadowBlur = 0, i.shadowOffsetY = 0, i.fillStyle = "#ffffff", i.textAlign = "center", i.textBaseline = "middle";
-      const Tt = R + k / 2, wt = at + tt + U / 2;
-      i.fillText(K, Tt, wt), i.fillText(E, Tt, wt + U), i.fillText(Q, Tt, wt + U * 2), this._selected && (y(e, s, o), y(e, l, r), y(e, s, r), y(e, l, o), y(e, m, o), y(e, m, r), y(e, s, u), y(e, l, u));
+      const et = 8 * e.verticalPixelRatio, U = 16 * e.verticalPixelRatio, It = i.measureText(Q), F = i.measureText(A), ct = i.measureText(tt), R = Math.max(It.width, F.width, ct.width) + et * 2, E = U * 3 + et * 2;
+      let k = x - R / 2, ht = c - E - 10 * e.verticalPixelRatio;
+      ht < 0 && (ht = p + 10 * e.verticalPixelRatio), k < 0 && (k = 0), k + R > e.mediaSize.width * e.horizontalPixelRatio && (k = e.mediaSize.width * e.horizontalPixelRatio - R), i.fillStyle = "#2962FF", i.shadowColor = "rgba(0,0,0,0.2)", i.shadowBlur = 4, i.shadowOffsetY = 2, i.beginPath(), i.roundRect(k, ht, R, E, 4 * e.verticalPixelRatio), i.fill(), i.shadowColor = "transparent", i.shadowBlur = 0, i.shadowOffsetY = 0, i.fillStyle = "#ffffff", i.textAlign = "center", i.textBaseline = "middle";
+      const wt = k + R / 2, Ct = ht + et + U / 2;
+      i.fillText(Q, wt, Ct), i.fillText(A, wt, Ct + U), i.fillText(tt, wt, Ct + U * 2), this._selected && (y(e, s, o), y(e, n, r), y(e, s, r), y(e, n, o), y(e, x, o), y(e, x, r), y(e, s, f), y(e, n, f));
     });
   }
 }
@@ -4801,7 +4920,7 @@ const Yi = {
   borderColor: "rgb(41, 98, 255)",
   borderWidth: 1
 };
-class Ot {
+class zt {
   _chart;
   _series;
   _p1;
@@ -4842,22 +4961,22 @@ class Ot {
     Object.assign(this._options, t), this.updateAllViews(), this._chart.timeScale().applyOptions({});
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), l = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), n = s.priceToCoordinate(this._p2.price);
-    if (o === null || l === null || r === null || n === null) return null;
-    const a = 8, c = Math.min(o, r), p = Math.max(o, r), _ = Math.min(l, n), f = Math.max(l, n), d = (o + r) / 2, u = (l + n) / 2, g = [
-      { x: o, y: l, index: 0 },
-      { x: r, y: n, index: 1 },
-      { x: o, y: n, index: 2 },
-      { x: r, y: l, index: 3 },
+    const i = this._chart.timeScale(), s = this._series, o = i.logicalToCoordinate(this._p1.logical), n = s.priceToCoordinate(this._p1.price), r = i.logicalToCoordinate(this._p2.logical), l = s.priceToCoordinate(this._p2.price);
+    if (o === null || n === null || r === null || l === null) return null;
+    const a = 8, c = Math.min(o, r), p = Math.max(o, r), _ = Math.min(n, l), u = Math.max(n, l), d = (o + r) / 2, f = (n + l) / 2, g = [
+      { x: o, y: n, index: 0 },
+      { x: r, y: l, index: 1 },
+      { x: o, y: l, index: 2 },
+      { x: r, y: n, index: 3 },
       { x: d, y: _, index: 4 },
-      { x: d, y: f, index: 5 },
-      { x: c, y: u, index: 6 },
-      { x: p, y: u, index: 7 }
+      { x: d, y: u, index: 5 },
+      { x: c, y: f, index: 6 },
+      { x: p, y: f, index: 7 }
     ];
-    for (const m of g)
-      if (Math.hypot(t - m.x, e - m.y) < a)
-        return { hit: !0, type: "point", index: m.index };
-    return gt({ x: t, y: e }, { x1: o, y1: l, x2: r, y2: n }) ? { hit: !0, type: "shape" } : null;
+    for (const x of g)
+      if (Math.hypot(t - x.x, e - x.y) < a)
+        return { hit: !0, type: "point", index: x.index };
+    return mt({ x: t, y: e }, { x1: o, y1: n, x2: r, y2: l }) ? { hit: !0, type: "shape" } : null;
   }
   autoscaleInfo() {
     return null;
@@ -4869,7 +4988,7 @@ class Ot {
     return this._paneViews;
   }
 }
-class ji {
+class qi {
   _points;
   _options;
   _selected;
@@ -4881,15 +5000,15 @@ class ji {
       if (this._points.length < 2)
         return;
       const i = e.context, s = [];
-      for (const l of this._points)
-        l.x === null || l.y === null || s.push({
-          x: x(l.x, e.horizontalPixelRatio),
-          y: x(l.y, e.verticalPixelRatio)
+      for (const n of this._points)
+        n.x === null || n.y === null || s.push({
+          x: m(n.x, e.horizontalPixelRatio),
+          y: m(n.y, e.verticalPixelRatio)
         });
       if (s.length < 2) return;
       if (s.length >= 5) {
-        const l = s[2], r = s[3], n = s[4];
-        i.beginPath(), i.moveTo(l.x, l.y), i.lineTo(r.x, r.y), i.lineTo(n.x, n.y), i.closePath(), i.fillStyle = this._options.fillColor, i.fill();
+        const n = s[2], r = s[3], l = s[4];
+        i.beginPath(), i.moveTo(n.x, n.y), i.lineTo(r.x, r.y), i.lineTo(l.x, l.y), i.closePath(), i.fillStyle = this._options.fillColor, i.fill();
       }
       xt(i, {
         lineColor: this._options.lineColor,
@@ -4898,11 +5017,11 @@ class ji {
         lineCap: "round",
         globalAlpha: 1
       }), i.beginPath(), i.moveTo(s[0].x, s[0].y);
-      for (let l = 1; l < s.length; l++)
-        i.lineTo(s[l].x, s[l].y);
+      for (let n = 1; n < s.length; n++)
+        i.lineTo(s[n].x, s[n].y);
       if (i.stroke(), s.length >= 5) {
-        const l = s[2], r = s[4], n = (r.y - l.y) / (r.x - l.x), a = 500, c = l.x - a, p = l.y - n * a, _ = r.x + a, f = r.y + n * a;
-        i.save(), i.setLineDash([5, 5]), i.strokeStyle = this._options.lineColor, i.lineWidth = 1 * e.verticalPixelRatio, i.beginPath(), i.moveTo(c, p), i.lineTo(_, f), i.stroke(), i.restore();
+        const n = s[2], r = s[4], l = (r.y - n.y) / (r.x - n.x), a = 500, c = n.x - a, p = n.y - l * a, _ = r.x + a, u = r.y + l * a;
+        i.save(), i.setLineDash([5, 5]), i.strokeStyle = this._options.lineColor, i.lineWidth = 1 * e.verticalPixelRatio, i.beginPath(), i.moveTo(c, p), i.lineTo(_, u), i.stroke(), i.restore();
       }
       i.font = `bold ${11 * e.verticalPixelRatio}px Arial`, i.textAlign = "center", i.textBaseline = "bottom";
       const o = [
@@ -4910,33 +5029,33 @@ class ji {
         { index: 3, label: "Head" },
         { index: 5, label: "Right Shoulder" }
       ];
-      for (const { index: l, label: r } of o) {
-        if (l >= s.length) continue;
-        const n = s[l], a = 6 * e.verticalPixelRatio, p = i.measureText(r).width + a * 2, _ = 18 * e.verticalPixelRatio, f = n.x - p / 2, d = n.y - _ - 10 * e.verticalPixelRatio;
-        i.fillStyle = this._options.labelBackground, i.beginPath(), i.roundRect(f, d, p, _, 3 * e.verticalPixelRatio), i.fill(), i.fillStyle = this._options.labelTextColor, i.textBaseline = "middle", i.fillText(r, n.x, d + _ / 2);
+      for (const { index: n, label: r } of o) {
+        if (n >= s.length) continue;
+        const l = s[n], a = 6 * e.verticalPixelRatio, p = i.measureText(r).width + a * 2, _ = 18 * e.verticalPixelRatio, u = l.x - p / 2, d = l.y - _ - 10 * e.verticalPixelRatio;
+        i.fillStyle = this._options.labelBackground, i.beginPath(), i.roundRect(u, d, p, _, 3 * e.verticalPixelRatio), i.fill(), i.fillStyle = this._options.labelTextColor, i.textBaseline = "middle", i.fillText(r, l.x, d + _ / 2);
       }
       if (this._selected)
-        for (const l of s)
-          y(e, l.x, l.y);
-      mt(i);
+        for (const n of s)
+          y(e, n.x, n.y);
+      yt(i);
     });
   }
 }
-class qi {
+class ji {
   _source;
   _points = [];
   constructor(t) {
     this._source = t;
   }
   update() {
-    this._points = ft(
+    this._points = gt(
       this._source._points,
       this._source._chart,
       this._source._series
     );
   }
   renderer() {
-    return new ji(this._points, this._source._options, this._source._selected);
+    return new qi(this._points, this._source._options, this._source._selected);
   }
 }
 const Zi = {
@@ -4946,7 +5065,7 @@ const Zi = {
   labelBackground: "#089981",
   labelTextColor: "#ffffff"
 };
-class zt {
+class Ht {
   _chart;
   _series;
   _points;
@@ -4957,7 +5076,7 @@ class zt {
     this._chart = t, this._series = e, this._points = i, this._options = {
       ...Zi,
       ...s
-    }, this._paneViews = [new qi(this)];
+    }, this._paneViews = [new ji(this)];
   }
   updatePoints(t) {
     this._points = t, this.updateAllViews();
@@ -4975,20 +5094,20 @@ class zt {
     Object.assign(this._options, t), this.updateAllViews(), this._chart.timeScale().applyOptions({});
   }
   toolHitTest(t, e) {
-    const i = this._chart.timeScale(), s = this._series, o = this._points.map((n) => {
-      const a = i.logicalToCoordinate(n.logical), c = s.priceToCoordinate(n.price);
+    const i = this._chart.timeScale(), s = this._series, o = this._points.map((l) => {
+      const a = i.logicalToCoordinate(l.logical), c = s.priceToCoordinate(l.price);
       return { x: a, y: c };
-    }), l = 8;
-    for (let n = 0; n < o.length; n++) {
-      const a = o[n];
-      if (!(a.x === null || a.y === null) && Math.hypot(t - a.x, e - a.y) < l)
-        return { hit: !0, type: "point", index: n };
+    }), n = 8;
+    for (let l = 0; l < o.length; l++) {
+      const a = o[l];
+      if (!(a.x === null || a.y === null) && Math.hypot(t - a.x, e - a.y) < n)
+        return { hit: !0, type: "point", index: l };
     }
     const r = 5;
-    for (let n = 0; n < o.length - 1; n++) {
-      const a = o[n], c = o[n + 1];
+    for (let l = 0; l < o.length - 1; l++) {
+      const a = o[l], c = o[l + 1];
       if (a.x === null || a.y === null || c.x === null || c.y === null) continue;
-      if (A({ x: t, y: e }, a, c) < r)
+      if (L({ x: t, y: e }, a, c) < r)
         return { hit: !0, type: "line" };
     }
     return null;
@@ -5000,17 +5119,22 @@ class zt {
     return this._paneViews;
   }
 }
-function ut(h) {
+function lt(h) {
+  if (!h) return null;
   const t = [];
-  h._points && Array.isArray(h._points) ? h._points.forEach((i) => {
-    t.push({ logical: i.logical, price: i.price });
-  }) : h._p1 && h._p2 && h._p3 ? (t.push({ logical: h._p1.logical, price: h._p1.price }), t.push({ logical: h._p2.logical, price: h._p2.price }), t.push({ logical: h._p3.logical, price: h._p3.price })) : h._p1 && h._p2 ? (t.push({ logical: h._p1.logical, price: h._p1.price }), t.push({ logical: h._p2.logical, price: h._p2.price })) : h._point ? t.push({ logical: h._point.logical, price: h._point.price }) : h._price !== void 0 ? t.push({ logical: 0, price: h._price }) : h._logical !== void 0 && t.push({ logical: h._logical, price: 0 });
+  try {
+    h._points && Array.isArray(h._points) ? h._points.forEach((i) => {
+      i && typeof i.logical == "number" && typeof i.price == "number" && t.push({ logical: i.logical, price: i.price });
+    }) : h._p1 && h._p2 && h._p3 ? (h._p1.logical !== void 0 && typeof h._p1.price == "number" && t.push({ logical: h._p1.logical, price: h._p1.price }), h._p2.logical !== void 0 && typeof h._p2.price == "number" && t.push({ logical: h._p2.logical, price: h._p2.price }), h._p3.logical !== void 0 && typeof h._p3.price == "number" && t.push({ logical: h._p3.logical, price: h._p3.price })) : h._p1 && h._p2 ? (h._p1.logical !== void 0 && typeof h._p1.price == "number" && t.push({ logical: h._p1.logical, price: h._p1.price }), h._p2.logical !== void 0 && typeof h._p2.price == "number" && t.push({ logical: h._p2.logical, price: h._p2.price })) : h._point ? h._point.logical !== void 0 && typeof h._point.price == "number" && t.push({ logical: h._point.logical, price: h._point.price }) : h._price !== void 0 && typeof h._price == "number" ? t.push({ logical: 0, price: h._price }) : h._logical !== void 0 && typeof h._logical == "number" && t.push({ logical: h._logical, price: 0 });
+  } catch (i) {
+    return console.error("Error extracting tool state:", i), null;
+  }
   const e = {};
-  return h._options && Object.keys(h._options).forEach((i) => {
+  return h._options && typeof h._options == "object" && Object.keys(h._options).forEach((i) => {
     e[i] = h._options[i];
   }), { points: t, options: e };
 }
-function qt(h, t) {
+function Jt(h, t) {
   const { points: e, options: i } = t;
   h._points && Array.isArray(h._points) ? h._points = e.map((s) => ({ logical: s.logical, price: s.price })) : h._p1 && h._p2 && h._p3 && e.length >= 3 ? (h._p1 = { logical: e[0].logical, price: e[0].price }, h._p2 = { logical: e[1].logical, price: e[1].price }, h._p3 = { logical: e[2].logical, price: e[2].price }) : h._p1 && h._p2 && e.length >= 2 ? (h._p1 = { logical: e[0].logical, price: e[0].price }, h._p2 = { logical: e[1].logical, price: e[1].price }) : h._point && e.length >= 1 ? h._point = { logical: e[0].logical, price: e[0].price } : h._price !== void 0 && e.length >= 1 ? h._price = e[0].price : h._logical !== void 0 && e.length >= 1 && (h._logical = e[0].logical), h._options && i && Object.keys(i).forEach((s) => {
     h._options[s] = i[s];
@@ -5024,34 +5148,37 @@ class Ji {
    * Record a tool being added
    */
   recordAdd(t, e) {
-    this._pushAction({
+    const i = lt(t);
+    i && this._pushAction({
       type: "add",
       tool: t,
       toolType: e,
-      newState: ut(t)
+      newState: i
     });
   }
   /**
    * Record a tool being deleted
    */
   recordDelete(t, e) {
-    this._pushAction({
+    const i = lt(t);
+    i && this._pushAction({
       type: "delete",
       tool: t,
       toolType: e,
-      prevState: ut(t)
+      prevState: i
     });
   }
   /**
    * Record a tool being modified (moved or style changed)
    */
   recordModify(t, e, i) {
-    this._pushAction({
+    const s = lt(t);
+    s && this._pushAction({
       type: "modify",
       tool: t,
       toolType: e,
       prevState: i,
-      newState: ut(t)
+      newState: s
     });
   }
   /**
@@ -5082,7 +5209,70 @@ class Ji {
       this._undoStack.shift();
   }
 }
-class Gi extends Zt {
+class Gi {
+  _input = null;
+  _onConfirm = null;
+  _onCancel = null;
+  _blurHandler = null;
+  /**
+   * Show the inline text editor
+   * @param initialText - Initial text value
+   * @param position - Position to show the editor (required)
+   * @param onConfirm - Callback when user confirms
+   * @param onCancel - Callback when user cancels
+   */
+  show(t, e, i, s) {
+    this.hide(), this._onConfirm = i || null, this._onCancel = s || null, this._input = document.createElement("input"), this._input.type = "text", this._input.value = t, this._input.className = "inline-text-editor", this._addStyles(), this._input.style.left = `${e.x}px`, this._input.style.top = `${e.y}px`, document.body.appendChild(this._input), setTimeout(() => {
+      this._input && (this._input.focus(), this._input.select());
+    }, 0), this._input.addEventListener("keydown", (o) => {
+      o.key === "Enter" ? (o.preventDefault(), o.stopPropagation(), this._handleConfirm()) : o.key === "Escape" && (o.preventDefault(), o.stopPropagation(), this._handleCancel());
+    }), this._blurHandler = () => {
+      setTimeout(() => this._handleConfirm(), 100);
+    }, this._input.addEventListener("blur", this._blurHandler), this._input.addEventListener("mousedown", (o) => {
+      o.stopPropagation();
+    }), this._input.addEventListener("click", (o) => {
+      o.stopPropagation();
+    });
+  }
+  /**
+   * Hide and remove the input
+   */
+  hide() {
+    this._input && (this._blurHandler && (this._input.removeEventListener("blur", this._blurHandler), this._blurHandler = null), this._input.parentNode && this._input.parentNode.removeChild(this._input)), this._input = null, this._onConfirm = null, this._onCancel = null;
+  }
+  _handleConfirm() {
+    const t = this._input?.value || "";
+    this._onConfirm && this._onConfirm(t), this.hide();
+  }
+  _handleCancel() {
+    this._onCancel && this._onCancel(), this.hide();
+  }
+  _addStyles() {
+    const t = "inline-text-editor-styles";
+    if (document.getElementById(t)) return;
+    const e = document.createElement("style");
+    e.id = t, e.textContent = `
+            .inline-text-editor {
+                position: fixed;
+                background: white;
+                border: 2px solid #2962FF;
+                border-radius: 4px;
+                padding: 6px 10px;
+                font-size: 14px;
+                font-family: Arial, sans-serif;
+                z-index: 10000;
+                min-width: 150px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            }
+
+            .inline-text-editor:focus {
+                outline: none;
+                border-color: #1E53E5;
+            }
+        `, document.head.appendChild(e);
+  }
+}
+class Ki extends Gt {
   _activeToolType = "None";
   _activeTool = null;
   _points = [];
@@ -5095,7 +5285,6 @@ class Gi extends Zt {
   _lastPixelPoint = null;
   _isRightClick = !1;
   // Track right-click to prevent adding points
-  _lastMouseEvent = null;
   // Editing state
   _selectedTool = null;
   // Currently selected tool
@@ -5106,14 +5295,22 @@ class Gi extends Zt {
   // Path tool double-click detection
   _lastClickTime = 0;
   _lastClickPoint = null;
+  // Context menu handler reference (ML-8)
+  _contextMenuHandler = null;
   _userPriceAlerts = null;
   _alertNotifications = null;
   _toolbar = null;
   _chartControls = null;
+  _textInputDialog = new Gi();
   // Undo/Redo history manager
   _historyManager = new Ji();
   _dragPrevState = null;
   // State before drag starts
+  // Alert subscription tracking (ML-1)
+  _alertSubscription = null;
+  // Double-click detection for text editing
+  _lastClickedTool = null;
+  _lastToolClickTime = 0;
   _setNoneButtonActive() {
     document.querySelectorAll("button").forEach((e) => e.classList.remove("active"));
     const t = document.getElementById("btn-none");
@@ -5125,7 +5322,7 @@ class Gi extends Zt {
       const t = this._tools.indexOf(this._activeTool);
       t !== -1 && this._tools.splice(t, 1), this._activeTool = null;
     }
-    this._points = [], this._isDrawing = !1, this._lastPixelPoint = null, this._activeToolType !== "None" && (this._activeToolType = "None", this._setChartInteraction(!0)), this._deselectCurrentTool(), this._toolbar?.hide(), this._deselectCurrentTool(), this._toolbar?.hide(), this._setNoneButtonActive(), this._updateCursor();
+    this._points = [], this._isDrawing = !1, this._lastPixelPoint = null, this._activeToolType !== "None" && (this._activeToolType = "None", this._setChartInteraction(!0)), this._deselectCurrentTool(), this._toolbar?.hide(), this._setNoneButtonActive(), this._updateCursor();
   }
   _updateCursor() {
     const t = this.chart.chartElement?.();
@@ -5179,7 +5376,7 @@ class Gi extends Zt {
   attached(t) {
     super.attached(t), this.chart.subscribeClick(this._clickHandler), this.chart.subscribeCrosshairMove(this._moveHandler);
     const e = this.chart.chartElement?.();
-    e && (e.addEventListener("mousedown", this._mouseDownHandler), e.addEventListener("mouseup", this._mouseUpHandler), e.addEventListener("contextmenu", (i) => i.preventDefault())), window.addEventListener("mousemove", this._rawMouseMoveHandler), window.addEventListener("keydown", this._keyDownHandler), this._userPriceAlerts = new Oi(), this.series.attachPrimitive(this._userPriceAlerts), this._alertNotifications = new zi(this), this._userPriceAlerts.alertTriggered().subscribe((i) => {
+    e && (e.addEventListener("mousedown", this._mouseDownHandler), e.addEventListener("mouseup", this._mouseUpHandler), this._contextMenuHandler = (i) => i.preventDefault(), e.addEventListener("contextmenu", this._contextMenuHandler)), window.addEventListener("mousemove", this._rawMouseMoveHandler), window.addEventListener("keydown", this._keyDownHandler), this._userPriceAlerts = new Di(), this.series.attachPrimitive(this._userPriceAlerts), this._alertNotifications = new Oi(this), this._alertSubscription = this._userPriceAlerts.alertTriggered().subscribe((i) => {
       this._alertNotifications?.show({
         alertId: i.alertId,
         symbol: "BTCUSD",
@@ -5195,15 +5392,21 @@ class Gi extends Zt {
           });
         }
       });
-    }, this), this._toolbar = new S(this), this._chartControls = new Fi(this.chart), this._chartControls.createControls();
+    }, this), this._toolbar = new S(this), this._chartControls = new zi(this.chart), this._chartControls.createControls();
   }
   detached() {
     this.chart.unsubscribeClick(this._clickHandler), this.chart.unsubscribeCrosshairMove(this._moveHandler), window.removeEventListener("mousemove", this._rawMouseMoveHandler), window.removeEventListener("keydown", this._keyDownHandler);
     const t = this.chart.chartElement?.();
-    t && (t.removeEventListener("mousedown", this._mouseDownHandler), t.removeEventListener("mouseup", this._mouseUpHandler)), this._userPriceAlerts && this.series.detachPrimitive(this._userPriceAlerts), this._chartControls && (this._chartControls.removeControls(), this._chartControls = null), super.detached();
+    t && (t.removeEventListener("mousedown", this._mouseDownHandler), t.removeEventListener("mouseup", this._mouseUpHandler), this._contextMenuHandler && (t.removeEventListener("contextmenu", this._contextMenuHandler), this._contextMenuHandler = null)), this._alertSubscription && (this._alertSubscription.unsubscribe(this), this._alertSubscription = null), this._tools.forEach((e) => {
+      try {
+        this.series.detachPrimitive(e);
+      } catch (i) {
+        console.error("Error detaching tool:", i);
+      }
+    }), this._userPriceAlerts && (this.series.detachPrimitive(this._userPriceAlerts), this._userPriceAlerts = null), this._chartControls && (this._chartControls.removeControls(), this._chartControls = null), this._toolbar && (this._toolbar.destroy(), this._toolbar = null), this._alertNotifications && (this._alertNotifications.destroy(), this._alertNotifications = null), this._textInputDialog && this._textInputDialog.hide(), this._tools = [], this._activeTool = null, this._selectedTool = null, this._points = [], this._dragState = null, this._isDragging = !1, this._isDrawing = !1, this._lastPixelPoint = null, this._lastClickedTool = null, this._lastToolClickTime = 0, this._dragPrevState = null, this._activeToolType = "None", this._isRightClick = !1, this._historyManager.clear(), this._setChartInteraction(!0), super.detached();
   }
   startTool(t) {
-    this._deselectCurrentTool(), this._activeToolType = t, this._points = [], this._activeTool = null, this._lastPixelPoint = null, t !== "None" && t !== "Eraser" && t !== "Measure" ? this._toolbar?.showCollapsed(t) : this._toolbar?.hide(), t === "Brush" || t === "Highlighter" || t === "Triangle" || t === "TrendLine" || t === "HorizontalLine" || t === "VerticalLine" || t === "Rectangle" || t === "Circle" || t === "CrossLine" || t === "Path" || t === "Arrow" || t === "Ray" || t === "ExtendedLine" || t === "HorizontalRay" || t === "PriceRange" || t === "LongPosition" || t === "ShortPosition" || t === "ElliottImpulseWave" || t === "ElliottCorrectionWave" || t === "DateRange" || t === "FibExtension" || t === "UserPriceAlerts" || t === "Eraser" || t === "PriceLabel" || t === "Measure" ? this._setChartInteraction(!1) : this._setChartInteraction(!0), this._updateCursor();
+    this._isDragging && (this._isDragging = !1, this._dragState = null, this._dragPrevState = null, this.chart.applyOptions({ handleScroll: !0, handleScale: !0 })), this._deselectCurrentTool(), this._activeToolType = t, this._points = [], this._activeTool = null, this._lastPixelPoint = null, t !== "None" && t !== "Eraser" && t !== "Measure" ? this._toolbar?.showCollapsed(t) : this._toolbar?.hide(), t === "Brush" || t === "Highlighter" || t === "Triangle" || t === "TrendLine" || t === "HorizontalLine" || t === "VerticalLine" || t === "Rectangle" || t === "Circle" || t === "CrossLine" || t === "Path" || t === "Arrow" || t === "Ray" || t === "ExtendedLine" || t === "HorizontalRay" || t === "PriceRange" || t === "LongPosition" || t === "ShortPosition" || t === "ElliottImpulseWave" || t === "ElliottCorrectionWave" || t === "DateRange" || t === "FibExtension" || t === "UserPriceAlerts" || t === "Eraser" || t === "PriceLabel" || t === "Measure" ? this._setChartInteraction(!1) : this._setChartInteraction(!0), this._updateCursor();
   }
   clearTools() {
     this._tools.forEach((t) => {
@@ -5227,15 +5430,15 @@ class Gi extends Zt {
     this.toolSupportsAlerts(t) ? this._userPriceAlerts?.openToolAlertDialog(t) : console.warn("Alerts not supported for this tool type yet");
   }
   toolSupportsAlerts(t) {
-    return t instanceof W || t instanceof j || t instanceof q || t instanceof Z || t instanceof ot || t instanceof N;
+    return t instanceof W || t instanceof q || t instanceof j || t instanceof Z || t instanceof J || t instanceof N;
   }
   enableSessionHighlighting(t) {
-    const e = this._tools.findIndex((i) => i instanceof $t);
+    const e = this._tools.findIndex((i) => i instanceof Ut);
     if (e !== -1) {
       const i = this._tools[e];
       this.series.detachPrimitive(i), this._tools.splice(e, 1);
     } else {
-      const i = new $t(t);
+      const i = new Ut(t);
       this.series.attachPrimitive(i), this._tools.push(i);
     }
   }
@@ -5249,7 +5452,7 @@ class Gi extends Zt {
    * Select a tool and show its anchor points
    */
   _selectTool(t) {
-    this._selectedTool && this._selectedTool !== t && this._selectedTool.setSelected(!1), this._selectedTool = t, t.setSelected(!0), this.requestUpdate(), this._lastMouseEvent ? this._toolbar?.showExpanded(t) : this._toolbar?.showExpanded(t);
+    t && (this._selectedTool && this._selectedTool !== t && this._selectedTool.setSelected(!1), this._selectedTool = t, t.setSelected(!0), this.requestUpdate(), this._toolbar?.showExpanded(t));
   }
   /**
    * Deselect the currently selected tool
@@ -5258,16 +5461,63 @@ class Gi extends Zt {
     this._selectedTool && (this._selectedTool.setSelected(!1), this._selectedTool = null, this.requestUpdate(), this._toolbar?.hide());
   }
   /**
+   * Show inline text editor for editing text/callout tools
+   */
+  _showTextInputDialog(t, e) {
+    t.setOnTextEdit((i) => {
+      const o = this.chart.chartElement?.()?.getBoundingClientRect();
+      if (!o) return;
+      let n;
+      if (e)
+        n = {
+          x: o.left + e.x,
+          y: o.top + e.y - 15
+          // Offset slightly above
+        };
+      else {
+        const r = this.chart.timeScale(), l = this.series;
+        if (t instanceof bt) {
+          const a = r.logicalToCoordinate(t._point.logical), c = l.priceToCoordinate(t._point.price);
+          if (a !== null && c !== null)
+            n = {
+              x: o.left + a,
+              y: o.top + c - 15
+            };
+          else
+            return;
+        } else if (t instanceof st) {
+          const a = r.logicalToCoordinate(t._p2.logical), c = l.priceToCoordinate(t._p2.price);
+          if (a !== null && c !== null)
+            n = {
+              x: o.left + a,
+              y: o.top + c - 15
+            };
+          else
+            return;
+        } else
+          return;
+      }
+      this._textInputDialog.show(
+        i,
+        n,
+        (r) => {
+          r.trim() && (t.updateText(r), this.requestUpdate());
+        }
+      );
+    }), t.editText();
+  }
+  /**
    * Delete a tool from the chart
    */
   deleteTool(t, e = !1) {
+    this._dragState && this._dragState.tool === t && (this._isDragging = !1, this._dragState = null, this._dragPrevState = null, this.chart.applyOptions({ handleScroll: !0, handleScale: !0 })), this._selectedTool === t && (this._selectedTool = null);
     const i = this._tools.indexOf(t);
     if (i !== -1) {
       if (!e) {
         const s = t.toolType || "None";
         this._historyManager.recordDelete(t, s);
       }
-      t instanceof W && t._alertId && this._userPriceAlerts?.removeAlert(t._alertId), this.series.detachPrimitive(t), this._tools.splice(i, 1), this._selectedTool = null, this.requestUpdate(), this._toolbar?.hide();
+      t instanceof W && t._alertId && this._userPriceAlerts?.removeAlert(t._alertId), this.series.detachPrimitive(t), this._tools.splice(i, 1), this.requestUpdate(), this._toolbar?.hide();
     }
   }
   /**
@@ -5284,7 +5534,7 @@ class Gi extends Zt {
         return;
       }
     }
-    this._deselectCurrentTool();
+    this._deselectCurrentTool(), this._lastClickedTool = null, this._lastToolClickTime = 0;
   }
   /**
    * Start a drag operation (anchor or shape)
@@ -5292,36 +5542,51 @@ class Gi extends Zt {
   _startDrag(t, e) {
     if (this._selectedTool && this._selectedTool._locked)
       return;
-    const i = this.chart.timeScale(), s = this.series, o = i.coordinateToLogical(e.x), l = s.coordinateToPrice(e.y);
-    o === null || l === null || (this._selectedTool && (this._dragPrevState = ut(this._selectedTool)), t.type === "point" ? this._dragState = {
-      tool: this._selectedTool,
-      type: "anchor",
-      anchorIndex: t.index,
-      startPoint: { logical: o, price: l }
-    } : this._dragState = {
-      tool: this._selectedTool,
-      type: "shape",
-      startPoint: { logical: o, price: l }
-    }, this._isDragging = !0, this.chart.applyOptions({ handleScroll: !1, handleScale: !1 }));
+    const i = this.chart.timeScale(), s = this.series, o = i.coordinateToLogical(e.x), n = s.coordinateToPrice(e.y);
+    if (!(o === null || n === null)) {
+      if (this._selectedTool) {
+        const r = lt(this._selectedTool);
+        r && (this._dragPrevState = r);
+      }
+      t.type === "point" ? this._dragState = {
+        tool: this._selectedTool,
+        type: "anchor",
+        anchorIndex: t.index,
+        startPoint: { logical: o, price: n }
+      } : this._dragState = {
+        tool: this._selectedTool,
+        type: "shape",
+        startPoint: { logical: o, price: n }
+      }, this._isDragging = !0, this.chart.applyOptions({ handleScroll: !1, handleScale: !1 });
+    }
   }
   /**
    * Handle active drag operation
    */
   _handleDrag(t) {
-    const i = this.chart.chartElement?.()?.getBoundingClientRect();
-    if (!i || !this._dragState) return;
-    const s = t.clientX - i.left, o = t.clientY - i.top, l = this.chart.timeScale(), r = this.series, n = l.coordinateToLogical(s), a = r.coordinateToPrice(o);
-    if (!(n === null || a === null)) {
+    try {
+      if (!this._isDragging || !this._dragState)
+        return;
+      if (!this._dragState.tool || this._tools.indexOf(this._dragState.tool) === -1) {
+        this._isDragging = !1, this._dragState = null, this._dragPrevState = null, this.chart.applyOptions({ handleScroll: !0, handleScale: !0 });
+        return;
+      }
+      const i = this.chart.chartElement?.()?.getBoundingClientRect();
+      if (!i) return;
+      const s = t.clientX - i.left, o = t.clientY - i.top, n = this.chart.timeScale(), r = this.series, l = n.coordinateToLogical(s), a = r.coordinateToPrice(o);
+      if (l === null || a === null) return;
       if (this._dragState.type === "anchor")
         this._dragState.tool.updatePointByIndex(
           this._dragState.anchorIndex,
-          { logical: n, price: a }
+          { logical: l, price: a }
         );
       else {
-        const c = n - this._dragState.startPoint.logical, p = a - this._dragState.startPoint.price;
-        this._moveToolByDelta(this._dragState.tool, c, p), this._dragState.startPoint = { logical: n, price: a };
+        const c = l - this._dragState.startPoint.logical, p = a - this._dragState.startPoint.price;
+        this._moveToolByDelta(this._dragState.tool, c, p), this._dragState.startPoint = { logical: l, price: a };
       }
-      this.chart.timeScale().applyOptions({});
+      this.requestUpdate();
+    } catch (e) {
+      console.error("Error handling drag:", e), this._isDragging = !1, this._dragState = null, this._dragPrevState = null, this.chart.applyOptions({ handleScroll: !0, handleScale: !0 });
     }
   }
   /**
@@ -5336,7 +5601,7 @@ class Gi extends Zt {
       price: t._p2.price + i
     }, t.updateAllViews()) : t._p1 && t._p2 && t._p3 ? (t._p1.logical += e, t._p1.price += i, t._p2.logical += e, t._p2.price += i, t._p3.logical += e, t._p3.price += i, t.updateAllViews()) : t._points ? (t._points.forEach((s) => {
       s.logical += e, s.price += i;
-    }), t.updateAllViews()) : t._p1 && t._p2 && t._p3 && (t instanceof ht || t instanceof pt) ? (t._p1.logical += e, t._p1.price += i, t._p2.logical += e, t._p2.price += i, t._p3.logical += e, t._p3.price += i, t.updateAllViews()) : t._point ? (t._point = {
+    }), t.updateAllViews()) : t._p1 && t._p2 && t._p3 && (t instanceof _t || t instanceof dt) ? (t._p1.logical += e, t._p1.price += i, t._p2.logical += e, t._p2.price += i, t._p3.logical += e, t._p3.price += i, t.updateAllViews()) : t._point ? (t._point = {
       logical: t._point.logical + e,
       price: t._point.price + i
     }, t.updateAllViews()) : t._price !== void 0 ? (t._price += i, t.updateAllViews()) : t._logical !== void 0 && (t._logical += e, t.updateAllViews());
@@ -5364,11 +5629,11 @@ class Gi extends Zt {
     }
     if (this._activeToolType === "Eraser") {
       if (!t.point) return;
-      const n = t.point.x, a = t.point.y;
+      const l = t.point.x, a = t.point.y;
       for (let c = this._tools.length - 1; c >= 0; c--) {
         const p = this._tools[c];
         if (!p.toolHitTest) continue;
-        if (p.toolHitTest(n, a)?.hit) {
+        if (p.toolHitTest(l, a)?.hit) {
           this.deleteTool(p);
           return;
         }
@@ -5383,243 +5648,250 @@ class Gi extends Zt {
     if (s === null) return;
     let o = { logical: s, price: e };
     (this._activeToolType === "Triangle" || this._activeToolType === "TrendLine" || this._activeToolType === "VerticalLine" || this._activeToolType === "Rectangle" || this._activeToolType === "Circle" || this._activeToolType === "ParallelChannel" || this._activeToolType === "FibRetracement" || this._activeToolType === "Arrow" || this._activeToolType === "Ray" || this._activeToolType === "ExtendedLine" || this._activeToolType === "HorizontalRay" || this._activeToolType === "PriceRange" || this._activeToolType === "LongPosition" || this._activeToolType === "ShortPosition" || this._activeToolType === "ElliottImpulseWave" || this._activeToolType === "ElliottCorrectionWave" || this._activeToolType === "DateRange" || this._activeToolType === "FibExtension" || this._activeToolType === "UserPriceAlerts" || this._activeToolType === "PriceLabel") && (o = { logical: s, price: e }), this._points.push(o);
-    const l = o, r = o;
+    const n = o, r = o;
     if (this._activeToolType === "TrendLine" || this._activeToolType === "Arrow" || this._activeToolType === "Ray" || this._activeToolType === "ExtendedLine") {
       if (this._points.length === 1) {
-        const n = this._points[0], a = {
+        const l = this._points[0], a = {
           rightEnd: this._activeToolType === "Arrow" ? 1 : 0,
           extendRight: this._activeToolType === "Ray" || this._activeToolType === "ExtendedLine",
           extendLeft: this._activeToolType === "ExtendedLine",
           ...this.getToolOptions(this._activeToolType)
         };
-        this._activeTool = new W(this.chart, this.series, n, n, a), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+        this._activeTool = new W(this.chart, this.series, l, l, a), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
       } else if (this._points.length === 2 && this._activeTool instanceof W) {
-        const n = this._points[0];
+        const l = this._points[0];
         let a = this._points[1];
-        this._activeTool.updatePoints(n, a);
+        this._activeTool.updatePoints(l, a);
         const c = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(c);
       }
     } else if (this._activeToolType === "HorizontalRay") {
-      if (this._activeTool instanceof q) {
-        const n = this._activeTool._point;
-        this._activeTool.updatePoint(n), this._addTool(this._activeTool, this._activeToolType);
+      if (this._activeTool instanceof j) {
+        const l = this._activeTool._point;
+        this._activeTool.updatePoint(l), this._addTool(this._activeTool, this._activeToolType);
         const a = this._activeTool;
         this._activeTool = null, this.chart.timeScale().applyOptions({}), this._selectTool(a);
       } else {
-        const n = l, a = new q(this.chart, this.series, n, this.getToolOptions(this._activeToolType));
+        const l = n, a = new j(this.chart, this.series, l, this.getToolOptions(this._activeToolType));
         this.series.attachPrimitive(a), this._addTool(a, this._activeToolType), this.chart.timeScale().applyOptions({}), this._selectTool(a);
       }
       this._points = [];
     } else if (this._activeToolType === "HorizontalLine") {
-      if (this._activeTool instanceof j) {
+      if (this._activeTool instanceof q) {
         this._activeTool.updatePrice(e), this._addTool(this._activeTool, this._activeToolType);
-        const n = this._activeTool;
-        this._activeTool = null, this.chart.timeScale().applyOptions({}), this._selectTool(n);
+        const l = this._activeTool;
+        this._activeTool = null, this.chart.timeScale().applyOptions({}), this._selectTool(l);
       } else {
-        const n = new j(this.chart, this.series, e, this.getToolOptions(this._activeToolType));
-        this.series.attachPrimitive(n), this._addTool(n, this._activeToolType), this.chart.timeScale().applyOptions({}), this._selectTool(n);
+        const l = new q(this.chart, this.series, e, this.getToolOptions(this._activeToolType));
+        this.series.attachPrimitive(l), this._addTool(l, this._activeToolType), this.chart.timeScale().applyOptions({}), this._selectTool(l);
       }
       this._points = [];
     } else if (this._activeToolType === "VerticalLine") {
       if (this._activeTool instanceof Z) {
         this._activeTool.updatePosition(s), this._addTool(this._activeTool, this._activeToolType);
-        const n = this._activeTool;
-        this._activeTool = null, this.chart.timeScale().applyOptions({}), this._selectTool(n);
+        const l = this._activeTool;
+        this._activeTool = null, this.chart.timeScale().applyOptions({}), this._selectTool(l);
       } else {
-        const n = new Z(this.chart, this.series, s, this.getToolOptions(this._activeToolType));
-        this.series.attachPrimitive(n), this._addTool(n, this._activeToolType), this.chart.timeScale().applyOptions({}), this._selectTool(n);
+        const l = new Z(this.chart, this.series, s, this.getToolOptions(this._activeToolType));
+        this.series.attachPrimitive(l), this._addTool(l, this._activeToolType), this.chart.timeScale().applyOptions({}), this._selectTool(l);
       }
       this._points = [];
     } else if (this._activeToolType === "Text") {
-      const n = new Re(this.chart, this.series, l, "Text", this.getToolOptions(this._activeToolType));
-      this.series.attachPrimitive(n), this._addTool(n, this._activeToolType), this._points = [], this.chart.timeScale().applyOptions({}), this._selectTool(n);
+      const l = new bt(this.chart, this.series, n, "Add text", this.getToolOptions(this._activeToolType));
+      this.series.attachPrimitive(l), this._addTool(l, this._activeToolType), this._points = [], this.chart.timeScale().applyOptions({}), this._selectTool(l), this._showTextInputDialog(l, t.point);
     } else if (this._activeToolType === "Callout") {
-      const n = new Xe(this.chart, this.series, l, l, "Callout", this.getToolOptions(this._activeToolType));
-      this.series.attachPrimitive(n), this._addTool(n, this._activeToolType), this._points = [], this.chart.timeScale().applyOptions({}), this._selectTool(n);
+      if (this._points.length === 1) {
+        const l = this._points[0];
+        this._activeTool = new st(this.chart, this.series, l, l, "Add text", this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof st) {
+        const l = this._points[0], a = this._points[1];
+        this._activeTool.updatePoints(l, a);
+        const c = this._activeTool;
+        this._activeTool = null, this._points = [], this._selectTool(c), this._showTextInputDialog(c, t.point);
+      }
     } else if (this._activeToolType === "PriceLabel") {
-      const n = this.series.priceFormatter().format(l.price), a = new Ii(this.chart, this.series, l, n, this.getToolOptions(this._activeToolType));
+      const l = this.series.priceFormatter().format(n.price), a = new Bi(this.chart, this.series, n, l, this.getToolOptions(this._activeToolType));
       this.series.attachPrimitive(a), this._addTool(a, this._activeToolType), this._points = [], this.chart.timeScale().applyOptions({}), this._selectTool(a);
     } else if (this._activeToolType === "ParallelChannel") {
       if (this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new N(this.chart, this.series, n, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+        const l = this._points[0];
+        this._activeTool = new N(this.chart, this.series, l, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
       } else if (this._points.length === 2) {
         if (this._activeTool instanceof N) {
-          const n = this._points[0], a = this._points[1];
-          this._activeTool.updatePoints(n, a, a);
+          const l = this._points[0], a = this._points[1];
+          this._activeTool.updatePoints(l, a, a);
         }
       } else if (this._points.length === 3 && this._activeTool instanceof N) {
-        const n = this._points[0], a = this._points[1], c = this._points[2];
-        this._activeTool.updatePoints(n, a, c);
+        const l = this._points[0], a = this._points[1], c = this._points[2];
+        this._activeTool.updatePoints(l, a, c);
         const p = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(p);
       }
     } else if (this._activeToolType === "FibRetracement") {
       if (this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new Ct(this.chart, this.series, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else if (this._points.length === 2 && this._activeTool instanceof Ct) {
-        const n = this._points[0], a = this._points[1];
-        this._activeTool.updatePoints(n, a);
+        const l = this._points[0];
+        this._activeTool = new Pt(this.chart, this.series, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof Pt) {
+        const l = this._points[0], a = this._points[1];
+        this._activeTool.updatePoints(l, a);
         const c = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(c);
       }
     } else if (this._activeToolType === "Triangle") {
       if (this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new ct(this.chart, this.series, n, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+        const l = this._points[0];
+        this._activeTool = new pt(this.chart, this.series, l, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
       } else if (this._points.length === 2) {
-        if (this._activeTool instanceof ct) {
-          const n = this._points[0], a = this._points[1];
-          this._activeTool.updatePoints(n, a, a);
+        if (this._activeTool instanceof pt) {
+          const l = this._points[0], a = this._points[1];
+          this._activeTool.updatePoints(l, a, a);
         }
-      } else if (this._points.length === 3 && this._activeTool instanceof ct) {
-        const n = this._points[0], a = this._points[1], c = this._points[2];
-        this._activeTool.updatePoints(n, a, c);
+      } else if (this._points.length === 3 && this._activeTool instanceof pt) {
+        const l = this._points[0], a = this._points[1], c = this._points[2];
+        this._activeTool.updatePoints(l, a, c);
         const p = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(p);
       }
     } else if (this._activeToolType === "LongPosition") {
       if (this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new ht(this.chart, this.series, n, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else if (this._points.length === 2 && this._activeTool instanceof ht) {
-        const n = this._points[0], a = this._points[1], c = a.price - n.price, p = n.price - c, _ = {
+        const l = this._points[0];
+        this._activeTool = new _t(this.chart, this.series, l, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof _t) {
+        const l = this._points[0], a = this._points[1], c = a.price - l.price, p = l.price - c, _ = {
           logical: a.logical,
           price: p
         };
-        this._activeTool.updatePoints(n, _, a);
-        const f = this._activeTool;
-        this._activeTool = null, this._points = [], this._selectTool(f);
+        this._activeTool.updatePoints(l, _, a);
+        const u = this._activeTool;
+        this._activeTool = null, this._points = [], this._selectTool(u);
       }
     } else if (this._activeToolType === "ShortPosition") {
       if (r && (this._points[this._points.length - 1] = r), this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new pt(this.chart, this.series, n, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else if (this._points.length === 2 && this._activeTool instanceof pt) {
-        const n = this._points[0], a = this._points[1], c = n.price - a.price, p = n.price + c, _ = {
+        const l = this._points[0];
+        this._activeTool = new dt(this.chart, this.series, l, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof dt) {
+        const l = this._points[0], a = this._points[1], c = l.price - a.price, p = l.price + c, _ = {
           logical: a.logical,
           price: p
         };
-        this._activeTool.updatePoints(n, _, a);
-        const f = this._activeTool;
-        this._activeTool = null, this._points = [], this._selectTool(f);
+        this._activeTool.updatePoints(l, _, a);
+        const u = this._activeTool;
+        this._activeTool = null, this._points = [], this._selectTool(u);
       }
     } else if (this._activeToolType === "CrossLine") {
-      const n = new Wt(this.chart, this.series, l, this.getToolOptions(this._activeToolType));
-      this.series.attachPrimitive(n), this._addTool(n, this._activeToolType), this._points = [], this.chart.timeScale().applyOptions({}), this._selectTool(n);
+      const l = new $t(this.chart, this.series, n, this.getToolOptions(this._activeToolType));
+      this.series.attachPrimitive(l), this._addTool(l, this._activeToolType), this._points = [], this.chart.timeScale().applyOptions({}), this._selectTool(l);
     } else if (this._activeToolType === "Rectangle") {
       if (r && (this._points[this._points.length - 1] = r), this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new ot(this.chart, this.series, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else if (this._points.length === 2 && this._activeTool instanceof ot) {
-        const n = this._points[0], a = this._points[1];
-        this._activeTool.updatePoints(n, a);
+        const l = this._points[0];
+        this._activeTool = new J(this.chart, this.series, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof J) {
+        const l = this._points[0], a = this._points[1];
+        this._activeTool.updatePoints(l, a);
         const c = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(c);
       }
     } else if (this._activeToolType === "PriceRange") {
       if (r && (this._points[this._points.length - 1] = r), this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new St(this.chart, this.series, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else if (this._points.length === 2 && this._activeTool instanceof St) {
-        const n = this._points[0], a = this._points[1];
-        this._activeTool.updatePoints(n, a);
+        const l = this._points[0];
+        this._activeTool = new kt(this.chart, this.series, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof kt) {
+        const l = this._points[0], a = this._points[1];
+        this._activeTool.updatePoints(l, a);
         const c = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(c);
       }
     } else if (this._activeToolType === "Circle") {
       if (r && (this._points[this._points.length - 1] = r), this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new bt(this.chart, this.series, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else if (this._points.length === 2 && this._activeTool instanceof bt) {
-        const n = this._points[0], a = this._points[1];
-        this._activeTool.updatePoints(n, a);
+        const l = this._points[0];
+        this._activeTool = new Mt(this.chart, this.series, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof Mt) {
+        const l = this._points[0], a = this._points[1];
+        this._activeTool.updatePoints(l, a);
         const c = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(c);
       }
     } else if (this._activeToolType === "ElliottImpulseWave") {
       if (this._points.length === 1)
-        this._activeTool = new Mt(this.chart, this.series, [l], this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      else if (this._activeTool instanceof Mt && (this._activeTool.addPoint(l), this._points.length === 6)) {
-        const n = this._activeTool;
-        this._activeTool = null, this._points = [], this._selectTool(n);
+        this._activeTool = new Rt(this.chart, this.series, [n], this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      else if (this._activeTool instanceof Rt && (this._activeTool.addPoint(n), this._points.length === 6)) {
+        const l = this._activeTool;
+        this._activeTool = null, this._points = [], this._selectTool(l);
       }
     } else if (this._activeToolType === "ElliottCorrectionWave") {
       if (this._points.length === 1)
-        this._activeTool = new Rt(this.chart, this.series, [l], this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      else if (this._activeTool instanceof Rt && (this._activeTool.addPoint(l), this._points.length === 4)) {
-        const n = this._activeTool;
-        this._activeTool = null, this._points = [], this._selectTool(n);
+        this._activeTool = new Et(this.chart, this.series, [n], this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      else if (this._activeTool instanceof Et && (this._activeTool.addPoint(n), this._points.length === 4)) {
+        const l = this._activeTool;
+        this._activeTool = null, this._points = [], this._selectTool(l);
       }
     } else if (this._activeToolType === "HeadAndShoulders") {
       if (this._points.length === 1)
-        this._activeTool = new zt(this.chart, this.series, [l], this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      else if (this._activeTool instanceof zt && (this._activeTool.addPoint(l), this._points.length === 7)) {
-        const n = this._activeTool;
-        this._activeTool = null, this._points = [], this._selectTool(n);
+        this._activeTool = new Ht(this.chart, this.series, [n], this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      else if (this._activeTool instanceof Ht && (this._activeTool.addPoint(n), this._points.length === 7)) {
+        const l = this._activeTool;
+        this._activeTool = null, this._points = [], this._selectTool(l);
       }
     } else if (this._activeToolType === "DateRange") {
       if (r && (this._points[this._points.length - 1] = r), this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new kt(this.chart, this.series, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else if (this._points.length === 2 && this._activeTool instanceof kt) {
-        const n = this._points[0], a = this._points[1];
-        this._activeTool.updatePoints(n, a);
+        const l = this._points[0];
+        this._activeTool = new Lt(this.chart, this.series, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof Lt) {
+        const l = this._points[0], a = this._points[1];
+        this._activeTool.updatePoints(l, a);
         const c = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(c);
       }
     } else if (this._activeToolType === "DatePriceRange") {
       if (r && (this._points[this._points.length - 1] = r), this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new Et(this.chart, this.series, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else if (this._points.length === 2 && this._activeTool instanceof Et) {
-        const n = this._points[0], a = this._points[1];
-        this._activeTool.updatePoints(n, a);
+        const l = this._points[0];
+        this._activeTool = new Ot(this.chart, this.series, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof Ot) {
+        const l = this._points[0], a = this._points[1];
+        this._activeTool.updatePoints(l, a);
         const c = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(c);
       }
     } else if (this._activeToolType === "Measure") {
       if (r && (this._points[this._points.length - 1] = r), this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new Ot(this.chart, this.series, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else if (this._points.length === 2 && this._activeTool instanceof Ot) {
-        const n = this._points[0], a = this._points[1];
-        this._activeTool.updatePoints(n, a);
+        const l = this._points[0];
+        this._activeTool = new zt(this.chart, this.series, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else if (this._points.length === 2 && this._activeTool instanceof zt) {
+        const l = this._points[0], a = this._points[1];
+        this._activeTool.updatePoints(l, a);
         const c = this._activeTool;
         this._activeTool = null, this._points = [], c.setSelected(!1);
       }
     } else if (this._activeToolType === "FibExtension") {
       if (this._points.length === 1) {
-        const n = this._points[0];
-        this._activeTool = new _t(this.chart, this.series, n, n, n, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+        const l = this._points[0];
+        this._activeTool = new ut(this.chart, this.series, l, l, l, this.getToolOptions(this._activeToolType)), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
       } else if (this._points.length === 2) {
-        if (this._activeTool instanceof _t) {
-          const n = this._points[0], a = this._points[1];
-          this._activeTool.updatePoints(n, a, a);
+        if (this._activeTool instanceof ut) {
+          const l = this._points[0], a = this._points[1];
+          this._activeTool.updatePoints(l, a, a);
         }
-      } else if (this._points.length === 3 && this._activeTool instanceof _t) {
-        const n = this._points[0], a = this._points[1], c = this._points[2];
-        this._activeTool.updatePoints(n, a, c);
+      } else if (this._points.length === 3 && this._activeTool instanceof ut) {
+        const l = this._points[0], a = this._points[1], c = this._points[2];
+        this._activeTool.updatePoints(l, a, c);
         const p = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(p);
       }
     } else if (this._activeToolType === "Path") {
-      const n = Date.now();
-      if (n - this._lastClickTime < 300 && this._lastClickPoint && t.point) {
+      const l = Date.now();
+      if (l - this._lastClickTime < 300 && this._lastClickPoint && t.point) {
         const c = Math.abs(t.point.x - this._lastClickPoint.x), p = Math.abs(t.point.y - this._lastClickPoint.y);
         if (c < 10 && p < 10 && this._points.length >= 2) {
-          this._points.pop(), this._activeTool instanceof I && this._activeTool.updatePoints([...this._points]);
+          this._points.pop(), this._activeTool instanceof B && this._activeTool.updatePoints([...this._points]);
           const _ = this._activeTool;
           this._activeTool = null, this._points = [], this._lastClickTime = 0, this._lastClickPoint = null, this._selectTool(_);
           return;
         }
       }
-      if (this._lastClickTime = n, this._lastClickPoint = t.point ? { x: t.point.x, y: t.point.y } : null, this._points.length === 1) {
-        const c = { ...Pt.path, ...this.getToolOptions(this._activeToolType) };
-        this._activeTool = new I(this.chart, this.series, [...this._points], c), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
-      } else this._activeTool instanceof I && this._activeTool.updatePoints([...this._points]);
+      if (this._lastClickTime = l, this._lastClickPoint = t.point ? { x: t.point.x, y: t.point.y } : null, this._points.length === 1) {
+        const c = { ...St.path, ...this.getToolOptions(this._activeToolType) };
+        this._activeTool = new B(this.chart, this.series, [...this._points], c), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      } else this._activeTool instanceof B && this._activeTool.updatePoints([...this._points]);
     }
   };
   _moveHandler = (t) => {
@@ -5630,31 +5902,31 @@ class Gi extends Zt {
     if (s === null) return;
     const o = { logical: s, price: e };
     if (!(this._activeToolType === "Brush" || this._activeToolType === "Highlighter")) {
-      if (this._activeToolType === "HorizontalLine" && this._activeTool instanceof j)
+      if (this._activeToolType === "HorizontalLine" && this._activeTool instanceof q)
         this._activeTool.updatePrice(e), this.chart.timeScale().applyOptions({});
       else if (this._activeToolType === "VerticalLine" && this._activeTool instanceof Z)
         this._activeTool.updatePosition(s), this.chart.timeScale().applyOptions({});
-      else if (this._activeToolType === "CrossLine" && this._activeTool instanceof Wt)
+      else if (this._activeToolType === "CrossLine" && this._activeTool instanceof $t)
         this._activeTool.updatePoint(o), this.chart.timeScale().applyOptions({});
-      else if (this._activeToolType === "HorizontalRay" && this._activeTool instanceof q)
+      else if (this._activeToolType === "HorizontalRay" && this._activeTool instanceof j)
         this._activeTool.updatePoint(o), this.chart.timeScale().applyOptions({});
       else if ((this._activeToolType === "TrendLine" || this._activeToolType === "Arrow" || this._activeToolType === "Ray" || this._activeToolType === "ExtendedLine") && this._activeTool instanceof W) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          let a = { logical: n, price: e };
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          let a = { logical: l, price: e };
           const c = this._points[0];
           this._activeTool.updatePoints(c, a), this.chart.timeScale().applyOptions({});
         }
-      } else if (this._activeToolType === "FibRetracement" && this._activeTool instanceof Ct) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e }, c = this._points[0];
+      } else if (this._activeToolType === "FibRetracement" && this._activeTool instanceof Pt) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e }, c = this._points[0];
           this._activeTool.updatePoints(c, a), this.chart.timeScale().applyOptions({});
         }
       } else if (this._activeToolType === "ParallelChannel" && this._activeTool instanceof N) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e };
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e };
           if (this._points.length === 1) {
             const c = this._points[0];
             this._activeTool.updatePoints(c, a, a);
@@ -5664,10 +5936,10 @@ class Gi extends Zt {
           }
           this.chart.timeScale().applyOptions({});
         }
-      } else if (this._activeToolType === "Triangle" && this._activeTool instanceof ct) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e };
+      } else if (this._activeToolType === "Triangle" && this._activeTool instanceof pt) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e };
           if (this._points.length === 1) {
             const c = this._points[0];
             this._activeTool.updatePoints(c, a, a);
@@ -5677,76 +5949,88 @@ class Gi extends Zt {
           }
           this.chart.timeScale().applyOptions({});
         }
-      } else if (this._activeToolType === "PriceRange" && this._activeTool instanceof St) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e }, c = this._points[0];
+      } else if (this._activeToolType === "PriceRange" && this._activeTool instanceof kt) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e }, c = this._points[0];
           this._activeTool.updatePoints(c, a), this.chart.timeScale().applyOptions({});
         }
-      } else if (this._activeToolType === "Circle" && this._activeTool instanceof bt) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e }, c = this._points[0];
+      } else if (this._activeToolType === "Circle" && this._activeTool instanceof Mt) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e }, c = this._points[0];
           this._activeTool.updatePoints(c, a), this.chart.timeScale().applyOptions({});
         }
-      } else if (this._activeToolType === "LongPosition" && this._activeTool instanceof ht) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e };
+      } else if (this._activeToolType === "Rectangle" && this._activeTool instanceof J) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e }, c = this._points[0];
+          this._activeTool.updatePoints(c, a), this.chart.timeScale().applyOptions({});
+        }
+      } else if (this._activeToolType === "Callout" && this._activeTool instanceof st) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e }, c = this._points[0];
+          this._activeTool.updatePoints(c, a), this.chart.timeScale().applyOptions({});
+        }
+      } else if (this._activeToolType === "LongPosition" && this._activeTool instanceof _t) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e };
           if (this._points.length === 1) {
-            const c = this._points[0], p = a, _ = p.price - c.price, f = c.price - _, d = {
+            const c = this._points[0], p = a, _ = p.price - c.price, u = c.price - _, d = {
               logical: p.logical,
-              price: f
+              price: u
             };
             this._activeTool.updatePoints(c, d, p), this.chart.timeScale().applyOptions({});
           }
         }
-      } else if (this._activeToolType === "ShortPosition" && this._activeTool instanceof pt) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e };
+      } else if (this._activeToolType === "ShortPosition" && this._activeTool instanceof dt) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e };
           if (this._points.length === 1) {
-            const c = this._points[0], p = a, _ = c.price - p.price, f = c.price + _, d = {
+            const c = this._points[0], p = a, _ = c.price - p.price, u = c.price + _, d = {
               logical: p.logical,
-              price: f
+              price: u
             };
             this._activeTool.updatePoints(c, d, p), this.chart.timeScale().applyOptions({});
           }
         }
-      } else if (this._activeToolType === "Path" && this._activeTool instanceof I && this._points.length >= 1) {
-        const l = [...this._points, o];
-        this._activeTool.updatePoints(l), this.chart.timeScale().applyOptions({});
-      } else if (this._activeToolType === "ElliottImpulseWave" && this._activeTool instanceof Mt && this._points.length >= 1) {
-        const l = [...this._points, o];
-        this._activeTool.updatePoints(l), this.chart.timeScale().applyOptions({});
-      } else if (this._activeToolType === "ElliottCorrectionWave" && this._activeTool instanceof Rt && this._points.length >= 1) {
-        const l = [...this._points, o];
-        this._activeTool.updatePoints(l), this.chart.timeScale().applyOptions({});
-      } else if (this._activeToolType === "HeadAndShoulders" && this._activeTool instanceof zt && this._points.length >= 1) {
-        const l = [...this._points, o];
-        this._activeTool.updatePoints(l), this.chart.timeScale().applyOptions({});
-      } else if (this._activeToolType === "DateRange" && this._activeTool instanceof kt) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e }, c = this._points[0];
+      } else if (this._activeToolType === "Path" && this._activeTool instanceof B && this._points.length >= 1) {
+        const n = [...this._points, o];
+        this._activeTool.updatePoints(n), this.chart.timeScale().applyOptions({});
+      } else if (this._activeToolType === "ElliottImpulseWave" && this._activeTool instanceof Rt && this._points.length >= 1) {
+        const n = [...this._points, o];
+        this._activeTool.updatePoints(n), this.chart.timeScale().applyOptions({});
+      } else if (this._activeToolType === "ElliottCorrectionWave" && this._activeTool instanceof Et && this._points.length >= 1) {
+        const n = [...this._points, o];
+        this._activeTool.updatePoints(n), this.chart.timeScale().applyOptions({});
+      } else if (this._activeToolType === "HeadAndShoulders" && this._activeTool instanceof Ht && this._points.length >= 1) {
+        const n = [...this._points, o];
+        this._activeTool.updatePoints(n), this.chart.timeScale().applyOptions({});
+      } else if (this._activeToolType === "DateRange" && this._activeTool instanceof Lt) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e }, c = this._points[0];
           this._activeTool.updatePoints(c, a), this.chart.timeScale().applyOptions({});
         }
-      } else if (this._activeToolType === "DatePriceRange" && this._activeTool instanceof Et) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e }, c = this._points[0];
+      } else if (this._activeToolType === "DatePriceRange" && this._activeTool instanceof Ot) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e }, c = this._points[0];
           this._activeTool.updatePoints(c, a), this.chart.timeScale().applyOptions({});
         }
-      } else if (this._activeToolType === "Measure" && this._activeTool instanceof Ot) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e }, c = this._points[0];
+      } else if (this._activeToolType === "Measure" && this._activeTool instanceof zt) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e }, c = this._points[0];
           this._activeTool.updatePoints(c, a), this.chart.timeScale().applyOptions({});
         }
-      } else if (this._activeToolType === "FibExtension" && this._activeTool instanceof _t) {
-        const l = this.chart.timeScale(), r = t.point.x, n = l.coordinateToLogical(r);
-        if (n !== null) {
-          const a = { logical: n, price: e }, c = this._points[0];
+      } else if (this._activeToolType === "FibExtension" && this._activeTool instanceof ut) {
+        const n = this.chart.timeScale(), r = t.point.x, l = n.coordinateToLogical(r);
+        if (l !== null) {
+          const a = { logical: l, price: e }, c = this._points[0];
           if (this._points.length === 1)
             this._activeTool.updatePoints(c, a, a);
           else if (this._points.length === 2) {
@@ -5759,13 +6043,18 @@ class Gi extends Zt {
     }
   };
   _mouseDownHandler = (t) => {
-    if (this._lastMouseEvent = t, this._isRightClick = t.button === 2, !this._isRightClick) {
+    if (this._isRightClick = t.button === 2, !this._isRightClick) {
       if (this._selectedTool && this._activeToolType === "None" && t.button === 0) {
         const i = this.chart.chartElement?.()?.getBoundingClientRect();
         if (i) {
-          const s = t.clientX - i.left, o = t.clientY - i.top, l = this._selectedTool.toolHitTest(s, o);
-          if (l?.hit) {
-            t.preventDefault(), this._startDrag(l, { x: s, y: o });
+          const s = t.clientX - i.left, o = t.clientY - i.top, n = this._selectedTool.toolHitTest(s, o);
+          if (n?.hit) {
+            const r = Date.now();
+            if (this._lastClickedTool === this._selectedTool && r - this._lastToolClickTime < 300 && (this._selectedTool instanceof bt || this._selectedTool instanceof st)) {
+              t.preventDefault(), this._showTextInputDialog(this._selectedTool, { x: s, y: o }), this._lastClickedTool = null, this._lastToolClickTime = 0;
+              return;
+            }
+            this._lastClickedTool = this._selectedTool, this._lastToolClickTime = r, t.preventDefault(), this._startDrag(n, { x: s, y: o });
             return;
           }
         }
@@ -5780,7 +6069,7 @@ class Gi extends Zt {
     }
     if (t.button === 0 && this._isDrawing && (t.preventDefault(), t.stopPropagation(), this._isDrawing = !1, this._activeTool && this._selectTool(this._activeTool), this._activeTool = null, this._points = []), t.button === 2) {
       if (t.preventDefault(), this._activeToolType === "Path" && this._points.length >= 2) {
-        this._activeTool instanceof I && this._activeTool.updatePoints([...this._points]);
+        this._activeTool instanceof B && this._activeTool.updatePoints([...this._points]);
         const e = this._activeTool;
         this._activeTool = null, this._points = [], this._selectTool(e), this._isRightClick = !1;
         return;
@@ -5799,23 +6088,31 @@ class Gi extends Zt {
       return;
     const e = this.chart.chartElement?.();
     if (!e) return;
-    const i = e.getBoundingClientRect(), s = t.clientX - i.left, o = t.clientY - i.top, r = this.chart.timeScale().coordinateToLogical(s), n = this.series.coordinateToPrice(o);
-    if (r === null || n === null) return;
-    const a = { logical: r, price: n }, _ = 10 * (this.chart._impl?.model?.().rendererOptionsProvider?.().options()?.horizontalPixelRatio || window.devicePixelRatio || 1);
+    const i = e.getBoundingClientRect(), s = t.clientX - i.left, o = t.clientY - i.top, r = this.chart.timeScale().coordinateToLogical(s), l = this.series.coordinateToPrice(o);
+    if (r === null || l === null) return;
+    const a = { logical: r, price: l }, _ = 10 * (this.chart._impl?.model?.().rendererOptionsProvider?.().options()?.horizontalPixelRatio || window.devicePixelRatio || 1);
     if (this._lastPixelPoint) {
-      const f = s - this._lastPixelPoint.x, d = o - this._lastPixelPoint.y;
-      if (Math.sqrt(f * f + d * d) < _)
+      const u = s - this._lastPixelPoint.x, d = o - this._lastPixelPoint.y;
+      if (Math.sqrt(u * u + d * d) < _)
         return;
     }
     if (this._points.length === 0) {
       this._points.push(a), this._lastPixelPoint = { x: s, y: o };
-      const f = this._activeToolType === "Brush" ? Pt.brush : Pt.highlighter, d = this.getToolOptions(this._activeToolType), u = { ...f, ...d };
-      u.lineColor && (u.color = u.lineColor), this._activeTool = new I(this.chart, this.series, [a], u), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
+      const u = this._activeToolType === "Brush" ? St.brush : St.highlighter, d = this.getToolOptions(this._activeToolType), f = { ...u, ...d };
+      f.lineColor && (f.color = f.lineColor), this._activeTool = new B(this.chart, this.series, [a], f), this.series.attachPrimitive(this._activeTool), this._addTool(this._activeTool, this._activeToolType);
     } else
-      this._activeTool instanceof I && (this._activeTool.addPoint(a), this._lastPixelPoint = { x: s, y: o }, this.chart.timeScale().applyOptions({}));
+      this._activeTool instanceof B && (this._activeTool.addPoint(a), this._lastPixelPoint = { x: s, y: o }, this.chart.timeScale().applyOptions({}));
   };
   _addTool(t, e, i = !1) {
-    t.toolType = e, this._tools.push(t), i || this._historyManager.recordAdd(t, e);
+    try {
+      t.toolType = e, this._tools.push(t), i || lt(t) && requestAnimationFrame(() => {
+        this._tools.indexOf(t) !== -1 && this._historyManager.recordAdd(t, e);
+      });
+    } catch (s) {
+      console.error("Error adding tool:", s);
+      const o = this._tools.indexOf(t);
+      throw o !== -1 && this._tools.splice(o, 1), s;
+    }
   }
   /**
    * End drag operation and record in history if changed
@@ -5831,12 +6128,14 @@ class Gi extends Zt {
    * Undo the last action
    */
   undo() {
+    if (this._isDragging)
+      return;
     const t = this._historyManager.popUndo();
     if (t) {
-      if (this._deselectCurrentTool(), t.type === "add") {
+      if (this._activeTool && this._cancelActiveDrawing(), this._deselectCurrentTool(), t.type === "add") {
         const e = this._tools.indexOf(t.tool);
         e !== -1 && (this.series.detachPrimitive(t.tool), this._tools.splice(e, 1), this.requestUpdate());
-      } else t.type === "delete" ? (this.series.attachPrimitive(t.tool), this._tools.push(t.tool), this.requestUpdate()) : t.type === "modify" && t.prevState && (qt(t.tool, t.prevState), this.requestUpdate());
+      } else t.type === "delete" ? (this.series.attachPrimitive(t.tool), this._tools.push(t.tool), this.requestUpdate()) : t.type === "modify" && t.prevState && (Jt(t.tool, t.prevState), this.requestUpdate());
       this._toolbar?.hide();
     }
   }
@@ -5844,14 +6143,16 @@ class Gi extends Zt {
    * Redo the last undone action
    */
   redo() {
+    if (this._isDragging)
+      return;
     const t = this._historyManager.popRedo();
     if (t) {
-      if (this._deselectCurrentTool(), t.type === "add")
+      if (this._activeTool && this._cancelActiveDrawing(), this._deselectCurrentTool(), t.type === "add")
         this.series.attachPrimitive(t.tool), this._tools.push(t.tool), this.requestUpdate();
       else if (t.type === "delete") {
         const e = this._tools.indexOf(t.tool);
         e !== -1 && (this.series.detachPrimitive(t.tool), this._tools.splice(e, 1), this.requestUpdate());
-      } else t.type === "modify" && t.newState && (qt(t.tool, t.newState), this.requestUpdate());
+      } else t.type === "modify" && t.newState && (Jt(t.tool, t.newState), this.requestUpdate());
       this._toolbar?.hide();
     }
   }
@@ -5863,5 +6164,5 @@ class Gi extends Zt {
   }
 }
 export {
-  Gi as LineToolManager
+  Ki as LineToolManager
 };
