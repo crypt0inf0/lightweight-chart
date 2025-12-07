@@ -730,6 +730,9 @@ function App() {
       created_at: new Date().toISOString(),
     };
 
+    // Add alert to state so it appears in the Alerts panel
+    setAlerts(prev => [...prev, newAlert]);
+
     // Show toast with formatted price
     showToast(`Alert created for ${currentSymbol} at ${priceDisplay}`, 'success');
 
