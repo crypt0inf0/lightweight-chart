@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Clock, Bell, Layers } from 'lucide-react';
+import { List, Clock } from 'lucide-react';
 import styles from './RightToolbar.module.css';
 import classNames from 'classnames';
 

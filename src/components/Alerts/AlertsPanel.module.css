@@ -93,6 +93,19 @@
     font-size: 14px;
 }
 
+.symbolRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alertId {
+    font-size: 11px;
+    color: var(--tv-color-text-secondary);
+    font-family: monospace;
+    opacity: 0.7;
+}
+
 .status {
     font-size: 12px;
     padding: 2px 6px;
@@ -107,6 +120,15 @@
 .status.triggered {
     color: #F23645;
     background-color: rgba(242, 54, 69, 0.12);
+}
+
+.status.paused {
+    color: #F7931A;
+    background-color: rgba(247, 147, 26, 0.12);
+}
+
+.item.paused {
+    opacity: 0.6;
 }
 
 .condition {

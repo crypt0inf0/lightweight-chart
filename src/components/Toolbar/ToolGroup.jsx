@@ -29,10 +29,10 @@ const ToolGroup = ({ tools, activeTool, onToolChange }) => {
         };
     }, []);
 
-    console.log('Rendering ToolGroup', tools[0].label);
+
 
     const handleMainClick = () => {
-        console.log('🖱️ Tool clicked (handleMainClick):', currentToolId);
+
         onToolChange(currentToolId);
     };
 
@@ -42,7 +42,7 @@ const ToolGroup = ({ tools, activeTool, onToolChange }) => {
     };
 
     const handleSubToolClick = (toolId) => {
-        console.log('🖱️ Sub-tool clicked:', toolId);
+
         onToolChange(toolId);
         setIsOpen(false);
     };

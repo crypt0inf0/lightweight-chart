@@ -76,30 +76,62 @@
     font-size: 11px;
     color: var(--tv-color-text-secondary);
     border-bottom: 1px solid var(--tv-color-border);
-    gap: 8px;
+    gap: 0;
+    align-items: center;
+}
+
+.resizeHandle {
+    width: 8px;
+    height: 100%;
+    min-height: 16px;
+    cursor: col-resize;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.resizeHandle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1px;
+    height: 12px;
+    background-color: transparent;
+    transition: background-color 0.15s;
+}
+
+.resizeHandle:hover::before,
+.isResizing .resizeHandle::before {
+    background-color: var(--tv-color-brand);
+}
+
+.isResizing {
+    user-select: none;
 }
 
 .colSymbol {
-    flex: 1;
-    min-width: 0;
+    flex-shrink: 0;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .colLast {
-    width: 90px;
     text-align: right;
+    justify-content: flex-end;
     flex-shrink: 0;
 }
 
 .colChg {
-    width: 75px;
     text-align: right;
+    justify-content: flex-end;
     flex-shrink: 0;
 }
 
 .colChgP {
-    width: 70px;
     text-align: right;
+    justify-content: flex-end;
     flex-shrink: 0;
 }
 
@@ -117,6 +149,8 @@
     position: relative;
     min-width: 0;
     overflow: visible;
+    gap: 8px;
+    align-items: center;
 }
 
 .item:hover {
@@ -138,12 +172,9 @@
 
 .symbolName {
     font-weight: 500;
-}
-
-.priceInfo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     flex-shrink: 0;
 }
 
@@ -152,33 +183,16 @@
 .chgP {
     text-align: right;
     white-space: nowrap;
-    overflow: visible;
-}
-
-.last {
-    width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     flex-shrink: 0;
 }
 
-.chg {
-    width: 75px;
-    flex-shrink: 0;
-}
-
-.chgP {
-    width: 70px;
-    flex-shrink: 0;
-}
-
-.up .last,
-.up .chg,
-.up .chgP {
+.up {
     color: var(--tv-color-up);
 }
 
-.down .last,
-.down .chg,
-.down .chgP {
+.down {
     color: var(--tv-color-down);
 }
 
@@ -202,6 +216,7 @@
 .item:hover .removeBtn {
     display: flex;
 }
+
 .columnHeaders span {
     cursor: pointer;
     user-select: none;
@@ -209,6 +224,7 @@
     align-items: center;
     gap: 2px;
 }
+
 .columnHeaders span:hover {
     color: var(--tv-color-text-primary);
 }

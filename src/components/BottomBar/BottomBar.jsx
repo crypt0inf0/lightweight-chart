@@ -14,16 +14,18 @@ const BottomBar = ({
     onResetZoom,
     isToolbarVisible = true
 }) => {
+    // Each time range has an associated interval for the candles
+    // 1D = 1 minute intervals, 5D = 5 minute intervals, etc.
     const timeRanges = [
-        { label: '1D', value: '1D' },
-        { label: '5D', value: '5D' },
-        { label: '1M', value: '1M' },
-        { label: '3M', value: '3M' },
-        { label: '6M', value: '6M' },
-        { label: 'YTD', value: 'YTD' },
-        { label: '1Y', value: '1Y' },
-        { label: '5Y', value: '5Y' },
-        { label: 'All', value: 'All' },
+        { label: '1D', value: '1D', interval: '1m' },
+        { label: '5D', value: '5D', interval: '5m' },
+        { label: '1M', value: '1M', interval: '30m' },
+        { label: '3M', value: '3M', interval: '1h' },
+        { label: '6M', value: '6M', interval: '4h' },
+        { label: 'YTD', value: 'YTD', interval: '1d' },
+        { label: '1Y', value: '1Y', interval: '1d' },
+        { label: '5Y', value: '5Y', interval: '1w' },
+        { label: 'All', value: 'All', interval: '1d' },
     ];
 
     return (
@@ -39,7 +41,7 @@ const BottomBar = ({
                         className={classNames(styles.timeRangeItem, {
                             [styles.active]: currentTimeRange === range.value
                         })}
-                        onClick={() => onTimeRangeChange && onTimeRangeChange(range.value)}
+                        onClick={() => onTimeRangeChange && onTimeRangeChange(range.value, range.interval)}
                     >
                         {range.label}
                     </div>

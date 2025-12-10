@@ -17,7 +17,7 @@ import RightToolbar from './components/Toolbar/RightToolbar';
 import AlertsPanel from './components/Alerts/AlertsPanel';
 
 const VALID_INTERVAL_UNITS = new Set(['s', 'm', 'h', 'd', 'w', 'M']);
-const DEFAULT_FAVORITE_INTERVALS = ['1m', '5m', '15m', '1h', '4h', '1d'];
+const DEFAULT_FAVORITE_INTERVALS = []; // No default favorites
 
 const isValidIntervalValue = (value) => {
   if (!value || typeof value !== 'string') return false;
@@ -36,7 +36,7 @@ const sanitizeFavoriteIntervals = (raw) => {
   if (!Array.isArray(raw)) return DEFAULT_FAVORITE_INTERVALS;
   const filtered = raw.filter(isValidIntervalValue);
   const unique = Array.from(new Set(filtered));
-  return unique.length ? unique : DEFAULT_FAVORITE_INTERVALS;
+  return unique; // Allow empty array
 };
 
 const sanitizeCustomIntervals = (raw) => {
@@ -90,6 +90,9 @@ function App() {
   // Refs for multiple charts
   const chartRefs = React.useRef({});
 
+  // Flag to skip next sync (used during resume to prevent duplicate)
+  const skipNextSyncRef = React.useRef(false);
+
   useEffect(() => {
     localStorage.setItem('tv_interval', currentInterval);
   }, [currentInterval]);
@@ -113,6 +116,9 @@ function App() {
       return Number.isFinite(ts) && ts >= cutoff;
     });
   });
+  const alertsRef = React.useRef(alerts); // Ref to avoid race condition in WebSocket callback
+  React.useEffect(() => { alertsRef.current = alerts; }, [alerts]);
+
   const [alertLogs, setAlertLogs] = useState(() => {
     const saved = safeParseJSON(localStorage.getItem('tv_alert_logs'), []);
     if (!Array.isArray(saved)) return [];
@@ -147,16 +153,34 @@ function App() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
-  // Show toast helper
+  // Toast timeout refs for cleanup
+  const toastTimeoutRef = React.useRef(null);
+  const snapshotToastTimeoutRef = React.useRef(null);
+
+  // Show toast helper with cleanup to prevent memory leaks
   const showToast = (message, type = 'error') => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
     setToast({ message, type });
-    setTimeout(() => setToast(null), 5000);
+    toastTimeoutRef.current = setTimeout(() => setToast(null), 5000);
   };
 
   const showSnapshotToast = (message) => {
+    if (snapshotToastTimeoutRef.current) {
+      clearTimeout(snapshotToastTimeoutRef.current);
+    }
     setSnapshotToast(message);
-    setTimeout(() => setSnapshotToast(null), 3000);
+    snapshotToastTimeoutRef.current = setTimeout(() => setSnapshotToast(null), 3000);
   };
+
+  // Cleanup toast timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      if (snapshotToastTimeoutRef.current) clearTimeout(snapshotToastTimeoutRef.current);
+    };
+  }, []);
 
   // Timeframe Management
   const [favoriteIntervals, setFavoriteIntervals] = useState(() => {
@@ -264,7 +288,7 @@ function App() {
     setFavoriteIntervals(prev => prev.filter(i => i !== intervalValue));
     // If current interval is removed, switch to default
     if (currentInterval === intervalValue) {
-      setCurrentInterval('1d');
+      handleIntervalChange('1d');
     }
   };
 
@@ -291,7 +315,7 @@ function App() {
     const hydrateWatchlist = async () => {
       try {
         const promises = watchlistSymbols.map(async (sym) => {
-          const data = await getTickerPrice(sym);
+          const data = await getTickerPrice(sym, abortController.signal);
           if (data && mounted) {
             return {
               symbol: sym,
@@ -400,14 +424,39 @@ function App() {
   }, [alertLogs]);
 
   // Check Alerts Logic (only for non line-tools alerts to avoid conflicting with plugin)
+  // Uses alertsRef to check current alerts without triggering reconnections
+  const alertSymbolsRef = React.useRef([]);
+
+  // Update symbol list when alerts change, but only if symbols actually changed
   useEffect(() => {
     const activeNonLineToolAlerts = alerts.filter(a => a.status === 'Active' && a._source !== 'lineTools');
-    if (activeNonLineToolAlerts.length === 0) return;
+    const newSymbols = [...new Set(activeNonLineToolAlerts.map(a => a.symbol))].sort();
+    const currentSymbols = alertSymbolsRef.current;
 
-    const alertSymbols = [...new Set(activeNonLineToolAlerts.map(a => a.symbol))];
-    if (alertSymbols.length === 0) return;
+    // Only update ref if symbol list actually changed
+    if (JSON.stringify(newSymbols) !== JSON.stringify(currentSymbols)) {
+      alertSymbolsRef.current = newSymbols;
+    }
+  }, [alerts]);
 
-    const ws = subscribeToMultiTicker(alertSymbols, (ticker) => {
+  // Separate effect for WebSocket - only reconnects when symbols actually change
+  const [alertWsSymbols, setAlertWsSymbols] = useState([]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentSymbols = alertSymbolsRef.current;
+      if (JSON.stringify(currentSymbols) !== JSON.stringify(alertWsSymbols)) {
+        setAlertWsSymbols([...currentSymbols]);
+      }
+    }, 1000); // Check every second instead of on every alert change
+
+    return () => clearInterval(interval);
+  }, [alertWsSymbols]);
+
+  useEffect(() => {
+    if (alertWsSymbols.length === 0) return;
+
+    const ws = subscribeToMultiTicker(alertWsSymbols, (ticker) => {
       setAlerts(prevAlerts => {
         let hasChanges = false;
         const newAlerts = prevAlerts.map(alert => {
@@ -450,7 +499,7 @@ function App() {
     return () => {
       if (ws) ws.close();
     };
-  }, [alerts]);
+  }, [alertWsSymbols]);
 
   const handleWatchlistReorder = (newSymbols) => {
     setWatchlistSymbols(newSymbols);
@@ -531,6 +580,10 @@ function App() {
   const [activeTool, setActiveTool] = useState(null);
   const [isMagnetMode, setIsMagnetMode] = useState(false);
   const [showDrawingToolbar, setShowDrawingToolbar] = useState(true);
+  const [isReplayMode, setIsReplayMode] = useState(false);
+  const [isDrawingsLocked, setIsDrawingsLocked] = useState(false);
+  const [isDrawingsHidden, setIsDrawingsHidden] = useState(false);
+  const [isTimerVisible, setIsTimerVisible] = useState(false);
 
   const toggleDrawingToolbar = () => {
     setShowDrawingToolbar(prev => !prev);
@@ -562,11 +615,26 @@ function App() {
       if (activeRef) {
         activeRef.clearTools();
       }
+      setIsDrawingsHidden(false); // Reset hidden state when all cleared
+      setIsDrawingsLocked(false); // Reset locked state when all cleared
       setActiveTool(null); // Reset active tool after clearing all
+    } else if (tool === 'lock_all') { // Lock All Drawings toggle
+      setIsDrawingsLocked(prev => !prev);
+      setActiveTool(tool); // Pass to ChartComponent to call toggleDrawingsLock
+    } else if (tool === 'hide_drawings') { // Hide All Drawings toggle
+      setIsDrawingsHidden(prev => !prev);
+      setActiveTool(tool); // Pass to ChartComponent to call toggleDrawingsVisibility
+    } else if (tool === 'show_timer') { // Show Timer toggle
+      setIsTimerVisible(prev => !prev);
+      setActiveTool(tool); // Pass to ChartComponent to toggle timer visibility
     } else {
       setActiveTool(tool);
     }
   };
+
+  const handleToolUsed = React.useCallback(() => {
+    setActiveTool(null);
+  }, []);
 
   // const chartComponentRef = React.useRef(null); // Removed in favor of chartRefs
 
@@ -705,6 +773,13 @@ function App() {
     }
   };
 
+  const handleReplayModeChange = (chartId, isActive) => {
+    // Only track active chart's replay mode for the topbar toggle
+    if (chartId === activeChartId) {
+      setIsReplayMode(isActive);
+    }
+  };
+
   const handleAlertClick = () => {
     const activeRef = chartRefs.current[activeChartId];
     if (activeRef) {
@@ -761,36 +836,125 @@ function App() {
   };
 
   const handleRestartAlert = (id) => {
-    setAlerts(prev => {
-      const next = prev.map(a => a.id === id ? { ...a, status: 'Active' } : a);
+    // Find the alert first (outside setAlerts to access chartRefs)
+    const target = alerts.find(a => a.id === id);
+    if (!target) return;
 
-      const target = next.find(a => a.id === id);
-      if (target && target._source === 'lineTools' && target.chartId != null) {
-        const chartRef = chartRefs.current[target.chartId];
-        if (chartRef && typeof chartRef.restartPriceAlert === 'function') {
-          chartRef.restartPriceAlert(target.price, 'crossing');
-        }
+    // Extract original condition from the alert's condition string
+    let originalCondition = 'crossing';
+    if (target.condition) {
+      const condLower = target.condition.toLowerCase();
+      if (condLower.includes('crossing_down') || condLower.includes('crossing down')) {
+        originalCondition = 'crossing_down';
+      } else if (condLower.includes('crossing_up') || condLower.includes('crossing up')) {
+        originalCondition = 'crossing_up';
       }
+    }
 
-      return next;
-    });
+    // Store the alert ID that is being resumed (sync will update its externalId)
+    skipNextSyncRef.current = { type: 'resume', alertId: id, chartId: target.chartId };
+
+    // Add alert back to chart
+    if (target._source === 'lineTools' && target.chartId != null) {
+      const chartRef = chartRefs.current[target.chartId];
+      if (chartRef && typeof chartRef.restartPriceAlert === 'function') {
+        chartRef.restartPriceAlert(target.price, originalCondition);
+      }
+    }
+
+    // Update status to Active (keep same ID)
+    setAlerts(prev => prev.map(a => a.id === id ? { ...a, status: 'Active' } : a));
+  };
+
+  const handlePauseAlert = (id) => {
+    const target = alerts.find(a => a.id === id);
+    if (!target) return;
+
+    // Set flag to skip next sync (prevents the alert from being deleted)
+    skipNextSyncRef.current = { type: 'pause' };
+
+    // Remove the visual alert from the chart
+    if (target._source === 'lineTools' && target.chartId != null && target.externalId) {
+      const chartRef = chartRefs.current[target.chartId];
+      if (chartRef && typeof chartRef.removePriceAlert === 'function') {
+        chartRef.removePriceAlert(target.externalId);
+      }
+    }
+
+    // Update status to Paused
+    setAlerts(prev => prev.map(a => a.id === id ? { ...a, status: 'Paused' } : a));
   };
 
   const handleChartAlertsSync = (chartId, symbol, chartAlerts) => {
-    setAlerts(prev => {
-      // Remove any previous synced alerts for this chart to avoid duplicates
-      const existingForChart = prev.filter(a => a._source === 'lineTools' && a.chartId === chartId);
-      // Keep previously Triggered alerts as history; only replace active ones
-      const remaining = prev.filter(a => a._source !== 'lineTools' || a.chartId !== chartId || a.status === 'Triggered');
+    const syncInfo = skipNextSyncRef.current;
 
-      const mapped = (chartAlerts || []).map(a => {
+    // If pausing, skip sync entirely (preserve paused alert in state)
+    if (syncInfo && syncInfo.type === 'pause') {
+      skipNextSyncRef.current = null;
+      return;
+    }
+
+    // If resuming, update the externalId of the resumed alert AND set status to Active
+    if (syncInfo && syncInfo.type === 'resume' && syncInfo.chartId === chartId) {
+      skipNextSyncRef.current = null;
+
+      // Find the new chart alert that was just created
+      const existingForChart = alerts.filter(a => a._source === 'lineTools' && a.chartId === chartId && a.status === 'Active');
+      const existingExternalIds = new Set(existingForChart.map(a => a.externalId));
+      const newChartAlert = (chartAlerts || []).find(a => !existingExternalIds.has(a.id));
+
+      if (newChartAlert) {
+        // Update the resumed alert with the new externalId AND ensure status is Active
+        setAlerts(prev => prev.map(a =>
+          a.id === syncInfo.alertId ? { ...a, externalId: newChartAlert.id, status: 'Active' } : a
+        ));
+      }
+      return;
+    }
+
+    setAlerts(prev => {
+      // Create a set of chart alert externalIds
+      const chartAlertIds = new Set((chartAlerts || []).map(a => a.id));
+
+      // Track existing alerts for this chart
+      const existingForChart = prev.filter(a => a._source === 'lineTools' && a.chartId === chartId);
+      const existingExternalIds = new Set(existingForChart.map(a => a.externalId));
+
+      // Keep alerts that:
+      // - Are NOT lineTools for this chart
+      // - Are Triggered or Paused
+      // - Are Active and still exist in chart
+      const remaining = prev.filter(a => {
+        if (a._source !== 'lineTools' || a.chartId !== chartId) return true;
+        if (a.status === 'Triggered' || a.status === 'Paused') return true;
+        return chartAlertIds.has(a.externalId);
+      });
+
+      // Find NEW chart alerts (not in existing externalIds)
+      const newChartAlerts = (chartAlerts || []).filter(a => !existingExternalIds.has(a.id));
+
+      // Create entries for truly new alerts
+      const newMapped = newChartAlerts.map(a => {
         const priceDisplay = formatPrice(a.price);
+
+        // Format condition display
+        let conditionDisplay = `Crossing ${priceDisplay}`;
+        if (a.condition === 'crossing_up') {
+          conditionDisplay = `Crossing Up ${priceDisplay}`;
+        } else if (a.condition === 'crossing_down') {
+          conditionDisplay = `Crossing Down ${priceDisplay}`;
+        } else if (a.condition && a.condition !== 'crossing') {
+          conditionDisplay = a.condition;
+        }
+
+        showToast(`Alert created for ${symbol} at ${priceDisplay}`, 'success');
+
         return {
           id: `lt-${chartId}-${a.id}`,
           externalId: a.id,
           symbol,
           price: priceDisplay,
-          condition: a.condition === 'crossing' ? `Crossing ${priceDisplay}` : a.condition,
+          condition: conditionDisplay,
           status: 'Active',
           created_at: new Date().toISOString(),
           _source: 'lineTools',
@@ -798,17 +962,7 @@ function App() {
         };
       });
 
-      // Detect newly created alerts (by externalId) to show a toast similar
-      // to the topbar-based alert creation flow.
-      const prevIds = new Set(existingForChart.map(a => a.externalId));
-      const newlyCreated = mapped.filter(a => !prevIds.has(a.externalId));
-      if (newlyCreated.length > 0) {
-        const latest = newlyCreated[newlyCreated.length - 1];
-        const displayPrice = formatPrice(latest.price);
-        showToast(`Alert created for ${symbol} at ${displayPrice}`, 'success');
-      }
-
-      return [...remaining, ...mapped];
+      return [...remaining, ...newMapped];
     });
   };
 
@@ -891,10 +1045,9 @@ function App() {
             onToggleTheme={toggleTheme}
             onDownloadImage={handleDownloadImage}
             onCopyImage={handleCopyImage}
-
-
             onFullScreen={handleFullScreen}
             onReplayClick={handleReplayClick}
+            isReplayMode={isReplayMode}
             onAlertClick={handleAlertClick}
             onCompareClick={handleCompareClick}
             layout={layout}
@@ -907,12 +1060,20 @@ function App() {
             activeTool={activeTool}
             isMagnetMode={isMagnetMode}
             onToolChange={handleToolChange}
+            isDrawingsLocked={isDrawingsLocked}
+            isDrawingsHidden={isDrawingsHidden}
+            isTimerVisible={isTimerVisible}
           />
         }
         bottomBar={
           <BottomBar
             currentTimeRange={currentTimeRange}
-            onTimeRangeChange={setCurrentTimeRange}
+            onTimeRangeChange={(range, interval) => {
+              setCurrentTimeRange(range);
+              if (interval) {
+                handleIntervalChange(interval);
+              }
+            }}
             isLogScale={isLogScale}
             isAutoScale={isAutoScale}
             onToggleLogScale={() => setIsLogScale(!isLogScale)}
@@ -946,6 +1107,7 @@ function App() {
               logs={alertLogs}
               onRemoveAlert={handleRemoveAlert}
               onRestartAlert={handleRestartAlert}
+              onPauseAlert={handlePauseAlert}
             />
           ) : null
         }
@@ -965,17 +1127,21 @@ function App() {
             chartRefs={chartRefs}
             onAlertsSync={handleChartAlertsSync}
             onAlertTriggered={handleChartAlertTriggered}
+            onReplayModeChange={handleReplayModeChange}
             // Common props
             chartType={chartType}
             // indicators={indicators} // Handled per chart now
             activeTool={activeTool}
-            onToolUsed={() => setActiveTool(null)}
+            onToolUsed={handleToolUsed}
             isLogScale={isLogScale}
             isAutoScale={isAutoScale}
             magnetMode={isMagnetMode}
             timeRange={currentTimeRange}
             isToolbarVisible={showDrawingToolbar}
             theme={theme}
+            isDrawingsLocked={isDrawingsLocked}
+            isDrawingsHidden={isDrawingsHidden}
+            isTimerVisible={isTimerVisible}
           />
         }
       />

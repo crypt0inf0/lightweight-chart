@@ -4271,6 +4271,8 @@ export declare class LineToolManager extends PluginBase {
 	private _alertSubscription;
 	private _lastClickedTool;
 	private _lastToolClickTime;
+	private _drawingsHidden;
+	private _allDrawingsLocked;
 	private _setNoneButtonActive;
 	private _cancelActiveDrawing;
 	private _updateCursor;
@@ -4280,6 +4282,41 @@ export declare class LineToolManager extends PluginBase {
 	detached(): void;
 	startTool(toolType: ToolType): void;
 	clearTools(): void;
+	/**
+	 * Hide all drawings by detaching them from the series
+	 * Tools remain in memory and can be shown again
+	 */
+	hideAllDrawings(): void;
+	/**
+	 * Show all previously hidden drawings by reattaching them to the series
+	 */
+	showAllDrawings(): void;
+	/**
+	 * Toggle visibility of all drawings
+	 * @returns true if drawings are now hidden, false if shown
+	 */
+	toggleDrawingsVisibility(): boolean;
+	/**
+	 * Check if drawings are currently hidden
+	 */
+	areDrawingsHidden(): boolean;
+	/**
+	 * Lock all drawings to prevent dragging/moving
+	 */
+	lockAllDrawings(): void;
+	/**
+	 * Unlock all drawings to allow dragging/moving
+	 */
+	unlockAllDrawings(): void;
+	/**
+	 * Toggle lock state for all drawings
+	 * @returns true if drawings are now locked, false if unlocked
+	 */
+	toggleDrawingsLock(): boolean;
+	/**
+	 * Check if all drawings are currently locked
+	 */
+	areDrawingsLocked(): boolean;
 	updateToolOptions(toolType: ToolType, options: any): void;
 	getToolOptions(toolType: ToolType): any;
 	/**
@@ -4289,6 +4326,7 @@ export declare class LineToolManager extends PluginBase {
 	createAlertForTool(tool: any): void;
 	toolSupportsAlerts(tool: any): boolean;
 	enableSessionHighlighting(highlighter: SessionHighlighter): void;
+	disableSessionHighlighting(): void;
 	getChartRect(): DOMRect | null;
 	setDefaultRange(range: {
 		from: number;
@@ -4302,6 +4340,10 @@ export declare class LineToolManager extends PluginBase {
 	 * Deselect the currently selected tool
 	 */
 	private _deselectCurrentTool;
+	/**
+	 * Public method to deselect the current tool (called from toolbar ESC button)
+	 */
+	deselectTool(): void;
 	/**
 	 * Show inline text editor for editing text/callout tools
 	 */
@@ -4352,6 +4394,71 @@ export declare class LineToolManager extends PluginBase {
 	 * Get history manager for external access (e.g., floating toolbar)
 	 */
 	getHistoryManager(): HistoryManager;
+}
+/**
+ * Price Scale Timer Plugin
+ *
+ * Displays a combined price label and countdown timer in a SINGLE box on the price axis.
+ * Uses a custom pane renderer to draw multi-line text (price on top, timer below).
+ */
+export interface PriceScaleTimerOptions {
+	/** Timeframe in seconds (e.g., 60 for 1m, 300 for 5m, 3600 for 1h) */
+	timeframeSeconds: number;
+	/** Text color for the label */
+	textColor: string;
+	/** Background color when price is going up (green) */
+	upColor: string;
+	/** Background color when price is going down (red) */
+	downColor: string;
+	/** Whether the entire plugin is visible */
+	visible: boolean;
+	/** Whether the timer portion is visible */
+	showTimerText: boolean;
+	/** Font size in pixels */
+	fontSize: number;
+}
+export declare class PriceScaleTimer implements ISeriesPrimitive<Time> {
+	private _chart;
+	private _series;
+	private _requestUpdate?;
+	private _options;
+	private _paneViews;
+	private _intervalId;
+	private _countdownText;
+	private _isBullish;
+	private _lastOpen;
+	private _lastClose;
+	constructor(options?: Partial<PriceScaleTimerOptions>);
+	attached({ chart, series, requestUpdate }: SeriesAttachedParameter<Time>): void;
+	detached(): void;
+	priceAxisPaneViews(): IPrimitivePaneView[];
+	private _dataChangedHandler;
+	private _subscribeToDataChanges;
+	private _unsubscribeFromDataChanges;
+	private _updateBullishStateFromSeriesData;
+	private _startInterval;
+	private _stopInterval;
+	private _updateCountdown;
+	private _formatTime;
+	private _pad;
+	getCountdownText(): string;
+	options(): PriceScaleTimerOptions;
+	applyOptions(options: Partial<PriceScaleTimerOptions>): void;
+	setVisible(visible: boolean): void;
+	isVisible(): boolean;
+	setTimerVisible(visible: boolean): void;
+	isTimerVisible(): boolean;
+	isAttached(): boolean;
+	getSeries(): ISeriesApi<keyof SeriesOptionsMap> | undefined;
+	getChart(): IChartApi | undefined;
+	isBullish(): boolean;
+	updateCandleData(open: number, close: number): void;
+	getLastOHLC(): {
+		open: number | null;
+		close: number | null;
+	};
+	updateAllViews(): void;
+	protected requestUpdate(): void;
 }
 
 export {};

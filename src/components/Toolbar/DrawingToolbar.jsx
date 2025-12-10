@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import styles from './DrawingToolbar.module.css';
 import * as Icons from './ToolIcons';
 
-const DrawingToolbar = ({ activeTool, onToolChange }) => {
+const DrawingToolbar = ({ activeTool, onToolChange, isDrawingsLocked = false, isDrawingsHidden = false, isTimerVisible = false }) => {
     // Group definitions
     const toolGroups = [
         {
@@ -79,6 +80,13 @@ const DrawingToolbar = ({ activeTool, onToolChange }) => {
             id: 'zoom_group',
             items: [
                 { id: 'zoom_in', icon: Icons.ZoomInIcon, label: 'Zoom In' }
+            ],
+            hasZoomOut: true // Special flag for conditional zoom out button
+        },
+        {
+            id: 'timer_group',
+            items: [
+                { id: 'show_timer', icon: Icons.TimerIcon, label: 'Show Timer' }
             ]
         },
         {
@@ -109,6 +117,9 @@ const DrawingToolbar = ({ activeTool, onToolChange }) => {
         });
         return initial;
     });
+
+    // Track if zoom mode has been expanded (to keep zoom-out visible)
+    const [isZoomExpanded, setIsZoomExpanded] = useState(false);
 
     // State for popover position
     const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
@@ -173,11 +184,28 @@ const DrawingToolbar = ({ activeTool, onToolChange }) => {
         return () => window.removeEventListener('scroll', handleScroll, true);
     }, [openPopoverId]);
 
+    // Manage zoom expanded state based on active tool
+    useEffect(() => {
+        if (activeTool === 'zoom_in' || activeTool === 'zoom_out') {
+            // Expand when zoom tools are selected
+            setIsZoomExpanded(true);
+        } else if (activeTool !== null && activeTool !== 'cursor') {
+            // Collapse when a different tool (not cursor/null) is selected
+            setIsZoomExpanded(false);
+        }
+        // When activeTool is null or 'cursor' (e.g., after ESC), keep current state
+    }, [activeTool]);
+
     return (
         <div className={styles.toolbar} ref={toolbarRef}>
             {toolGroups.map((group, index) => {
                 const activeItem = groupActiveTools[group.id];
-                const isActive = activeTool === activeItem.id || group.items.some(i => i.id === activeTool);
+                // Check if this is a toggle tool (lock_all, hide_drawings, or show_timer) that should show active state
+                const isToggleActive =
+                    (activeItem.id === 'lock_all' && isDrawingsLocked) ||
+                    (activeItem.id === 'hide_drawings' && isDrawingsHidden) ||
+                    (activeItem.id === 'show_timer' && isTimerVisible);
+                const isActive = isToggleActive || activeTool === activeItem.id || group.items.some(i => i.id === activeTool);
                 const showArrow = group.items.length > 1;
 
                 return (
@@ -217,6 +245,22 @@ const DrawingToolbar = ({ activeTool, onToolChange }) => {
                                 )}
                             </div>
                         </div>
+                        {/* Conditional Zoom Out button - appears below zoom when zoom is active or was recently active */}
+                        {group.hasZoomOut && isZoomExpanded && (
+                            <div className={styles.toolGroupContainer}>
+                                <div className={styles.controlWrapper}>
+                                    <div
+                                        className={`${styles.toolButton} ${activeTool === 'zoom_out' ? styles.active : ''}`}
+                                        onClick={() => onToolChange('zoom_out')}
+                                        title="Zoom Out"
+                                    >
+                                        <div className={styles.toolIcon}>
+                                            <Icons.ZoomOutIcon />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {/* Separators between specific groups */}
                         {(index === 0 || index === 1 || index === 2 || index === 3 || index === 4 || index === 5 || index === 6 || index === 8 || index === 11) && (
                             <div className={styles.separator} />
@@ -253,11 +297,14 @@ const DrawingToolbar = ({ activeTool, onToolChange }) => {
     );
 };
 
-import PropTypes from 'prop-types';
+
 
 DrawingToolbar.propTypes = {
     activeTool: PropTypes.string,
-    onToolChange: PropTypes.func.isRequired
+    onToolChange: PropTypes.func.isRequired,
+    isDrawingsLocked: PropTypes.bool,
+    isDrawingsHidden: PropTypes.bool,
+    isTimerVisible: PropTypes.bool
 };
 
 export default DrawingToolbar;

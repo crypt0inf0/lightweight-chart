@@ -77,16 +77,18 @@ export const getKlines = async (symbol, interval = '1d', limit = 1000, signal) =
     }
 };
 
-export const getTickerPrice = async (symbol) => {
+export const getTickerPrice = async (symbol, signal) => {
     try {
-        const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+        const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`, { signal });
         if (!response.ok) {
             throw new Error(`Binance ticker error: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error fetching ticker price:", error);
+        if (error.name !== 'AbortError') {
+            console.error("Error fetching ticker price:", error);
+        }
         return null;
     }
 };

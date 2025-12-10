@@ -10,6 +10,7 @@ const ChartGrid = ({
     chartRefs,
     onAlertsSync,
     onAlertTriggered,
+    onReplayModeChange,
     ...chartProps
 }) => {
     const getGridClass = () => {
@@ -39,6 +40,7 @@ const ChartGrid = ({
                         interval={chart.interval}
                         onAlertsSync={onAlertsSync ? (alerts) => onAlertsSync(chart.id, chart.symbol, alerts) : undefined}
                         onAlertTriggered={onAlertTriggered ? (evt) => onAlertTriggered(chart.id, chart.symbol, evt) : undefined}
+                        onReplayModeChange={onReplayModeChange ? (isActive) => onReplayModeChange(chart.id, isActive) : undefined}
                         {...chartProps}
                         indicators={chart.indicators}
                         comparisonSymbols={chart.comparisonSymbols}

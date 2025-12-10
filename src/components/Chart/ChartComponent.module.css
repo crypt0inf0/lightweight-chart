@@ -74,7 +74,8 @@
     pointer-events: none;
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
+    gap: 1px;
 }
 
 .axisLabelSymbol {
@@ -110,4 +111,117 @@
 .axisLabelTimer {
     font-size: 10px;
     opacity: 0.9;
+}
+
+/* Symbol Legend - Right side following current price like price axis */
+.symbolLegend {
+    position: absolute;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 20;
+    pointer-events: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+}
+
+.symbolLegendName {
+    background-color: #f57f17;
+    color: white;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+    font-weight: 600;
+    border-radius: 2px 0 0 2px;
+}
+
+.symbolLegendPrice {
+    background-color: #f57f17;
+    color: white;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+    font-weight: 600;
+    border-radius: 0 2px 2px 0;
+}
+
+/* OHLC Header Bar */
+.ohlcHeader {
+    position: absolute;
+    top: 8px;
+    left: 55px;
+    z-index: 25;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.ohlcSymbol {
+    color: var(--tv-color-text-primary, #D1D4DC);
+    font-weight: 600;
+}
+
+.ohlcDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #089981;
+}
+
+.ohlcDot.down {
+    background-color: #F23645;
+}
+
+.ohlcValues {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+
+.ohlcItem {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.ohlcLabel {
+    color: var(--tv-color-text-secondary, #787B86);
+    font-weight: 400;
+}
+
+.ohlcValue {
+    color: var(--tv-color-text-primary, #D1D4DC);
+    font-weight: 500;
+}
+
+.ohlcValue.up {
+    color: #089981;
+}
+
+.ohlcValue.down {
+    color: #F23645;
+}
+
+.ohlcChange {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ohlcChangeValue {
+    font-weight: 500;
+}
+
+.ohlcChangeValue.up {
+    color: #089981;
+}
+
+.ohlcChangeValue.down {
+    color: #F23645;
 }

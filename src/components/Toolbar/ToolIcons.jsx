@@ -342,9 +342,27 @@ export const ZoomInIcon = ({ size = 28, ...props }) => (
 );
 ZoomInIcon.propTypes = IconPropTypes;
 
+export const ZoomOutIcon = ({ size = 28, ...props }) => (
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' width={size} height={size} fill='currentColor' {...props}>
+        <path d='M17.646 18.354l4 4 .708-.708-4-4z'></path>
+        <path d='M12.5 21a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17zm0-1a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15z'></path>
+        <path d='M9 13h7v-1H9z'></path>
+    </svg>
+);
+ZoomOutIcon.propTypes = IconPropTypes;
+
 export const MeasureIcon = ({ size = 28, ...props }) => (
     <svg xmlns='http://www.w3.org/2000/svg' width={size} height={size} viewBox='0 0 28 28' {...props}>
         <path fill='currentColor' d='M2 9.75a1.5 1.5 0 0 0-1.5 1.5v5.5a1.5 1.5 0 0 0 1.5 1.5h24a1.5 1.5 0 0 0 1.5-1.5v-5.5a1.5 1.5 0 0 0-1.5-1.5zm0 1h3v2.5h1v-2.5h3.25v3.9h1v-3.9h3.25v2.5h1v-2.5h3.25v3.9h1v-3.9H22v2.5h1v-2.5h3a.5.5 0 0 1 .5.5v5.5a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-5.5a.5.5 0 0 1 .5-.5z' transform='rotate(-45 14 14)'></path>
     </svg>
 );
 MeasureIcon.propTypes = IconPropTypes;
+
+export const TimerIcon = ({ size = 28, ...props }) => (
+    <svg xmlns='http://www.w3.org/2000/svg' width={size} height={size} viewBox='0 0 28 28' fill='currentColor' {...props}>
+        <path d='M14 5a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 1a8 8 0 1 1 0 16 8 8 0 0 1 0-16z'></path>
+        <path d='M14.5 8v6h4v1h-5V8h1z'></path>
+        <path d='M12 3h4v1h-4z'></path>
+    </svg>
+);
+TimerIcon.propTypes = IconPropTypes;

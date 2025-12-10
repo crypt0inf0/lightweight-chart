@@ -13,7 +13,8 @@ const Topbar = ({
     onToggleFavorite, onAddCustomInterval, onRemoveCustomInterval,
     onUndo, onRedo, onMenuClick, theme, onToggleTheme,
     onDownloadImage, onCopyImage, onFullScreen,
-    layout, onLayoutChange, onSaveLayout, onAlertClick, onCompareClick, onReplayClick
+    layout, onLayoutChange, onSaveLayout, onAlertClick, onCompareClick, onReplayClick,
+    isReplayMode = false
 }) => {
     const [showIndicators, setShowIndicators] = useState(false);
     const [showTimeframes, setShowTimeframes] = useState(false);
@@ -563,7 +564,7 @@ const Topbar = ({
                                                     </div>
                                                     <div className={styles.text}>Alert</div>
                                                 </button>
-                                                <button className={classNames(styles.button)} aria-label="Bar Replay" onClick={onReplayClick}>
+                                                <button className={classNames(styles.button, { [styles.isActive]: isReplayMode })} aria-label="Bar Replay" onClick={onReplayClick}>
                                                     <div className={styles.icon}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28"><path fill="none" stroke="currentColor" d="M13.5 20V9l-6 5.5 6 5.5zM21.5 20V9l-6 5.5 6 5.5z"></path></svg>
                                                     </div>

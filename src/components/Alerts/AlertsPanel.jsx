@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, Bell, Trash2, PlayCircle, Clock } from 'lucide-react';
+import { X, Bell, Trash2, PlayCircle, PauseCircle, Clock } from 'lucide-react';
 import styles from './AlertsPanel.module.css';
 import classNames from 'classnames';
 
-const AlertsPanel = ({ alerts, logs, onRemoveAlert, onRestartAlert }) => {
+const AlertsPanel = ({ alerts, logs, onRemoveAlert, onRestartAlert, onPauseAlert }) => {
     const [activeTab, setActiveTab] = useState('alerts');
 
     return (
@@ -54,14 +54,24 @@ const AlertsPanel = ({ alerts, logs, onRemoveAlert, onRestartAlert }) => {
                                             {alert.condition}
                                         </div>
                                         <div className={styles.itemFooter}>
-                                            <span className={styles.time}>{new Date(alert.created_at).toLocaleDateString()}</span>
+                                            <span className={styles.time}>
+                                                {new Date(alert.created_at).toLocaleDateString()} {new Date(alert.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                            </span>
                                             <div className={styles.itemActions}>
-                                                {status === 'Triggered' && (
+                                                {status === 'Active' && (
+                                                    <PauseCircle
+                                                        size={16}
+                                                        className={styles.actionIcon}
+                                                        onClick={() => onPauseAlert(alert.id)}
+                                                        title="Pause Alert"
+                                                    />
+                                                )}
+                                                {(status === 'Triggered' || status === 'Paused') && (
                                                     <PlayCircle
                                                         size={16}
                                                         className={styles.actionIcon}
                                                         onClick={() => onRestartAlert(alert.id)}
-                                                        title="Restart Alert"
+                                                        title="Resume Alert"
                                                     />
                                                 )}
                                                 <Trash2

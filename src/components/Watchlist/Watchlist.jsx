@@ -1,11 +1,57 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Plus, X } from 'lucide-react';
 import styles from './Watchlist.module.css';
 import classNames from 'classnames';
 
+const DEFAULT_COLUMN_WIDTHS = {
+    symbol: 80,
+    last: 90,
+    chg: 75,
+    chgP: 70
+};
+
+const MIN_COLUMN_WIDTH = 40;
+
 const Watchlist = ({ currentSymbol, items, onSymbolSelect, onAddClick, onRemoveClick, onReorder }) => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
     const [draggedIndex, setDraggedIndex] = useState(null);
+    const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
+    const [resizing, setResizing] = useState(null);
+    const startXRef = useRef(0);
+    const startWidthRef = useRef(0);
+
+    const handleResizeStart = useCallback((e, column) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setResizing(column);
+        startXRef.current = e.clientX;
+        startWidthRef.current = columnWidths[column];
+    }, [columnWidths]);
+
+    useEffect(() => {
+        if (!resizing) return;
+
+        const handleMouseMove = (e) => {
+            const diff = e.clientX - startXRef.current;
+            const newWidth = Math.max(MIN_COLUMN_WIDTH, startWidthRef.current + diff);
+            setColumnWidths(prev => ({
+                ...prev,
+                [resizing]: newWidth
+            }));
+        };
+
+        const handleMouseUp = () => {
+            setResizing(null);
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [resizing]);
 
     const handleSort = useCallback((key) => {
         let direction = 'asc';
@@ -64,7 +110,7 @@ const Watchlist = ({ currentSymbol, items, onSymbolSelect, onAddClick, onRemoveC
     }, [items, sortConfig]);
 
     return (
-        <div className={styles.watchlist}>
+        <div className={classNames(styles.watchlist, { [styles.isResizing]: resizing })}>
             <div className={styles.header}>
                 <span className={styles.title}>Watchlist</span>
                 <div className={styles.actions}>
@@ -73,16 +119,44 @@ const Watchlist = ({ currentSymbol, items, onSymbolSelect, onAddClick, onRemoveC
             </div>
 
             <div className={styles.columnHeaders}>
-                <span className={styles.colSymbol} onClick={() => handleSort('symbol')}>
+                <span
+                    className={styles.colSymbol}
+                    style={{ width: columnWidths.symbol, minWidth: columnWidths.symbol }}
+                    onClick={() => handleSort('symbol')}
+                >
                     Symbol {sortConfig.key === 'symbol' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </span>
-                <span className={styles.colLast} onClick={() => handleSort('last')}>
+                <div
+                    className={styles.resizeHandle}
+                    onMouseDown={(e) => handleResizeStart(e, 'symbol')}
+                />
+                <span
+                    className={styles.colLast}
+                    style={{ width: columnWidths.last, minWidth: MIN_COLUMN_WIDTH }}
+                    onClick={() => handleSort('last')}
+                >
                     Last {sortConfig.key === 'last' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </span>
-                <span className={styles.colChg} onClick={() => handleSort('chg')}>
+                <div
+                    className={styles.resizeHandle}
+                    onMouseDown={(e) => handleResizeStart(e, 'last')}
+                />
+                <span
+                    className={styles.colChg}
+                    style={{ width: columnWidths.chg, minWidth: MIN_COLUMN_WIDTH }}
+                    onClick={() => handleSort('chg')}
+                >
                     Chg {sortConfig.key === 'chg' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </span>
-                <span className={styles.colChgP} onClick={() => handleSort('chgP')}>
+                <div
+                    className={styles.resizeHandle}
+                    onMouseDown={(e) => handleResizeStart(e, 'chg')}
+                />
+                <span
+                    className={styles.colChgP}
+                    style={{ width: columnWidths.chgP, minWidth: MIN_COLUMN_WIDTH }}
+                    onClick={() => handleSort('chgP')}
+                >
                     Chg% {sortConfig.key === 'chgP' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </span>
             </div>
@@ -101,14 +175,30 @@ const Watchlist = ({ currentSymbol, items, onSymbolSelect, onAddClick, onRemoveC
                         onDragOver={(e) => handleDragOver(e, index)}
                         onDrop={(e) => handleDrop(e, index)}
                     >
-                        <div className={styles.symbolInfo}>
-                            <span className={styles.symbolName}>{item.symbol}</span>
-                        </div>
-                        <div className={classNames(styles.priceInfo, { [styles.up]: item.up, [styles.down]: !item.up })}>
-                            <span className={styles.last}>{item.last}</span>
-                            <span className={styles.chg}>{item.chg}</span>
-                            <span className={styles.chgP}>{item.chgP}</span>
-                        </div>
+                        <span
+                            className={styles.symbolName}
+                            style={{ width: columnWidths.symbol, minWidth: columnWidths.symbol }}
+                        >
+                            {item.symbol}
+                        </span>
+                        <span
+                            className={classNames(styles.last, { [styles.up]: item.up, [styles.down]: !item.up })}
+                            style={{ width: columnWidths.last, minWidth: MIN_COLUMN_WIDTH }}
+                        >
+                            {item.last}
+                        </span>
+                        <span
+                            className={classNames(styles.chg, { [styles.up]: item.up, [styles.down]: !item.up })}
+                            style={{ width: columnWidths.chg, minWidth: MIN_COLUMN_WIDTH }}
+                        >
+                            {item.chg}
+                        </span>
+                        <span
+                            className={classNames(styles.chgP, { [styles.up]: item.up, [styles.down]: !item.up })}
+                            style={{ width: columnWidths.chgP, minWidth: MIN_COLUMN_WIDTH }}
+                        >
+                            {item.chgP}
+                        </span>
                         <div
                             className={styles.removeBtn}
                             onClick={(e) => { e.stopPropagation(); onRemoveClick(item.symbol); }}
